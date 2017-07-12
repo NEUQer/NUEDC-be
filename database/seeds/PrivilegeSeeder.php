@@ -32,11 +32,6 @@ class PrivilegeSeeder extends Seeder
                 'description' => '查看本校的比赛结果以及审核情况'
             ],
             [
-                'name' => 'sign_up_contest',
-                'display_name' => '报名参赛',
-                'description' => '通过学生报名入口报名参加比赛'
-            ],
-            [
                 'name' => 'recommend_experts',
                 'display_name' => '推荐专家',
                 'description' => '填写相关信息向评审会推荐本校的专家'
