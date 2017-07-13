@@ -1,6 +1,6 @@
 <?php
 
-namespace NEUQOJ\Http\Middleware;
+namespace App\Http\Middleware;
 
 use App\Common\Utils;
 use App\Exceptions\Auth\NeedLoginException;
