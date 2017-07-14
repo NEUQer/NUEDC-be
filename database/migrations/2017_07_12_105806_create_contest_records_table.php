@@ -18,16 +18,16 @@ class CreateContestRecordsTable extends Migration
             $table->bigInteger('register_id');
             $table->string('team_name');
             $table->integer('school_id');
-            $table->string('school_name',100);
+            $table->string('school_name', 100);
             $table->integer('contest_id');
-            $table->string('school_level',45);
+            $table->string('school_level', 45);
             $table->string('member1');
             $table->string('member2');
             $table->string('member3');
             $table->string('teacher');
-            $table->string('contact_mobile',45);
-            $table->string('email',100);
-            $table->integer('problem_selected')->nullable();
+            $table->string('contact_mobile', 45);
+            $table->string('email', 100);
+            $table->integer('problem_selected')->default(-1);
             $table->string('status');
             $table->string('result')->nullable(); // 关键标志位，老王的意思直接用中文字符
             $table->string('result_info')->nullable();

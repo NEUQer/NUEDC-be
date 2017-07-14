@@ -13,9 +13,12 @@
 
 include 'custom/user.php';
 include 'custom/sysAdmin.php';
+include 'custom/schoolAdmin.php';
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::get('/test','TestController@test');
+Route::get('/test/excel/export','TestController@export');
+Route::post('/test/excel/import','TestController@import');

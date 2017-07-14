@@ -20,4 +20,6 @@ interface RoleServiceInterface
     function getRolePrivileges(string $roleName);
 
     function giveRoleTo(int $userId,string $roleName);
+
+    function hasRole(int $userId, string $role):bool ;
 }

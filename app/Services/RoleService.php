@@ -125,29 +125,29 @@ class RoleService implements RoleServiceInterface
 
     public function getRolePrivileges(string $roleName)
     {
-        $rows = $this->rolePriRepo->getBy('role_name',$roleName,['privilege_name']);
+        $rows = $this->rolePriRepo->getBy('role_name', $roleName, ['privilege_name']);
 
         $privileges = [];
 
         foreach ($rows as $row) {
-            $privileges[] =$row->privilege_name;
+            $privileges[] = $row->privilege_name;
         }
 
         return $privileges;
     }
 
-    public function giveRoleTo(int $userId, string $roleName):bool
+    public function giveRoleTo(int $userId, string $roleName): bool
     {
         $privileges = $this->getRolePrivileges($roleName);
 
         $flag = false;
 
-        DB::transaction(function ()use($userId,$privileges,&$flag){
+        DB::transaction(function () use ($userId, $privileges, &$flag) {
             // 删除之前全部权限，重新生成
             $this->userPriRepo->deleteWhere(['user_id' => $userId]);
             $relations = [];
             foreach ($privileges as $privilege) {
-                $relations[] =[
+                $relations[] = [
                     'user_id' => $userId,
                     'privilege' => $privilege
                 ];
@@ -170,6 +170,17 @@ class RoleService implements RoleServiceInterface
         }
 
         return true;
+    }
+
+    public function hasRole(int $userId, string $role): bool
+    {
+        $arr = $this->userPriRepo->getBy('user_id', $userId, ['role_name']);
+        foreach ($arr as $item) {
+            if ($item['role_name'] == $role) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

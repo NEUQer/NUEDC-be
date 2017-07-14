@@ -7,3 +7,4 @@ Homestead.json
 Homestead.yaml
 .env
 .DS_Store
+/app/Http/Controllers/TestController.php
