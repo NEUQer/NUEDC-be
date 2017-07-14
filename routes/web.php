@@ -12,6 +12,7 @@
 */
 
 include 'custom/user.php';
+include 'custom/sysAdmin.php';
 
 Route::get('/', function () {
     return view('welcome');
