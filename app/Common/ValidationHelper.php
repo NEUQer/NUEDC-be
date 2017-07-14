@@ -40,4 +40,21 @@ class ValidationHelper
 
         return $data;
     }
+
+    public static function checkAndGet(Request $request,array $rules)
+    {
+        $validator = Validator::make($request->all(),$rules);
+
+        if ($validator->fails()) {
+            throw new FormValidationException($validator->getMessageBag()->all());
+        }
+
+        $data = [];
+
+        foreach ($rules as $key => $rule) {
+            $data[$key] = $request->input($key,null);
+        }
+
+        return $data;
+    }
 }

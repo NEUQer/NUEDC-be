@@ -87,6 +87,7 @@ class UserService implements UserServiceInterface
     /**
      * 在开启了注册验证的条件下，用于激活注册的用户
      * @param int $userId
+     * @throws
      * @return bool
      */
     public function active(int $userId): bool
@@ -115,7 +116,7 @@ class UserService implements UserServiceInterface
      * @param string $identifier 用户输入的值
      * @param string $password 密码
      * @param string $ip
-     * @return string token值
+     * @return array
      */
 
     public function loginBy(string $param, string $identifier, string $password, string $ip,int $client)
@@ -144,10 +145,9 @@ class UserService implements UserServiceInterface
 
     public function login(int $userId, string $ip,int $client): string
     {
-        $user = $this->userRepository->get($userId, [
-            'id', 'password','name','email','mobile'
-        ]);
-        if (!$this->isUserExist(['id' => $userId])) {
+        $user = $this->userRepository->get($userId);
+
+        if ($user == null) {
             throw new UserNotExistException();
         }
 
@@ -167,5 +167,9 @@ class UserService implements UserServiceInterface
         return $this->userRepository->getWhereCount($condition) == 1;
     }
 
+    public function createUser(array $user):int
+    {
+        return $this->userRepository->insertWithId($user);
+    }
 
 }

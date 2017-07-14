@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Validator;
 
 class Utils
 {
+    public static $DEFAULT_STR_BASE = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
     /**
      * 毫秒级时间戳生成工具
      * 返回当前时间的13位毫秒级时间戳
@@ -47,6 +49,10 @@ class Utils
 
     public static function randomString(string $base,int $length)
     {
+        if ($base=='') {
+            $base = self::$DEFAULT_STR_BASE;
+        }
+
         $randomString = null;
         $max = strlen($base)-1;
 

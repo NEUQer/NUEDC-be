@@ -11,6 +11,8 @@ namespace App\Services\Contracts;
 
 interface SysAdminServiceInterface
 {
+    function login(string $loginName,string $password,string $ip);
+
     // 竞赛管理
     function getContests();
 
@@ -27,4 +29,12 @@ interface SysAdminServiceInterface
 //    function createProblem(array $problem):int;
 //
 //    function updateProblem()
+
+    // 学校管理员
+
+    function generateSchoolAdmin(int $schoolId,array $schoolAdmin);
+
+    function updateSchoolAdmin(int $userId,array $data):bool;
+
+    function deleteSchoolAdmin(int $userId):bool;
 }
