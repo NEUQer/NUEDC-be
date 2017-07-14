@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Common\ValidationHelper;
+use App\Exceptions\Common\UnknownException;
+use App\Exceptions\Permission\PermissionDeniedException;
+use Permission;
 use App\Services\SchoolAdminService;
 use Illuminate\Http\Request;
 
@@ -16,12 +19,44 @@ class SchoolAdminController extends Controller
     }
 
     /**
-     * 创建学校队伍
+     * 校管理员登录
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function login(Request $request)
+    {
+        $rules = [
+            'identifier' => 'required|string',
+            'password' => 'required|min:6|max:20',
+        ];
+
+        ValidationHelper::validateCheck($request->all(), $rules);
+
+        $loginName = $request->get("identifier");
+        $password = $request->get("password");
+        $ip = $request->ip();
+        $client = 1;
+
+        $data = $this->schoolAdminService->login($loginName, $password, $ip, $client);
+
+        return response()->json([
+            'code' => 0,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * 创建学校队伍
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
+     */
     public function addSchoolTeam(Request $request)
     {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
         $rules = [
             'team_name' => 'required|string|max:255',
             'school_id' => 'required|integer|max:11',
@@ -49,12 +84,16 @@ class SchoolAdminController extends Controller
 
     /**
      * 更新学校队伍信息
-     *
      * @param Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
      */
-    public function updateSchoolTeam(Request $request)
+    public function updateSchoolTeam(Request $request, int $id)
     {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
         $rules = [
             'team_name' => 'required|string|max:255',
             'school_id' => 'required|integer|max:11',
@@ -66,16 +105,14 @@ class SchoolAdminController extends Controller
             'member3' => 'required|string|max:255',
             'teacher' => 'required|string|max:255',
             'contact_mobile' => 'required|string|max:45',
-            'email' => 'required|string|max:email'
+            'email' => 'required|email'
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
 
         $schoolTeamData = ValidationHelper::getInputData($request, $rules);
 
-        $schoolTeamId = $request->get('school_team_id');
-
-        if ($this->schoolAdminService->updateSchoolTeam($schoolTeamId, $schoolTeamData)) {
+        if ($this->schoolAdminService->updateSchoolTeam($id, $schoolTeamData)) {
             return response()->json([
                 'code' => 0
             ]);
@@ -84,13 +121,18 @@ class SchoolAdminController extends Controller
 
     /**
      * 删除学校队伍
-     *
      * @param Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
      */
-    public function deleteSchoolTeam(Request $request)
+    public function deleteSchoolTeam(Request $request, int $id)
     {
-        if ($this->schoolAdminService->deleteSchoolTeam($request->get('school_team_id'))) {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        if ($this->schoolAdminService->deleteSchoolTeam($id)) {
             return response()->json([
                 'code' => 0
             ]);
@@ -99,14 +141,17 @@ class SchoolAdminController extends Controller
 
     /**
      * 获取本校队伍信息（比赛前）
-     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
      */
     public function getSchoolTeams(Request $request)
     {
-        $schoolId = $request->user->schoolId;
-        $contestId = $request->get("contestId");
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+        $schoolId = $request->user['school_id'];
+        $contestId = $request->get("contest_id");
         $data = $this->schoolAdminService->getSchoolTeams($schoolId, $contestId);
 
         return response()->json([
@@ -117,14 +162,17 @@ class SchoolAdminController extends Controller
 
     /**
      * 查看本校队伍获奖情况
-     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
      */
     public function getSchoolResults(Request $request)
     {
-        $schoolId = $request->user->schoolId;
-        $contestId = $request->get('contestId');
+        if (!Permission::checkPermission($request->user->id, ['view_school_results'])) {
+            throw new PermissionDeniedException();
+        }
+        $schoolId = $request->user['school_id'];
+        $contestId = $request->get('contest_id');
         $data = $this->schoolAdminService->getSchoolResults($schoolId, $contestId);
 
         return response()->json([
@@ -135,28 +183,40 @@ class SchoolAdminController extends Controller
 
     /**
      * 审核本校队伍
-     *
      * @param Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
      */
-    public function checkSchoolTeam(Request $request)
+    public function checkSchoolTeam(Request $request, int $id)
     {
-        $schoolTeamId = $request->get("school_team_id");
-        if ($this->schoolAdminService->checkSchoolTeam($schoolTeamId)) {
-            return response()->json([
-                'code' => 0
-            ]);
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
         }
+
+        if (!$this->schoolAdminService->checkSchoolTeam($id)) {
+            throw new UnknownException("check fail");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 
 
     public function exportSchoolTeams(Request $request)
     {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
 
     }
 
     public function exportSchoolResults(Request $request)
     {
-
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
     }
 }

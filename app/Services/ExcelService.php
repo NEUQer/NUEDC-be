@@ -20,8 +20,8 @@ class ExcelService implements ExcelServiceInterface
     /**
      * 导出excel
      *
-     * @param array $cellData  表格内容 eg. $cellData = [['name','age'],['Hotown','21']]
-     * @param string $fileName  导出的excel文件名，后缀默认为xlsx   eg. $fileName = 'file'
+     * @param array $cellData 表格内容  eg. $cellData = [['name','age'],['Hotown','21']]
+     * @param string $fileName 导出的excel文件名，后缀默认为xlsx   eg. $fileName = 'file'
      */
     public function export(array $cellData, string $fileName)
     {
@@ -35,8 +35,9 @@ class ExcelService implements ExcelServiceInterface
     /**
      * 导入excel
      *
-     * @param string $filePath
+     * @param UploadedFile $file
      * @return array
+     * @throws ExcelStoreFailException
      */
     public function import(UploadedFile $file)
     {

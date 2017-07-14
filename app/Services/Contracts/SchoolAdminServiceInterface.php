@@ -11,6 +11,10 @@ namespace App\Services\Contracts;
 
 interface SchoolAdminServiceInterface
 {
+    function login(string $loginName, string $password, string $ip, string $client);
+
+    function getStartedContent();
+
     function addSchoolTeam(array $schoolTeamInfo): bool;
 
     function getSchoolTeams(int $schoolId, int $contestId);
@@ -22,5 +26,10 @@ interface SchoolAdminServiceInterface
     function checkSchoolTeam(int $schoolTeamId): bool;
 
     function getSchoolResults(int $schoolId, int $contestId);
+
+    function exportSchoolTeams(int $schoolId, int $contestId);
+
+    function exportSchoolResults(int $schoolId, int $contestId);
 }
+
 ?>

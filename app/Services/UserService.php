@@ -31,7 +31,8 @@ class UserService implements UserServiceInterface
     private $roleService;
     private $contestRecordRepo;
     private $contestRepo;
-    public function __construct(ContestRepository $contestRepository,UserRepository $userRepository, ContestRecordRepository $recordRepository,TokenService $tokenService,VerifyCodeService $verifyCodeService,RoleService $roleService)
+
+    public function __construct(ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
     {
         $this->userRepository = $userRepository;
         $this->tokenService = $tokenService;
@@ -67,19 +68,19 @@ class UserService implements UserServiceInterface
         }
 
 
-        if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'],1,$userInfo['code']))
+        if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'], 1, $userInfo['code']))
             $userInfo['status'] = 1;
 
 
         $userInfo['password'] = Encrypt::encrypt($userInfo['password']); // 对密码加密
 
-        $users = ['name'=> $userInfo['name'],'email'=>$userInfo['email'],
-            'mobile'=>$userInfo['mobile'],'password'=>$userInfo['password'],
-            'sex'=>$userInfo['sex'],'school_id'=>$userInfo['schoolId']];
+        $users = ['name' => $userInfo['name'], 'email' => $userInfo['email'],
+            'mobile' => $userInfo['mobile'], 'password' => $userInfo['password'],
+            'sex' => $userInfo['sex'], 'school_id' => $userInfo['schoolId']];
 
-        $userId =  $this->userRepository->insertWithId($users);
+        $userId = $this->userRepository->insertWithId($users);
 
-        $this->roleService->giveRoleTo($userId,'student');
+        $this->roleService->giveRoleTo($userId, 'student');
 
         return $userId;
     }
@@ -119,13 +120,11 @@ class UserService implements UserServiceInterface
      * @return array
      */
 
-    public function loginBy(string $param, string $identifier, string $password, string $ip,int $client)
+    public function loginBy(string $param, string $identifier, string $password, string $ip, int $client)
     {
         // 在这里修改需要获取的字段
 
-        $user = $this->userRepository->getBy($param, $identifier, [
-            'id', 'password','name','email','mobile'
-        ])->first();
+        $user = $this->userRepository->getBy($param, $identifier)->first();
 
         if ($user == null) {
             throw new UserNotExistException();
@@ -139,12 +138,13 @@ class UserService implements UserServiceInterface
 
         return [
             'user' => $user,
-            'token' => $this->tokenService->makeToken($user->id, $ip,$client)
+            'token' => $this->tokenService->makeToken($user->id, $ip, $client)
         ];
     }
 
-    public function login(int $userId, string $ip,int $client): string
+    public function login(int $userId, string $ip, int $client): string
     {
+
         $user = $this->userRepository->get($userId);
 
         if ($user == null) {
@@ -157,9 +157,9 @@ class UserService implements UserServiceInterface
         ];
     }
 
-    public function logout(int $userId,int $client)
+    public function logout(int $userId, int $client)
     {
-        $this->tokenService->destoryToken($userId,$client);
+        $this->tokenService->destoryToken($userId, $client);
     }
 
     public function isUserExist(array $condition): bool

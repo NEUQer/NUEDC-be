@@ -28,5 +28,4 @@ class ContestRepository extends AbstractRepository
 
 
     use InsertWithIdTrait;
-
 }

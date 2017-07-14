@@ -1,16 +1,14 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: yinzhe
- * Date: 17/7/13
- * Time: 下午8:07
+ * User: Hotown
+ * Date: 17/7/12
+ * Time: 下午3:32
  */
-
 namespace App\Repository\Eloquent;
 
+class ContestRecordRepository extends AbstractRepository {
 
-class ContestRecordRepository extends AbstractRepository
-{
     function model()
     {
         return "App\Repository\Models\ContestRecord";
@@ -24,4 +22,5 @@ class ContestRecordRepository extends AbstractRepository
             ->leftjoin('problems','contest_records.problem_selected','=','problems.id')->
             select('contest_records.*','contests.title as contestTitle','problems.title as problemTitle')->get();
     }
+
 }
