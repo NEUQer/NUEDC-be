@@ -44,4 +44,16 @@ class Utils
         $patternMobile = '/(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7}/';
         return preg_match($patternMobile, $mobile) == 1;
     }
+
+    public static function randomString(string $base,int $length)
+    {
+        $randomString = null;
+        $max = strlen($base)-1;
+
+        for($i=0;$i<$length;$i++){
+            $randomString.=$base[rand(0,$max)];
+        }
+
+        return $randomString;
+    }
 }

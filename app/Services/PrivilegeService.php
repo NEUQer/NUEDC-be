@@ -72,5 +72,8 @@ class PrivilegeService implements PrivilegeServiceInterface
 
         return true;
     }
-
+    function getUserPrivileges(int $userId)
+    {
+        return $this->userPrivilegeRepo->get($userId,['privilege']);
+    }
 }

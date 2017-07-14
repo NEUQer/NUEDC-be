@@ -15,6 +15,7 @@ class CreateContestRecordsTable extends Migration
     {
         Schema::create('contest_records', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigInteger('register_id');
             $table->string('team_name');
             $table->integer('school_id');
             $table->string('school_name',100);
@@ -26,13 +27,13 @@ class CreateContestRecordsTable extends Migration
             $table->string('teacher');
             $table->string('contact_mobile',45);
             $table->string('email',100);
-            $table->integer('problem_selected');
+            $table->integer('problem_selected')->nullable();
             $table->string('status');
-            $table->string('result'); // 关键标志位，老王的意思直接用中文字符
-            $table->string('result_info');
-            $table->string('onsite_info');//现场比赛相关信息
-            $table->string('problem_selected_at');
-            $table->string('result_at');//比赛结果确定时间
+            $table->string('result')->nullable(); // 关键标志位，老王的意思直接用中文字符
+            $table->string('result_info')->nullable();
+            $table->string('onsite_info')->nullable();//现场比赛相关信息
+            $table->string('problem_selected_at')->nullable();
+            $table->string('result_at')->nullable();//比赛结果确定时间
             $table->timestamps();
         });
     }

@@ -27,7 +27,7 @@ class CreateContestsTable extends Migration
             $table->string('problem_start_time');
             $table->string('problem_end_time');
             // 附加
-            $table->text('add_on');
+            $table->json('add_on')->nullable();
             $table->timestamps();
         });
     }

@@ -14,4 +14,6 @@ interface PrivilegeServiceInterface
     function getAllPrivileges();
 
     function refreshUserPrivileges(int $userId,array $privileges):bool;
+
+    function getUserPrivileges(int $userId);
 }

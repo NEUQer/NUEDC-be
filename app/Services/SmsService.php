@@ -39,7 +39,7 @@ class SmsService implements SmsServiceInterface
 
         $result = $this->curlPost(self::API_SEND_URI, $postArr);
 
-        return $result;
+        return $this->execResult($result);
     }
 
     /**

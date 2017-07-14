@@ -28,4 +28,7 @@ interface UserServiceInterface
     // 辅助类函数
 
     function isUserExist(array $condition):bool;
+
+
+
 }

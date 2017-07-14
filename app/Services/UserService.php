@@ -13,18 +13,32 @@ use App\Common\Encrypt;
 use App\Exceptions\Auth\PasswordWrongException;
 use App\Exceptions\Auth\UserExistedException;
 use App\Exceptions\Auth\UserNotExistException;
+use App\Exceptions\Common\UnknownException;
+use App\Exceptions\Contest\ContestNotExistException;
+use App\Exceptions\Contest\ContestRegisterTimeError;
+use App\Repository\Eloquent\ContestRecordRepository;
+use App\Repository\Eloquent\ContestRepository;
 use App\Repository\Eloquent\UserRepository;
 use App\Services\Contracts\UserServiceInterface;
+use Carbon\Carbon;
+use SebastianBergmann\Environment\Console;
 
 class UserService implements UserServiceInterface
 {
     private $userRepository;
     private $tokenService;
-
-    public function __construct(UserRepository $userRepository, TokenService $tokenService)
+    private $verifyCodeService;
+    private $roleService;
+    private $contestRecordRepo;
+    private $contestRepo;
+    public function __construct(ContestRepository $contestRepository,UserRepository $userRepository, ContestRecordRepository $recordRepository,TokenService $tokenService,VerifyCodeService $verifyCodeService,RoleService $roleService)
     {
         $this->userRepository = $userRepository;
         $this->tokenService = $tokenService;
+        $this->verifyCodeService = $verifyCodeService;
+        $this->roleService = $roleService;
+        $this->contestRecordRepo = $recordRepository;
+        $this->contestRepo = $contestRepository;
     }
 
     public function getRepository()
@@ -52,13 +66,22 @@ class UserService implements UserServiceInterface
             }
         }
 
-        if (!config('user.register_need_check')) {
-            $userInfo['status'] = 1; // 直接设置成激活
-        }
+
+        if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'],1,$userInfo['code']))
+            $userInfo['status'] = 1;
+
 
         $userInfo['password'] = Encrypt::encrypt($userInfo['password']); // 对密码加密
 
-        return $this->userRepository->insertWithId($userInfo);
+        $users = ['name'=> $userInfo['name'],'email'=>$userInfo['email'],
+            'mobile'=>$userInfo['mobile'],'password'=>$userInfo['password'],
+            'sex'=>$userInfo['sex'],'school_id'=>$userInfo['schoolId']];
+
+        $userId =  $this->userRepository->insertWithId($users);
+
+        $this->roleService->giveRoleTo($userId,'student');
+
+        return $userId;
     }
 
     /**
@@ -143,4 +166,6 @@ class UserService implements UserServiceInterface
     {
         return $this->userRepository->getWhereCount($condition) == 1;
     }
+
+
 }

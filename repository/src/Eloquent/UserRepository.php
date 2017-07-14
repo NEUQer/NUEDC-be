@@ -8,6 +8,8 @@
 
 namespace App\Repository\Eloquent;
 
+
+
 use App\Repository\Traits\InsertWithIdTrait;
 
 class UserRepository extends AbstractRepository
