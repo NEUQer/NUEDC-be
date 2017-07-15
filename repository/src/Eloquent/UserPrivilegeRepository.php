@@ -29,4 +29,11 @@ class UserPrivilegeRepository extends AbstractRepository
 
         return true;
     }
+
+    public function getUserPrivilegeInfo(int $userId){
+        return $this->model->where('user_id',$userId)->
+        leftjoin('privileges','privileges.name','=','user_privileges.privilege')->
+        select('name as privilegeName','display_name as displayName','description')
+            ->get()->toArray();
+    }
 }

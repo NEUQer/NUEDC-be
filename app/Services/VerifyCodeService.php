@@ -72,14 +72,14 @@ class VerifyCodeService implements VerifyCodeServiceInterface
              'mobile'=>$mobile,
              'type'=>$type,
              'code'=>$code,
-             'expires_at'=>300000,
+             'expires_at'=>Utils::createTimeStamp()+300000,
              'updated_at'=>Utils::createTimeStamp()
          ];
 
          $this->verifyCodeRepository->insert($newVerify);
        }
        else{
-           $this->verifyCodeRepository->updateWhere(['mobile'=>$mobile,'type'=>$type],['code'=> $code,'updated_at'=>Utils::createTimeStamp()]);
+           $this->verifyCodeRepository->updateWhere(['mobile'=>$mobile,'type'=>$type],['code'=> $code,'updated_at'=>Utils::createTimeStamp(),'expires_at'=>Utils::createTimeStamp()+300000]);
        }
 
        return $code;
@@ -93,7 +93,7 @@ class VerifyCodeService implements VerifyCodeServiceInterface
         if ($verifyCode == null)
             throw new VerifyCodeErrorException();
         //dd($verifyCode);
-        if ($verifyCode['updated_at']+$verifyCode['expires_at'] < Utils::createTimeStamp())
+        if ($verifyCode['expires_at'] < Utils::createTimeStamp())
             throw new VerifyCodeTimeOutException();
 
         return true;

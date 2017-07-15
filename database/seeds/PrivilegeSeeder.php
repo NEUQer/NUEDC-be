@@ -67,6 +67,11 @@ class PrivilegeSeeder extends Seeder
                 'display_name' => '审核专家',
                 'description' => '审核学校管理员推荐的专家'
             ],
+            [
+                'name' => 'manage_privilege',
+                'display_name' => '管理权限',
+                'description' => '管理用户和角色的权限'
+            ]
         ]);
     }
 }

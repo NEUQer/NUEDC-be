@@ -13,6 +13,7 @@ use App\Exceptions\Permission\InvalidPrivilegeException;
 use App\Repository\Eloquent\PrivilegeRepository;
 use App\Repository\Eloquent\UserPrivilegeRepository;
 use App\Services\Contracts\PrivilegeServiceInterface;
+use Illuminate\Support\Facades\DB;
 
 class PrivilegeService implements PrivilegeServiceInterface
 {
