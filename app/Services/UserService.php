@@ -76,7 +76,8 @@ class UserService implements UserServiceInterface
 
         $users = ['name' => $userInfo['name'], 'email' => $userInfo['email'],
             'mobile' => $userInfo['mobile'], 'password' => $userInfo['password'],
-            'sex' => $userInfo['sex'], 'school_id' => $userInfo['schoolId']];
+            'sex' => $userInfo['sex'], 'school_id' => $userInfo['schoolId'],
+            'school_name' => $userInfo['schoolName']];
 
         $userId = $this->userRepository->insertWithId($users);
 
