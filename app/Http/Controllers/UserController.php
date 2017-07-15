@@ -243,6 +243,7 @@ class UserController extends Controller
 
     }
 
+
     public function getContestProblemDetail(Request $request){
 
         $rules = [

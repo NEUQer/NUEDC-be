@@ -11,8 +11,10 @@ Route::group(['middleware' => ['token']], function () {
     Route::put("/school/team/update/{id}", 'SchoolAdminController@updateSchoolTeam');
     Route::delete("/school/team/delete/{id}", 'SchoolAdminController@deleteSchoolTeam');
     Route::put("/school/team/check/{id}",'SchoolAdminController@checkSchoolTeam');
-
     Route::get("/school/team/awards", 'SchoolAdminController@getSchoolResults');
 });
+
 Route::post('/school/admin/login','SchoolAdminController@login');
+Route::get('/school/admin/team/export','SchoolAdminController@exportSchoolTeams');
+Route::get('/school/admin/result/export','SchoolAdminController@exportSchoolResults');
 

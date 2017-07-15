@@ -90,7 +90,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                 'contact_mobile',
                 'email',
                 'status'
-            ]);
+            ])->all();
         }
     }
 
@@ -159,14 +159,14 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'result_info',  //获得奖项
             'result_at',
             'onsite_info'   //现场赛信息
-        ]);
+        ])->all();
 
         return $results;
     }
 
     function exportSchoolTeams(int $schoolId, int $contestId)
     {
-        $result = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
+        $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
             'contest_id',
             'id',
             'team_name',
@@ -180,10 +180,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'contact_mobile',
             'email',
             'status'
-        ]);
+        ])->all();
 
-        $cellData = ['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱', '审核状态'];
-        array_merge($cellData, $result);
+
+        $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱', '审核状态']];
+
+        foreach($results as $result) {
+            $temp = array_values($result['attributes']);
+            $cellData = array_merge($cellData, [$temp]);
+        }
 
         $this->excelService->export($cellData, 'data');
 
@@ -192,7 +197,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function exportSchoolResults(int $schoolId, int $contestId)
     {
-        $result = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
+        $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
             'contest_id',
             'id',
             'team_name',
@@ -211,11 +216,16 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'result_info',  //获得奖项
             'result_at',
             'onsite_info'   //现场赛信息
-        ]);
+        ])->all();
 
-        $cellData = ['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱', '审核状态'];
+        $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱',
+                        '所选题目','选题时间','审查情况','获得奖项','奖项确定时间','现场赛相关信息']];
 
-        array_merge($cellData, $result);
+        foreach($results as $result) {
+            $temp = array_values($result['attributes']);
+            $cellData = array_merge($cellData, [$temp]);
+        }
+
         $this->excelService->export($cellData, 'result');
 
         return true;

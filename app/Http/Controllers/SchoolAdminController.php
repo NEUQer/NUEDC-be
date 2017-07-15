@@ -187,6 +187,7 @@ class SchoolAdminController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      * @throws PermissionDeniedException
+     * @throws UnknownException
      */
     public function checkSchoolTeam(Request $request, int $id)
     {
@@ -203,20 +204,53 @@ class SchoolAdminController extends Controller
         ]);
     }
 
-
+    /**
+     * 导出学校队伍
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
+     * @throws UnknownException
+     */
     public function exportSchoolTeams(Request $request)
     {
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
+        $schoolId = $request->user['school_id'];
+        $contestId = $request->get("contest_id");
 
+        if (!$this->schoolAdminService->exportSchoolTeams($schoolId, $contestId)) {
+            throw new UnknownException("export school teams fails");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 
+    /**
+     * 导出学校获奖记录
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
+     * @throws UnknownException
+     */
     public function exportSchoolResults(Request $request)
     {
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
+
+        $schoolId = $request->user['school_id'];
+        $contestId = $request->get("contest_id");
+
+        if (!$this->schoolAdminService->exportSchoolResults($schoolId, $contestId)) {
+            throw new UnknownException("export school results fails");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 }
