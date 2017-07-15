@@ -19,7 +19,7 @@ class CreateVerifyCodesTable extends Migration
             $table->string('code',100);
             $table->primary(['mobile','type']);
             $table->bigInteger('updated_at');
-            $table->bigInteger('expires_at',20);
+            $table->bigInteger('expires_at');
         });
     }
 
