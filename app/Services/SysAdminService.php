@@ -11,27 +11,40 @@ namespace App\Services;
 
 use App\Common\Encrypt;
 use App\Common\Utils;
+use App\Exceptions\Common\UnknownException;
+use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Repository\Eloquent\SchoolRepository;
 use App\Services\Contracts\SysAdminServiceInterface;
+use Illuminate\Support\Facades\DB;
 
 class SysAdminService implements SysAdminServiceInterface
 {
     private $contestRepo;
     private $userService;
     private $schoolRepo;
+    private $authService;
+    private $recordRepo;
 
-    public function __construct(ContestRepository $contestRepository,UserService $userService,SchoolRepository $schoolRepository)
+    public function __construct(
+        ContestRepository $contestRepository,UserService $userService,
+        SchoolRepository $schoolRepository,AuthService $authService,
+        ContestRecordRepository $contestRecordRepository
+    )
     {
         $this->contestRepo = $contestRepository;
         $this->userService = $userService;
         $this->schoolRepo = $schoolRepository;
+        $this->authService = $authService;
+        $this->recordRepo = $contestRepository;
     }
 
     public function login(string $loginName, string $password, string $ip)
     {
         return $this->userService->loginBy('login_name',$loginName,$password,$ip,1);
     }
+
+    // 竞赛管理
 
     public function getContests()
     {
@@ -57,34 +70,110 @@ class SysAdminService implements SysAdminServiceInterface
         return $this->contestRepo->deleteWhere($condition) == 1;
     }
 
-    function generateSchoolAdmin(int $schoolId, array $schoolAdmin)
+    // 学校管理员
+
+    public function getSchoolAdmins(int $page, int $size)
+    {
+        $schoolAdmins = $this->userService->getRepository()->paginate($page,$size,[],['role' => 'school_admin'],[
+            'id','name','email','mobile','school_id','school_name','sex','status','role','created_at'
+        ]);
+
+        $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin']);
+
+        return [
+            'school_admins' => $schoolAdmins,
+            'count' => $count
+        ];
+    }
+
+    public function generateSchoolAdmin(int $schoolId)
     {
         $loginName = 'SCHOOL_'.$schoolId.Utils::randomString('',6);
         $password = Utils::randomString('',6);
         $school = $this->schoolRepo->get($schoolId,['id','name']);
 
-        $userId = $this->userService->createUser([
+        $userId = -1;
+
+        DB::transaction(function ()use(&$userId,$password,$school,$loginName){
+            $userId = $this->userService->getRepository()->insertWithId([
+                'login_name' => $loginName,
+                'school_id' => $school->id,
+                'school_name' => $school->name,
+                'password' => Encrypt::encrypt($password),
+                'status' => 1,
+                'role' => 'school_admin'
+            ]);
+            $this->authService->giveRoleTo($userId,'school_admin');
+        });
+
+        return [
+            'user_id' => $userId,
             'login_name' => $loginName,
-            'school_id' => $schoolId,
-            'school_name' => $school->name,
-            'password' => Encrypt::encrypt($password),
-            'status' => 1
+            'password' => $password
+        ];
+    }
+
+    // 这个方法不仅可以修改学校管理员，对于任意用户都是可用的
+
+    public function updateUser(int $userId, array $data): bool
+    {
+         if (isset($data['password'])) {
+             $data['password'] = Encrypt::encrypt($data['password']);
+         }
+
+         return $this->userService->getRepository()->updateWhere(['id' => $userId],$data) == 1;
+    }
+
+    public function deleteUser(int $userId): bool
+    {
+        return $this->userService->getRepository()->deleteWhere(['id' => $userId]) == 1;
+    }
+
+    public function getSchools(int $page, int $size)
+    {
+        $schools = $this->schoolRepo->paginate($page,$size,[],[
+            'id','name','level','address','post_code','principal','principal_mobile'
         ]);
 
-        //todo 授权
+        $count = $this->schoolRepo->getWhereCount([]);
 
-        return $userId;
+        return [
+            'schools' => $schools,
+            'count' => $count
+        ];
     }
 
-    function updateSchoolAdmin(int $userId, array $data): bool
+    public function updateSchool(int $schoolId, array $data): bool
     {
-        // TODO: Implement updateSchoolAdmin() method.
+        return $this->schoolRepo->update($data,$schoolId) == 1;
     }
 
-    function deleteSchoolAdmin(int $userId): bool
+    public function deleteSchool(int $schoolId): bool
     {
-        // TODO: Implement deleteSchoolAdmin() method.
+        return $this->schoolRepo->deleteWhere(['id' => $schoolId]) == 1;
     }
 
+    // 参赛管理
 
+    public function getRecords(int $page, int $size,array $condition)
+    {
+        $records = $this->recordRepo->paginate($page,$size,$condition);
+
+        $count = $this->recordRepo->getWhereCount($condition);
+
+        return [
+            'records' => $records,
+            'count' => $count
+        ];
+    }
+
+    public function updateRecord(int $recordId,array $data): bool
+    {
+        return $this->recordRepo->update($data,$recordId) == 1;
+    }
+
+    public function deleteRecord(int $recordId): bool
+    {
+        return $this->recordRepo->deleteWhere(['id' => $recordId]) == 1;
+    }
 }

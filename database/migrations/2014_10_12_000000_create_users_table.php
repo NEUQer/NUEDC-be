@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('sex',4)->nullable();
             $table->string('add_on')->nullable();
             $table->integer('status')->default(0);
+            $table->string('role',45)->nullable();
             $table->timestamps();
         });
     }

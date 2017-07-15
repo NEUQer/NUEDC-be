@@ -32,7 +32,7 @@ class RoleSeeder extends Seeder
 
         $studentPrivileges = ['sign_up_contest'];
         $schoolAdminPrivileges = ['manage_school_teams','view_school_results','sign_up_contest','recommend_experts'];
-        $systemAdminPrivileges = ['manage_schools','manage_contest','manage_problems','manage_school_admins','manage_all_teams','examine_experts','manage_privilege'];
+        $systemAdminPrivileges = ['manage_schools','manage_contest','manage_problems','manage_school_admins','manage_all_teams','examine_experts','manage_privilege','manage_users'];
 
         $privileges = [];
 

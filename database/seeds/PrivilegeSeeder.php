@@ -55,7 +55,12 @@ class PrivilegeSeeder extends Seeder
             [
                 'name' => 'manage_school_admins',
                 'display_name' => '管理校管理员',
-                'description' => '生成、删除、修改对应学校的管理员账号'
+                'description' => '创建新的校管理员账号'
+            ],
+            [
+                'name' => 'manage_users',
+                'display_name' => '管理用户',
+                'description' => '更新和删除已有的系统用户'
             ],
             [
                 'name' => 'manage_all_teams',

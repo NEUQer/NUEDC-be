@@ -143,7 +143,7 @@ class UserService implements UserServiceInterface
         ];
     }
 
-    public function login(int $userId, string $ip, int $client): string
+    public function login(int $userId, string $ip, int $client)
     {
 
         $user = $this->userRepository->get($userId);
@@ -166,11 +166,6 @@ class UserService implements UserServiceInterface
     public function isUserExist(array $condition): bool
     {
         return $this->userRepository->getWhereCount($condition) == 1;
-    }
-
-    public function createUser(array $user):int
-    {
-        return $this->userRepository->insertWithId($user);
     }
 
 }

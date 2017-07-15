@@ -22,7 +22,7 @@ interface SysAdminServiceInterface
 
     function deleteContest(array $condition):bool;
 
-    // 题目管理
+    // todo 题目管理
 
 //    function getProblems();
 //
@@ -32,9 +32,30 @@ interface SysAdminServiceInterface
 
     // 学校管理员
 
-    function generateSchoolAdmin(int $schoolId,array $schoolAdmin);
+    function getSchoolAdmins(int $page,int $size);
 
-    function updateSchoolAdmin(int $userId,array $data):bool;
+    function generateSchoolAdmin(int $schoolId);
 
-    function deleteSchoolAdmin(int $userId):bool;
+    function updateUser(int $userId,array $data):bool;
+
+    function deleteUser(int $userId):bool;
+
+    // todo 学校管理
+
+    function getSchools(int $page,int $size);
+
+    function updateSchool(int $schoolId,array $data):bool;
+
+    function deleteSchool(int $schoolId):bool;
+
+    // todo 参赛情况管理
+
+    function getRecords(int $page,int $size,array $condition);
+
+    function updateRecord(int $recordId,array $data):bool;
+
+    function deleteRecord(int $recordId):bool;
+
+    // todo 成绩录入
+
 }

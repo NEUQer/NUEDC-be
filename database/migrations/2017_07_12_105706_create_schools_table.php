@@ -15,15 +15,15 @@ class CreateSchoolsTable extends Migration
     {
         Schema::create('schools', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',100);
+            $table->string('name',100)->unique();
             $table->string('level',45);
             $table->string('nick_name',100)->nullable();
             $table->string('english_name',100)->nullable();
             $table->string('english_nick_name',100)->nullable();
-            $table->string('address');
-            $table->string('post_code',45);//邮编
-            $table->string('principal',100);//负责人姓名
-            $table->string('principal_mobile',45);//负责人联系电话
+            $table->string('address')->nullable();
+            $table->string('post_code',45)->nullable();//邮编
+            $table->string('principal',100)->nullable();//负责人姓名
+            $table->string('principal_mobile',45)->nullable();//负责人联系电话
             $table->timestamps();
         });
     }
