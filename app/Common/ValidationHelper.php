@@ -35,7 +35,9 @@ class ValidationHelper
         $data = [];
 
         foreach ($rules as $key => $rule) {
-            $data[$key] = $request->input($key,null);
+            if ($request->input($key,null) != null) {
+                $data[$key] = $request->input($key);
+            }
         }
 
         return $data;
@@ -52,7 +54,9 @@ class ValidationHelper
         $data = [];
 
         foreach ($rules as $key => $rule) {
-            $data[$key] = $request->input($key,null);
+            if ($request->input($key,null) != null) {
+                $data[$key] = $request->input($key);
+            }
         }
 
         return $data;

@@ -13,7 +13,9 @@ class CreateContestsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contests', function (Blueprint $table) {
+        $current = new \Carbon\Carbon();
+
+        Schema::create('contests', function (Blueprint $table) use($current){
             $table->increments('id');
             $table->string('title',45);
             $table->text('description')->nullable();
@@ -21,11 +23,12 @@ class CreateContestsTable extends Migration
             $table->tinyInteger('can_register')->default(0);
             $table->tinyInteger('can_select_problem')->default(0);
             // 报名时间
-            $table->timestamp('register_start_time');
-            $table->timestamp('register_end_time');
+            // 下面这几个时间戳最好改成可空
+            $table->timestamp('register_start_time')->default($current);
+            $table->timestamp('register_end_time')->default($current);
             // 选题时间
-            $table->timestamp('problem_start_time');
-            $table->timestamp('problem_end_time');
+            $table->timestamp('problem_start_time')->default($current);
+            $table->timestamp('problem_end_time')->default($current);
             // 附加
             $table->json('add_on')->nullable();
             $table->timestamps();

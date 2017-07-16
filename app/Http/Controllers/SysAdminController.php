@@ -83,11 +83,10 @@ class SysAdminController extends Controller
         return response()->json([
             'code' => 0,
             'data' => [
-                'contest_id' => $contestId
+                'colentest_id' => $contestId
             ]
         ]);
     }
-
     public function updateContest(Request $request, int $contestId)
     {
         $contest = ValidationHelper::checkAndGet($request, [
@@ -98,6 +97,8 @@ class SysAdminController extends Controller
             'register_end_time' => 'required|date',
             'problem_start_time' => 'required|date',
             'problem_end_time' => 'required|date',
+            'can_register' => 'integer|min:0|max:1',
+            'can_select_problem' => 'integer|min:0|max:1',
             'add_on' => 'string'
         ]);
 
@@ -299,7 +300,7 @@ class SysAdminController extends Controller
 
     public function getRecords(Request $request)
     {
-        $inputs = ValidationHelper::checkAndGet($request, [
+        ValidationHelper::validateCheck($request->all(), [
             'page' => 'integer|min:1',
             'size' => 'integer|min:1|max:500',
             'contest_id' => 'integer',
@@ -315,12 +316,27 @@ class SysAdminController extends Controller
         $page = $request->input('page', 1);
         $size = $request->input('size', 20);
 
-        unset($inputs['page']);
-        unset($inputs['size']);
+        $conditions = [];
+
+        if ($request->input('contest_id',null) != null) {
+            $conditions['contest_id'] = $request->input('contest_id');
+        }
+
+        if ($request->input('status',null) != null) {
+            $conditions['status'] = $request->input('status');
+        }
+
+        if ($request->input('result',null) != null) {
+            $conditions['result'] = $request->input('result');
+        }
+
+        if ($request->input('school_id',null) != null) {
+            $conditions['school_id'] = $request->input('school_id');
+        }
 
         return response()->json([
             'code' => 0,
-            'data' => $this->sysAdminService->getRecords($page, $size, $inputs)
+            'data' => $this->sysAdminService->getRecords($page, $size, $conditions)
         ]);
     }
 

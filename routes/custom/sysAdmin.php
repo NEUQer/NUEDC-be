@@ -19,11 +19,6 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::post('/school/{id}/update','SysAdminController@updateSchool');
     Route::get('/school/{id}/delete','SysAdminController@deleteSchool');
 
-    Route::get('/schools','SysAdminController@getSchools');
-    Route::post('/school/create','SysAdminController@createSchool');
-    Route::post('/school/{id}/update','SysAdminController@updateSchool');
-    Route::get('/school/{id}/delete','SysAdminController@deleteSchool');
-
     Route::get('/school-admins','SysAdminController@getSchoolAdmins');
     Route::post('/school-admin/create','SysAdminController@generateSchoolAdmin');
 

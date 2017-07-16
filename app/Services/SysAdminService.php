@@ -36,7 +36,7 @@ class SysAdminService implements SysAdminServiceInterface
         $this->userService = $userService;
         $this->schoolRepo = $schoolRepository;
         $this->authService = $authService;
-        $this->recordRepo = $contestRepository;
+        $this->recordRepo = $contestRecordRepository;
     }
 
     public function login(string $loginName, string $password, string $ip)
@@ -74,7 +74,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function getSchoolAdmins(int $page, int $size)
     {
-        $schoolAdmins = $this->userService->getRepository()->paginate($page,$size,[],['role' => 'school_admin'],[
+        $schoolAdmins = $this->userService->getRepository()->paginate($page,$size,['role' => 'school_admin'],[
             'id','name','email','mobile','school_id','school_name','sex','status','role','created_at'
         ]);
 
@@ -88,7 +88,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function generateSchoolAdmin(int $schoolId)
     {
-        $loginName = 'SCHOOL_'.$schoolId.Utils::randomString('',6);
+        $loginName = 'SCHOOL_'.$schoolId.'_'.Utils::randomString('',6);
         $password = Utils::randomString('',6);
         $school = $this->schoolRepo->get($schoolId,['id','name']);
 
