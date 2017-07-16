@@ -69,7 +69,8 @@ class UserService implements UserServiceInterface
 
 
         if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'], 1, $userInfo['code']))
-                 $userInfo['status'] = 1;
+            $userInfo['status'] = 1;
+
 
         $userInfo['password'] = Encrypt::encrypt($userInfo['password']); // 对密码加密
 
@@ -172,4 +173,21 @@ class UserService implements UserServiceInterface
         return $this->userRepository->insertWithId($user);
     }
 
+
+    public function updateUserPassword(array $userInfo)
+    {
+        $user = $this->userRepository->get($userInfo['userId'])->first();
+
+        if ($user == null) {
+            throw new UserNotExistException();
+        }
+
+        // 检查密码
+
+        if (!Encrypt::check($userInfo['password'], $user->password)) {
+            throw new PasswordWrongException();
+        }
+
+        return $this->userRepository->update(['password'=>Encrypt::encrypt($userInfo['newPassword'])],$userInfo['userId']);
+    }
 }
