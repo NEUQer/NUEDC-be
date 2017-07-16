@@ -7,7 +7,7 @@
  */
 
 
-Route::group(['middleware' => 'privilege'], function() {
+Route::group(['middleware' => 'privilege','prefix' => '/sysadmin'], function() {
     Route::group(['prefix' => '/auth'], function() {
         Route::post('/updateSysPrivilege','AuthController@updateSysPrivilege');
         Route::post('/updateUserPrivilege','AuthController@updateUserPrivileges');
