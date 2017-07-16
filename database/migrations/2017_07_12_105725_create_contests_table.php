@@ -20,8 +20,8 @@ class CreateContestsTable extends Migration
             $table->string('title',45);
             $table->text('description')->nullable();
             $table->string('status');
-            $table->tinyInteger('can_register')->default(0);
-            $table->tinyInteger('can_select_problem')->default(0);
+            $table->tinyInteger('can_register')->default(-1);
+            $table->tinyInteger('can_select_problem')->default(-1);
             // 报名时间
             // 下面这几个时间戳最好改成可空
             $table->timestamp('register_start_time')->default($current);

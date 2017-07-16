@@ -90,13 +90,13 @@ class SysAdminController extends Controller
     public function updateContest(Request $request, int $contestId)
     {
         $contest = ValidationHelper::checkAndGet($request, [
-            'title' => 'required|string|max:45',
-            'description' => 'required',
-            'status' => 'string|max:255',
-            'register_start_time' => 'required|date',
-            'register_end_time' => 'required|date',
-            'problem_start_time' => 'required|date',
-            'problem_end_time' => 'required|date',
+            'title' => 'string|max:45',
+            'description' => 'string|max:255',
+            'status' => 'max:255',
+            'register_start_time' => 'date',
+            'register_end_time' => 'date',
+            'problem_start_time' => 'date',
+            'problem_end_time' => 'date',
             'can_register' => 'integer|min:0|max:1',
             'can_select_problem' => 'integer|min:0|max:1',
             'add_on' => 'string'
