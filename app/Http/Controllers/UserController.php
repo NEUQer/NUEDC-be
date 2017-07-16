@@ -98,7 +98,6 @@ class UserController extends Controller
         $rules = [
             'identifier' => 'required|string',
             'password' => 'required|min:6|max:20',
-            'client' => 'required|min:1|max:2' // 登录设备标识符
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
@@ -116,7 +115,7 @@ class UserController extends Controller
         }
 
         $data = $this->userService
-            ->loginBy($loginMethod, $identifier, $request->password, $request->ip(),$request->client);
+            ->loginBy($loginMethod, $identifier, $request->password, $request->ip(),1);
 
         // 在下面定制要取出的字段
 
@@ -129,7 +128,7 @@ class UserController extends Controller
     public function logout(Request $request)
     {
 
-        $this->tokenService->destoryToken($request->user->id,$request['client']);
+        $this->tokenService->destoryToken($request->user->id,1);
 
         return response()->json([
             'code' => 0

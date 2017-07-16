@@ -31,13 +31,13 @@ class SysAdminController extends Controller
     public function login(Request $request)
     {
         $data = ValidationHelper::checkAndGet($request,[
-            'login_name' => 'required|string',
+            'identifier' => 'required|string',
             'password' => 'required|string|min:6'
         ]);
 
         return response()->json([
             'code' => 0,
-            'data' => $this->sysAdminService->login($data['login_name'],$data['password'],$request->ip())
+            'data' => $this->sysAdminService->login($data['identifier'],$data['password'],$request->ip())
         ]);
     }
 
