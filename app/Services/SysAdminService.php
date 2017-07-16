@@ -49,7 +49,7 @@ class SysAdminService implements SysAdminServiceInterface
     public function getContests()
     {
         return $this->contestRepo->all([
-            'id','title','status','can_register',
+            'id','description','title','status','can_register',
             'can_select_problem','can_select_problem','register_start_time',
             'register_end_time','problem_start_time','problem_end_time'
         ]);
@@ -141,6 +141,11 @@ class SysAdminService implements SysAdminServiceInterface
             'schools' => $schools,
             'count' => $count
         ];
+    }
+
+    public function createSchool(array $data): int
+    {
+        return $this->schoolRepo->insertWithId($data);
     }
 
     public function updateSchool(int $schoolId, array $data): bool

@@ -162,11 +162,12 @@ abstract class AbstractRepository implements RepositoryInterface
 
     // 分页方法
 
-    public function paginate(int $page = 1, int $size = 20, array $param = [], array $columns = ['*'])
+    public function paginate(int $page = 1, int $size = 20, array $param = [], array $columns = ['*'],$orderBy='created_at',$order = 'desc')
     {
         if (!empty($param))
             return $this->model
                 ->where($param)
+                ->orderBy($orderBy,$order)
                 ->skip($size * --$page)
                 ->take($size)
                 ->get($columns);

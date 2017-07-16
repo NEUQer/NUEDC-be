@@ -10,9 +10,11 @@ namespace App\Http\Controllers;
 
 use App\Common\Encrypt;
 use App\Common\Utils;
+use App\Services\AuthService;
 use App\Services\ExcelService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class TestController extends Controller
@@ -51,8 +53,16 @@ class TestController extends Controller
         ]);
     }
 
-    public function test(Request $request)
+    public function test(Request $request,AuthService $service)
     {
-        echo new Carbon();
+       $userId =  DB::table('users')->insertGetId([
+            'login_name' => 'admin',
+            'password' => Encrypt::encrypt('123456'),
+            'status' => 1,
+        ]);
+
+        $service->giveRoleTo($userId,'system_admin');
+
+        return $userId;
     }
 }

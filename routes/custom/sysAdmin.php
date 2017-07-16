@@ -7,5 +7,32 @@
  */
 
 Route::group(['prefix' => 'sysadmin'],function (){
+    Route::post('/login','SysAdminController@login');
+
     Route::get('/contests','SysAdminController@getAllContests');
+    Route::post('/contest/create','SysAdminController@createContest');
+    Route::post('/contest/{id}/update','SysAdminController@updateContest');
+    Route::post('/contest/{id}/delete','SysAdminController@deleteContest');
+
+    Route::get('/schools','SysAdminController@getSchools');
+    Route::post('/school/create','SysAdminController@createSchool');
+    Route::post('/school/{id}/update','SysAdminController@updateSchool');
+    Route::get('/school/{id}/delete','SysAdminController@deleteSchool');
+
+    Route::get('/schools','SysAdminController@getSchools');
+    Route::post('/school/create','SysAdminController@createSchool');
+    Route::post('/school/{id}/update','SysAdminController@updateSchool');
+    Route::get('/school/{id}/delete','SysAdminController@deleteSchool');
+
+    Route::get('/school-admins','SysAdminController@getSchoolAdmins');
+    Route::post('/school-admin/create','SysAdminController@generateSchoolAdmin');
+
+    Route::post('/user/{id}/update','SysAdminController@updateUser');
+    Route::get('/user/{id}/delete','SysAdminController@deleteUser');
+
+    Route::get('/contest-records','SysAdminController@getRecords');
+    Route::post('/contest-record/{id}/update','SysAdminController@updateRecord');
+    Route::get('/contest-record/{id}/delete','SysAdminController@deleteRecord');
+
+
 });

@@ -32,8 +32,8 @@ class CreateContestRecordsTable extends Migration
             $table->string('result')->nullable(); // 关键标志位，老王的意思直接用中文字符
             $table->string('result_info')->nullable();
             $table->string('onsite_info')->nullable();//现场比赛相关信息
-            $table->string('problem_selected_at')->nullable();
-            $table->string('result_at')->nullable();//比赛结果确定时间
+            $table->timestamp('problem_selected_at')->nullable();
+            $table->timestamp('result_at')->nullable();//比赛结果确定时间
             $table->timestamps();
         });
     }

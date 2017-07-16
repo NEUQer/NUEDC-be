@@ -21,11 +21,11 @@ class CreateContestsTable extends Migration
             $table->tinyInteger('can_register')->default(0);
             $table->tinyInteger('can_select_problem')->default(0);
             // 报名时间
-            $table->string('register_start_time');
-            $table->string('register_end_time');
+            $table->timestamp('register_start_time');
+            $table->timestamp('register_end_time');
             // 选题时间
-            $table->string('problem_start_time');
-            $table->string('problem_end_time');
+            $table->timestamp('problem_start_time');
+            $table->timestamp('problem_end_time');
             // 附加
             $table->json('add_on')->nullable();
             $table->timestamps();

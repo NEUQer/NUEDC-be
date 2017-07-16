@@ -42,6 +42,8 @@ interface SysAdminServiceInterface
 
     // todo 学校管理
 
+    function createSchool(array $data):int;
+
     function getSchools(int $page,int $size);
 
     function updateSchool(int $schoolId,array $data):bool;

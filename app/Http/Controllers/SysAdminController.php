@@ -25,12 +25,25 @@ class SysAdminController extends Controller
     public function __construct(SysAdminService $sysAdminService)
     {
         $this->sysAdminService = $sysAdminService;
-        $this->middleware('token');
+        $this->middleware('token')->except('login');
+    }
+
+    public function login(Request $request)
+    {
+        $data = ValidationHelper::checkAndGet($request,[
+            'login_name' => 'required|string',
+            'password' => 'required|string|min:6'
+        ]);
+
+        return response()->json([
+            'code' => 0,
+            'data' => $this->sysAdminService->login($data['login_name'],$data['password'],$request->ip())
+        ]);
     }
 
     public function getAllContests(Request $request)
     {
-        if (!Permission::checkPermission($request->user->id, ['manage_contests'])) {
+        if (!Permission::checkPermission($request->user->id, ['manage_contest'])) {
             throw new PermissionDeniedException();
         }
 
@@ -57,8 +70,12 @@ class SysAdminController extends Controller
             'add_on' => 'string'
         ]);
 
-        if (!Permission::checkPermission($request->user->id, 'manage_contest')) {
+        if (!Permission::checkPermission($request->user->id, ['manage_contest'])) {
             throw new PermissionDeniedException();
+        }
+
+        if ($contest['status'] == null) {
+            $contest['status'] = '未开始报名';
         }
 
         $contestId = $this->sysAdminService->createContest($contest);
@@ -84,8 +101,12 @@ class SysAdminController extends Controller
             'add_on' => 'string'
         ]);
 
-        if (!Permission::checkPermission($request->user->id, 'manage_contest')) {
+        if (!Permission::checkPermission($request->user->id, ['manage_contest'])) {
             throw new PermissionDeniedException();
+        }
+
+        if ($contest['status'] == null) {
+            unset($contest['status']);
         }
 
         if (!$this->sysAdminService->updateContest(['id' => $contestId], $contest)) {
@@ -134,6 +155,29 @@ class SysAdminController extends Controller
             'data' => $data
         ]);
 
+    }
+
+    public function createSchool(Request $request)
+    {
+        $data = ValidationHelper::checkAndGet($request,[
+            'name' => 'required|string|max:100',
+            'level' => 'required|string|max:45',
+            'address' => 'string|max:255',
+            'post_code' => 'string|max:45',
+            'principal' => 'string|max:100',
+            'principal_mobile' => 'string|max:45'
+        ]);
+
+        if (!Permission::checkPermission($request->user->id,['manage_schools'])) {
+            throw new PermissionDeniedException();
+        }
+
+        return response()->json([
+            'code' => 0,
+            'data' => [
+                'school_id' => $this->sysAdminService->createSchool($data)
+            ]
+        ]);
     }
 
     public function updateSchool(Request $request, int $id)
