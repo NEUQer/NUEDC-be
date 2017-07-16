@@ -150,9 +150,14 @@ class SchoolAdminController extends Controller
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
+
         $schoolId = $request->user['school_id'];
         $contestId = $request->get("contest_id");
-        $data = $this->schoolAdminService->getSchoolTeams($schoolId, $contestId);
+
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 2);
+
+        $data = $this->schoolAdminService->getSchoolTeams($schoolId, $contestId, $page, $size);
 
         return response()->json([
             'code' => 0,
@@ -173,7 +178,11 @@ class SchoolAdminController extends Controller
         }
         $schoolId = $request->user['school_id'];
         $contestId = $request->get('contest_id');
-        $data = $this->schoolAdminService->getSchoolResults($schoolId, $contestId);
+
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 20);
+
+        $data = $this->schoolAdminService->getSchoolResults($schoolId, $contestId, $page, $size);
 
         return response()->json([
             'code' => 0,

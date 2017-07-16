@@ -13,6 +13,7 @@ use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Services\Contracts\SchoolAdminServiceInterface;
+use Carbon\Carbon;
 
 class SchoolAdminService implements SchoolAdminServiceInterface
 {
@@ -53,7 +54,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function addSchoolTeam(array $schoolTeamInfo): bool
     {
-        $currentTime = Utils::createTimeStamp();
+        $currentTime = new Carbon();
         $schoolTeamInfo['created_at'] = $currentTime;
         $schoolTeamInfo['updated_at'] = $currentTime;
         //-1作为未选题的标识
@@ -66,32 +67,37 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return $this->contestRecordsRepo->insert($schoolTeamInfo) == 1;
     }
 
-    function getSchoolTeams(int $schoolId, int $contestId)
+    function getSchoolTeams(int $schoolId, int $contestId, int $page, int $size)
     {
-        $rows = $this->contestRecordsRepo->getWhereCount([
+        $count = $this->contestRecordsRepo->getWhereCount([
             'school_id' => $schoolId,
             'contest_id' => $contestId
         ]);
 
-        if ($rows == 0) {
+        if ($count == 0) {
             throw new SchoolTeamsNotExistedException();
-        } else {
-            return $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
-                'contest_id',
-                'id',
-                'team_name',
-                'school_id',
-                'school_name',
-                'school_level',
-                'member1',
-                'member2',
-                'member3',
-                'teacher',
-                'contact_mobile',
-                'email',
-                'status'
-            ])->all();
         }
+
+        $teams = $this->contestRecordsRepo->paginate($page, $size, ['school_id' => $schoolId, 'contest_id' => $contestId], [
+            'contest_id',
+            'id',
+            'team_name',
+            'school_id',
+            'school_name',
+            'school_level',
+            'member1',
+            'member2',
+            'member3',
+            'teacher',
+            'contact_mobile',
+            'email',
+            'status'
+        ]);
+
+        return [
+            'teams' => $teams,
+            'count' => $count
+        ];
     }
 
     function updateSchoolTeam(int $schoolTeamId, array $schoolTeamInfo): bool
@@ -129,18 +135,18 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return false;
     }
 
-    function getSchoolResults(int $schoolId, int $contestId)
+    function getSchoolResults(int $schoolId, int $contestId, int $page, int $size)
     {
-        $rows = $this->contestRecordsRepo->getWhereCount([
+        $count = $this->contestRecordsRepo->getWhereCount([
             'school_id' => $schoolId,
             'contest_id' => $contestId
         ]);
 
-        if ($rows == 0) {
+        if ($count == 0) {
             throw new SchoolTeamsNotExistedException();
         }
 
-        $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
+        $results = $this->contestRecordsRepo->paginate($page, $size, ['school_id' => $schoolId, 'contest_id' => $contestId], [
             'contest_id',
             'id',
             'team_name',
@@ -159,9 +165,12 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'result_info',  //获得奖项
             'result_at',
             'onsite_info'   //现场赛信息
-        ])->all();
+        ]);
 
-        return $results;
+        return [
+            'results' => $results,
+            'count' => $count
+        ];
     }
 
     function exportSchoolTeams(int $schoolId, int $contestId)
@@ -185,7 +194,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱', '审核状态']];
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
             $temp = array_values($result['attributes']);
             $cellData = array_merge($cellData, [$temp]);
         }
@@ -219,9 +228,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ])->all();
 
         $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱',
-                        '所选题目','选题时间','审查情况','获得奖项','奖项确定时间','现场赛相关信息']];
+            '所选题目', '选题时间', '审查情况', '获得奖项', '奖项确定时间', '现场赛相关信息']];
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
             $temp = array_values($result['attributes']);
             $cellData = array_merge($cellData, [$temp]);
         }
