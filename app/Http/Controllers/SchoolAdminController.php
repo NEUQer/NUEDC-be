@@ -262,4 +262,18 @@ class SchoolAdminController extends Controller
             'code' => 0
         ]);
     }
+
+    public function getStartedContest(Request $request)
+    {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $data = $this->schoolAdminService->getStartedContest();
+
+        return response()->json([
+            'code' => 0,
+            'data' => $data
+        ]);
+    }
 }

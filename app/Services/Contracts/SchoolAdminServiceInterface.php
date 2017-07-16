@@ -13,7 +13,7 @@ interface SchoolAdminServiceInterface
 {
     function login(string $loginName, string $password, string $ip, string $client);
 
-    function getStartedContent();
+    function getStartedContest();
 
     function addSchoolTeam(array $schoolTeamInfo): bool;
 

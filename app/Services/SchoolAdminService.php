@@ -34,7 +34,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $this->userService = $userService;
     }
 
-    function getStartedContent()
+    function getStartedContest()
     {
         $now = strtotime(Carbon::now());
         $collection = $this->contestRepo->all();
@@ -60,7 +60,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         //-1作为未选题的标识
         $schoolTeamInfo['problem_selected'] = -1;
         //中文字符标记状态
-        $schoolTeamInfo['status'] = '待审核';
+        $schoolTeamInfo['status'] = '未审核';
 
         $schoolTeamInfo['register_id'] = 1234;
 
@@ -128,7 +128,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'status'
         ])->first();
 
-        if ('待审核' == $teamStatus->status) {
+        if ('未审核' == $teamStatus->status) {
             return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已审核']) == 1;
         }
 
@@ -161,8 +161,8 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'email',
             'problem_selected',
             'problem_selected_at',
-            'result',   //审查情况
-            'result_info',  //获得奖项
+            'result',
+            'result_info',
             'result_at',
             'onsite_info'   //现场赛信息
         ]);
@@ -221,14 +221,14 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'email',
             'problem_selected',
             'problem_selected_at',
-            'result',   //审查情况
-            'result_info',  //获得奖项
+            'result',   //获奖情况
+            'result_info',  //审查状态
             'result_at',
             'onsite_info'   //现场赛信息
         ])->all();
 
         $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱',
-            '所选题目', '选题时间', '审查情况', '获得奖项', '奖项确定时间', '现场赛相关信息']];
+            '所选题目', '选题时间', '获奖情况', '审查状态', '奖项确定时间', '现场赛相关信息']];
 
         foreach ($results as $result) {
             $temp = array_values($result['attributes']);

@@ -38,6 +38,10 @@ Route::group(['middleware' => ['token']], function () {
      * 导出队伍获奖情况
      */
     Route::get('/school/admin/result/export','SchoolAdminController@exportSchoolResults');
+    /**
+     * 获取竞赛列表
+     */
+    Route::get('/school/admin/contest','SchoolAdminController@getStartedContest');
 });
 
 /**
