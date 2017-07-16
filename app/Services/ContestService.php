@@ -12,6 +12,7 @@ namespace App\Services;
 use App\Exceptions\Contest\ContestCloseException;
 use App\Exceptions\Contest\ContestNotRegisterException;
 use App\Exceptions\Contest\ContestNotStartException;
+use App\Exceptions\Contest\ContestProblemNotExist;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterHavePassed;
 use App\Repository\Eloquent\ProblemRepository;
@@ -62,28 +63,32 @@ class ContestService implements ContestServiceInterface
             'status'=>'待审核'
         ];
 
-        $Info = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$teamInfo['contest_id']])->first();
-        //未报过名
-        if ($Info == null){
 
-            $time = $this->contestRepo->get($teamInfo['contest_id'],['register_start_time','register_end_time']);
+        $time = $this->contestRepo->get($teamInfo['contest_id'],['can_register','register_start_time','register_end_time']);
 
-            if ($time == null)
-                throw new ContestNotExistException();
+        if($time  == null)
+            throw new ContestNotExistException();
 
+        if ($time['can_register'] == -1){
             $now = strtotime(Carbon::now());
 
             if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])){
                 throw new ContestRegisterTimeError();
             }
+        }else if ($time['can_register'] == 0){
+            throw new ContestRegisterTimeError();
+        }
 
 
+        $Info = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$teamInfo['contest_id']])->first();
+        //未报过名
+        if ($Info == null){
             if ($this->contestRecordRepo->insert($teamInfo) < 1)
                 throw new UnknownException("报名失败");
         }
         //不为空说明已经报过名
         else{
-            //dd($Info);
+
             if ($Info['status'] == "已审核"){
                 throw new ContestRegisterHavePassed();
             }
@@ -191,7 +196,7 @@ class ContestService implements ContestServiceInterface
     function updateProblemSelect(int $userId, array $key)
     {
         if ($this->problemRepo->get($key['problemId'])->first() == null){
-
+            throw new ContestProblemNotExist();
     }
         $info = $this->contestRecordRepo->getByMult(['contest_id'=>$key['contestId'],'register_id'=>$userId,'status'=>'已审核'],['problem_selected','problem_selected_at'])->first();
 
@@ -199,16 +204,20 @@ class ContestService implements ContestServiceInterface
             throw new ContestRegisterHaveNotPassException();
 
 
-        $time = $this->contestRepo->get($key['contestId'],['problem_start_time','problem_end_time']);
+        $time = $this->contestRepo->get($key['contestId'],['can_select_problem','problem_start_time','problem_end_time']);
 
-        $now =  strtotime(Carbon::now());
+        if ($time['can_select_problem'] == -1){
+            $now =  strtotime(Carbon::now());
 
-        if ($now < strtotime($time['problem_start_time']))
-            throw new ContestNotStartException();
+            if ($now < strtotime($time['problem_start_time']))
+                throw new ContestNotStartException();
 
 
-        if ($now > strtotime($time['problem_end_time']))
+            if ($now > strtotime($time['problem_end_time']))
+                throw new ContestCloseException();
+        }elseif ($time['can_select_problem'] == 0){
             throw new ContestCloseException();
+        }
 
 
         //无论选择与否都是更新对应行数据

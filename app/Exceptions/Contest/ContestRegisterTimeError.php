@@ -14,5 +14,5 @@ class ContestRegisterTimeError extends BaseException
 {
     protected $code = 30001;
 
-    protected $data = "Contest Register Time Error";
+    protected $data = "Contest Register close or have not open !";
 }
