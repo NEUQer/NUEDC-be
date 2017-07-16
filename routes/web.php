@@ -20,6 +20,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::group(['middleware' => 'token'],function (){
+    Route::get('/verify-token',function (\Illuminate\Http\Request $request) {
+        return $request->user;
+    });
+});
+
 Route::get('/test','TestController@test');
 Route::get('/test/excel/export','TestController@export');
 Route::post('/test/excel/import','TestController@import');
