@@ -214,10 +214,11 @@ class UserController extends Controller
 
     public function abandonContest(Request $request,int $contestId){
 
+        $this->contestService->abandonContest($request->user->id,$contestId);
+
         return response()->json(
             [
-                'code'=> 0,
-                'data'=> $this->contestService->abandonContest($request->user->id,$contestId)
+                'code'=> 0
             ]
         );
     }

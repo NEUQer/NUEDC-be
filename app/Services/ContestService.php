@@ -165,9 +165,9 @@ class ContestService implements ContestServiceInterface
 
     function getAllPassContestList(int $userId): array
     {
-       $contestIds = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'status'=>"已审核"],['contest_id']);
+       $contestIds = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'status'=>"已审核"],['contest_id'])->toArray();
 
-       return $this->contestRepo->getIn('id',$contestIds);
+       return $this->contestRepo->getIn('id',$contestIds)->toArray();
     }
 
     function getProblemDetail(int $userId, array $key)
