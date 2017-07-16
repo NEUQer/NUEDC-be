@@ -10,6 +10,7 @@ namespace App\Services;
 
 
 use App\Exceptions\Contest\ContestCloseException;
+use App\Exceptions\Contest\ContestNotRegisterException;
 use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterHavePassed;
@@ -118,9 +119,14 @@ class ContestService implements ContestServiceInterface
         return $data;
     }
 
-    function getContestSignUpStatus(int $userId, int $contestId): array
+    function getContestSignUpStatus(int $userId, int $contestId)
     {
-        return $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$contestId]);
+        $data = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$contestId])->first();
+
+        if ($data == null)
+            throw new ContestNotRegisterException();
+
+        return $data;
     }
 
     function abandonContest(int $userId, int $contestId): bool

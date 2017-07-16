@@ -135,18 +135,26 @@ class UserController extends Controller
             'code' => 0
         ]);
     }
+    public function updateUserPassword(Request $request){
+        $rules = [
+            'oldPassword'=>'required|min:6|max:20',
+            'newPassword'=>'required|min:6|max:20',
+        ];
 
-    public function index(Request $request,PrivilegeService $privilegeService){
+        $userPwd = ValidationHelper::checkAndGet($request,$rules);
+
+        $userInfo = [
+            'userId'=>$request->user->id,
+            'password'=>$userPwd['oldPassword'],
+            'newPassword'=>$userPwd['newPassword']
+        ];
+
+        $this->userService->updateUserPassword($userInfo);
+
         return response()->json(
-            [
-                'code' => 0,
-                'data'=>[
-                    'privileges'=>$privilegeService->getUserPrivileges($request->user->id)
-                ]
-            ]
+            ['code'=>0]
         );
     }
-
     public function getAllContest(){
 
         $data = $this->contestService->getAllContest();

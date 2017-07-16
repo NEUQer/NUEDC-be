@@ -15,7 +15,7 @@ interface ContestServiceInterface
 
     function updateSignUpContest(int $userId,array $signInfo):array ;
 
-    function getContestSignUpStatus(int $userId,int $contestId):array ;
+    function getContestSignUpStatus(int $userId,int $contestId) ;
 
     function abandonContest(int $userId,int $contestId):bool ;
 

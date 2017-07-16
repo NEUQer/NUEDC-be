@@ -11,8 +11,16 @@ Route::group(['prefix' => '/user'], function() {
     Route::post('/register','UserController@register');
     Route::post('/login','UserController@login');
     Route::get('/preRegister','UserController@perRegister');
-    Route::get('/logout','UserController@logout');
+
 });
+
+Route::group(['middleware'=>'token'],function (){
+    Route::group(['prefix' => '/user'],function (){
+       Route::post('/updatePassword','UserController@updateUserPassword');
+       Route::get('/logout','UserController@logout');
+    });
+});
+
 Route::group(['middleware' => 'user'], function() {
 
     Route::group(['prefix' => '/user'], function() {

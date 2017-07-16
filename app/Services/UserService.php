@@ -69,8 +69,7 @@ class UserService implements UserServiceInterface
 
 
         if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'], 1, $userInfo['code']))
-            $userInfo['status'] = 1;
-
+                 $userInfo['status'] = 1;
 
         $userInfo['password'] = Encrypt::encrypt($userInfo['password']); // 对密码加密
 
@@ -143,7 +142,7 @@ class UserService implements UserServiceInterface
         ];
     }
 
-    public function login(int $userId, string $ip, int $client)
+    public function login(int $userId, string $ip, int $client): string
     {
 
         $user = $this->userRepository->get($userId);
@@ -166,6 +165,11 @@ class UserService implements UserServiceInterface
     public function isUserExist(array $condition): bool
     {
         return $this->userRepository->getWhereCount($condition) == 1;
+    }
+
+    public function createUser(array $user):int
+    {
+        return $this->userRepository->insertWithId($user);
     }
 
 }

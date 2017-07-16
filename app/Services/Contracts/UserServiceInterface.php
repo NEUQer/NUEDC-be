@@ -29,6 +29,8 @@ interface UserServiceInterface
 
     function isUserExist(array $condition):bool;
 
+    function updateUserPassword(array $userInfo);
+
 
 
 }
