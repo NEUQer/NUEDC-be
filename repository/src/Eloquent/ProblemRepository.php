@@ -9,10 +9,14 @@
 namespace App\Repository\Eloquent;
 
 
+use App\Repository\Traits\InsertWithIdTrait;
+
 class ProblemRepository extends AbstractRepository
 {
     function model()
     {
         return "App\Repository\Models\Problem";
     }
+
+    use InsertWithIdTrait;
 }

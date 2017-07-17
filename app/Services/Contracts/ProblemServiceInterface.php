@@ -13,7 +13,7 @@ interface ProblemServiceInterface
 
     function addProblem(array $problemData):bool ;
 
-    function updateProblem(array $problemData):bool ;
+    function updateProblem(array $condition, array $problemData):bool ;
 
-    function deleteProblem($problemId):bool ;
+    function deleteProblem(array $condition):bool ;
 }

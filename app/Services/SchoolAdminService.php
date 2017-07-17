@@ -199,9 +199,13 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             $cellData = array_merge($cellData, [$temp]);
         }
 
-        $this->excelService->export($cellData, 'data');
+        if ($this->excelService->export($cellData, 'data')) {
+            return true;
+        } else {
+            return false;
+        }
 
-        return true;
+
     }
 
     function exportSchoolResults(int $schoolId, int $contestId)

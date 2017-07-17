@@ -5,6 +5,7 @@
  * Date: 17/7/17
  * Time: 13:13
  */
+
 namespace App\Services;
 
 use App\Repository\Eloquent\ProblemRepository;
@@ -21,24 +22,22 @@ class ProblemService implements ProblemServiceInterface
 
     function getProblemByContestId(int $contestId)
     {
-        $this->problemRepo->getBy('contest_id',$contestId);
+        $this->problemRepo->getBy('contest_id', $contestId)->all();
     }
 
     function addProblem(array $problemData): bool
     {
-        $this->problemRepo->insert($problemData);
-
-        return true;
+        return $this->problemRepo->insertWithId($problemData);
     }
 
-    function updateProblem(array $problemData): bool
+    function updateProblem(array $condition, array $problemData): bool
     {
-        // TODO: Implement updateProblem() method.
+        return $this->problemRepo->updateWhere($condition, $problemData) == 1;
     }
 
-    function deleteProblem($problemId): bool
+    function deleteProblem(array $condition): bool
     {
-        // TODO: Implement deleteProblem() method.
+        return $this->problemRepo->deleteWhere($condition) == 1;
     }
 
 }

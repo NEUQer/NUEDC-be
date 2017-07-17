@@ -8,6 +8,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\ExcelExportFailException;
 use App\Exceptions\ExcelStoreFailException;
 use App\Services\Contracts\ExcelServiceInterface;
 
@@ -19,17 +20,24 @@ class ExcelService implements ExcelServiceInterface
 {
     /**
      * 导出excel
-     *
-     * @param array $cellData 表格内容  eg. $cellData = [['name','age'],['Hotown','21']]
-     * @param string $fileName 导出的excel文件名，后缀默认为xlsx   eg. $fileName = 'file'
+     * @param array $cellData
+     * @param string $fileName
+     * @return bool
+     * @throws ExcelExportFailException
      */
-    public function export(array $cellData, string $fileName)
+    public function export(array $cellData, string $fileName): bool
     {
-        Excel::create($fileName, function ($excel) use ($cellData) {
+        $bool = Excel::create($fileName, function ($excel) use ($cellData) {
             $excel->sheet('sheet1', function ($sheet) use ($cellData) {
                 $sheet->rows($cellData);
             });
         })->export('xlsx');
+
+        if (!$bool) {
+            throw new ExcelExportFailException();
+        } else {
+            return true;
+        }
     }
 
     /**
