@@ -33,7 +33,7 @@ class UserController extends Controller
     private $contestService;
 
 
-    public function __construct(UserService $userService,VerifyCodeService $verifyCodeService,TokenService $tokenService,PermissionService $permissionService,ContestService $contestService)
+    public function __construct(UserService $userService, VerifyCodeService $verifyCodeService, TokenService $tokenService, PermissionService $permissionService, ContestService $contestService)
     {
         $this->userService = $userService;
         $this->verifyCodeService = $verifyCodeService;
@@ -42,29 +42,47 @@ class UserController extends Controller
         $this->contestService = $contestService;
     }
 
+    public function getSchools(Request $request)
+    {
+        ValidationHelper::validateCheck($request->all(),[
+            'page' => 'integer|min:1',
+            'size' => 'integer|min:1'
+        ]);
 
-    public function perRegister(Request $request){
+        $page = $request->input('page',1);
+        $size = $request->input('size',-1);
+
+        return response()->json([
+            'code' => 0,
+            'data' => $this->userService->getSchools($page,$size)
+        ]);
+
+    }
+
+    public function perRegister(Request $request)
+    {
         $rules = [
-            'mobile'=>'required|mobile|max:100'
+            'mobile' => 'required|mobile|max:100'
         ];
 
-        ValidationHelper::validateCheck($request->all(),$rules);
+        ValidationHelper::validateCheck($request->all(), $rules);
 
-        $data = ValidationHelper::getInputData($request,$rules);
+        $data = ValidationHelper::getInputData($request, $rules);
 
 
-        $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'],1);
+        $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], 1);
 
         return response()->json(
             [
-                'code'=> 0,
-                'data'=>[
+                'code' => 0,
+                'data' => [
                     'verifyCode' => $verifyCode
                 ]
             ]
         );
 
     }
+
     public function register(Request $request)
     {
         $rules = [
@@ -72,10 +90,10 @@ class UserController extends Controller
             'email' => 'required|email|max:100',
             'mobile' => 'required|mobile|max:45',
             'password' => 'required|min:6|max:20',
-            'sex'=>'required|max:4',
-            'schoolId'=>'required',
-            'code'=>'required|max:4',
-            'schoolName'=>'required'
+            'sex' => 'required|max:4',
+            'schoolId' => 'required',
+            'code' => 'required|max:4',
+            'schoolName' => 'required'
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
@@ -115,7 +133,7 @@ class UserController extends Controller
         }
 
         $data = $this->userService
-            ->loginBy($loginMethod, $identifier, $request->password, $request->ip(),1);
+            ->loginBy($loginMethod, $identifier, $request->password, $request->ip(), 1);
 
         // 在下面定制要取出的字段
 
@@ -128,40 +146,44 @@ class UserController extends Controller
     public function logout(Request $request)
     {
 
-        $this->tokenService->destoryToken($request->user->id,1);
+        $this->tokenService->destoryToken($request->user->id, 1);
 
         return response()->json([
             'code' => 0
         ]);
     }
-    public function updateUserPassword(Request $request){
+
+    public function updateUserPassword(Request $request)
+    {
         $rules = [
-            'oldPassword'=>'required|min:6|max:20',
-            'newPassword'=>'required|min:6|max:20',
+            'oldPassword' => 'required|min:6|max:20',
+            'newPassword' => 'required|min:6|max:20',
         ];
 
-        $userPwd = ValidationHelper::checkAndGet($request,$rules);
+        $userPwd = ValidationHelper::checkAndGet($request, $rules);
 
         $userInfo = [
-            'userId'=>$request->user->id,
-            'password'=>$userPwd['oldPassword'],
-            'newPassword'=>$userPwd['newPassword']
+            'userId' => $request->user->id,
+            'password' => $userPwd['oldPassword'],
+            'newPassword' => $userPwd['newPassword']
         ];
 
         $this->userService->updateUserPassword($userInfo);
 
         return response()->json(
-            ['code'=>0]
+            ['code' => 0]
         );
     }
-    public function getAllContest(){
+
+    public function getAllContest()
+    {
 
         $data = $this->contestService->getAllContest();
 
         return response()->json(
             [
-                'code'=>0,
-                'data'=>$data
+                'code' => 0,
+                'data' => $data
             ]
         );
     }
@@ -171,79 +193,84 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * 报名和修改报名的统计接口
      */
-    public function signUpContest(Request $request){
+    public function signUpContest(Request $request)
+    {
 
 
         $rules = [
-            'teamName'=>'required',
-            'schoolId'=>'required|integer',
-            'schoolName'=>'required',
-            'contestId'=>'required|integer',
-            'schoolLevel'=>'required',
-            'member1'=>'required',
-            'member2'=>'required',
-            'member3'=>'required',
-            'teacher'=>'required',
-            'mobile'=>'required|max:45',
-            'email'=>'required|max:100',
+            'teamName' => 'required',
+            'schoolId' => 'required|integer',
+            'schoolName' => 'required',
+            'contestId' => 'required|integer',
+            'schoolLevel' => 'required',
+            'member1' => 'required',
+            'member2' => 'required',
+            'member3' => 'required',
+            'teacher' => 'required',
+            'mobile' => 'required|max:45',
+            'email' => 'required|max:100',
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
 
-        $signInfo = ValidationHelper::getInputData($request,$rules);
+        $signInfo = ValidationHelper::getInputData($request, $rules);
 
         return response()->json(
             [
-                'code'=>0,
-                'data'=> $this->contestService->updateSignUpContest($request->user->id,$signInfo)
+                'code' => 0,
+                'data' => $this->contestService->updateSignUpContest($request->user->id, $signInfo)
             ]
         );
     }
 
-    public function getContestSignUpStatus(Request $request,int $contestId){
+    public function getContestSignUpStatus(Request $request, int $contestId)
+    {
 
         return response()->json(
             [
-                'code'=> 0,
-                'data'=> $this->contestService->getContestSignUpStatus($request->user->id,$contestId)
+                'code' => 0,
+                'data' => $this->contestService->getContestSignUpStatus($request->user->id, $contestId)
             ]
         );
     }
 
 
-    public function abandonContest(Request $request,int $contestId){
+    public function abandonContest(Request $request, int $contestId)
+    {
 
-        $this->contestService->abandonContest($request->user->id,$contestId);
+        $this->contestService->abandonContest($request->user->id, $contestId);
 
         return response()->json(
             [
-                'code'=> 0
+                'code' => 0
             ]
         );
     }
 
-    public function getAllPassContest(Request $request){
+    public function getAllPassContest(Request $request)
+    {
 
 
         return response()->json(
             [
-                'code'=>0,
-                'data'=>[
-                    'contestList'=>$this->contestService->getAllPassContestList($request->user->id)
+                'code' => 0,
+                'data' => [
+                    'contestList' => $this->contestService->getAllPassContestList($request->user->id)
                 ]
             ]
         );
     }
 
-    public function getContestProblemList(Request $request,int $contestId){
+    public function getContestProblemList(Request $request, int $contestId)
+    {
 
-        if (!$this->permissionService->checkPermission($request->user->id,['sign_up_contest']))
+        if (!$this->permissionService->checkPermission($request->user->id, ['sign_up_contest']))
             throw new PermissionDeniedException();
 
         return response()->json(
             [
-                'code'=>0,
-                'data'=> $this->contestService->getContestProblemList($contestId,$request->user->id)
+                'code' => 0,
+                'data' => $this->contestService->getContestProblemList($contestId, $request->user->id)
             ]
 
 
@@ -252,21 +279,22 @@ class UserController extends Controller
     }
 
 
-    public function getContestProblemDetail(Request $request){
+    public function getContestProblemDetail(Request $request)
+    {
 
         $rules = [
-           'contestId'=>'required',
-            'problemId'=>'required',
+            'contestId' => 'required',
+            'problemId' => 'required',
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
 
-        $key = ValidationHelper::getInputData($request,$rules);
+        $key = ValidationHelper::getInputData($request, $rules);
 
         return response()->json(
             [
-                'code'=>0,
-                'data'=>$this->contestService->getProblemDetail($request->user->id,$key)
+                'code' => 0,
+                'data' => $this->contestService->getProblemDetail($request->user->id, $key)
             ]
         );
     }
@@ -276,29 +304,31 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * 无论是否为初次选择都只要更新
      */
-    public function updateContestProblemSelect(Request $request){
+    public function updateContestProblemSelect(Request $request)
+    {
         $rules = [
-            'contestId'=>'required',
-            'problemId'=>'required',
+            'contestId' => 'required',
+            'problemId' => 'required',
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
 
-        $key = ValidationHelper::getInputData($request,$rules);
-        if ($this->contestService->updateProblemSelect($request->user->id,$key) < 1)
+        $key = ValidationHelper::getInputData($request, $rules);
+        if ($this->contestService->updateProblemSelect($request->user->id, $key) < 1)
             throw new UnknownException("选题更新失败");
 
         return response()->json([
-                'code'=>0
-            ]);
+            'code' => 0
+        ]);
 
     }
 
-    public function getContestResultStatus(Request $request,int $contestId){
+    public function getContestResultStatus(Request $request, int $contestId)
+    {
         return response()->json(
             [
-                'code'=>0,
-                'data'=>$this->contestService->getContestResult($request->user->id,$contestId)
+                'code' => 0,
+                'data' => $this->contestService->getContestResult($request->user->id, $contestId)
             ]
         );
     }

@@ -97,8 +97,8 @@ class SysAdminController extends Controller
             'register_end_time' => 'date',
             'problem_start_time' => 'date',
             'problem_end_time' => 'date',
-            'can_register' => 'integer|min:0|max:1',
-            'can_select_problem' => 'integer|min:0|max:1',
+            'can_register' => 'integer|min:-1|max:1',
+            'can_select_problem' => 'integer|min:-1|max:1',
             'add_on' => 'string'
         ]);
 

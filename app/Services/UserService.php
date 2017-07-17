@@ -18,6 +18,7 @@ use App\Exceptions\Contest\ContestNotExistException;
 use App\Exceptions\Contest\ContestRegisterTimeError;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
+use App\Repository\Eloquent\SchoolRepository;
 use App\Repository\Eloquent\UserRepository;
 use App\Services\Contracts\UserServiceInterface;
 use Carbon\Carbon;
@@ -31,8 +32,9 @@ class UserService implements UserServiceInterface
     private $roleService;
     private $contestRecordRepo;
     private $contestRepo;
+    private $schoolRepo;
 
-    public function __construct(ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
+    public function __construct(SchoolRepository $schoolRepository, ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
     {
         $this->userRepository = $userRepository;
         $this->tokenService = $tokenService;
@@ -40,11 +42,29 @@ class UserService implements UserServiceInterface
         $this->roleService = $roleService;
         $this->contestRecordRepo = $recordRepository;
         $this->contestRepo = $contestRepository;
+        $this->schoolRepo = $schoolRepository;
     }
 
     public function getRepository()
     {
         return $this->userRepository;
+    }
+
+    public function getSchools(int $page, int $size)
+    {
+        if ($size == -1) {
+            //不分页
+            $schools = $this->schoolRepo->all(['id', 'name', 'level']);
+            $count = count($schools);
+        } else {
+            $schools = $this->schoolRepo->paginate($page, $size, [], ['id', 'name', 'level']);
+            $count = $this->schoolRepo->getWhereCount();
+        }
+
+        return [
+            'schools' => $schools,
+            'count' => $count
+        ];
     }
 
     /**
@@ -77,7 +97,7 @@ class UserService implements UserServiceInterface
         $users = ['name' => $userInfo['name'], 'email' => $userInfo['email'],
             'mobile' => $userInfo['mobile'], 'password' => $userInfo['password'],
             'sex' => $userInfo['sex'], 'school_id' => $userInfo['schoolId'],
-            'school_name' => $userInfo['schoolName'],'status'=>$userInfo['status']];
+            'school_name' => $userInfo['schoolName'], 'status' => $userInfo['status']];
 
         $userId = $this->userRepository->insertWithId($users);
 
@@ -154,7 +174,7 @@ class UserService implements UserServiceInterface
 
         return [
             'user' => $user,
-            'token' => $this->tokenService->makeToken($userId, $ip,$client)
+            'token' => $this->tokenService->makeToken($userId, $ip, $client)
         ];
     }
 
@@ -168,7 +188,7 @@ class UserService implements UserServiceInterface
         return $this->userRepository->getWhereCount($condition) == 1;
     }
 
-    public function createUser(array $user):int
+    public function createUser(array $user): int
     {
         return $this->userRepository->insertWithId($user);
     }
@@ -188,6 +208,6 @@ class UserService implements UserServiceInterface
             throw new PasswordWrongException();
         }
 
-        return $this->userRepository->update(['password'=>Encrypt::encrypt($userInfo['newPassword'])],$userInfo['userId']);
+        return $this->userRepository->update(['password' => Encrypt::encrypt($userInfo['newPassword'])], $userInfo['userId']);
     }
 }

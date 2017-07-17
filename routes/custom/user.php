@@ -11,6 +11,7 @@ Route::group(['prefix' => '/user'], function() {
     Route::post('/register','UserController@register');
     Route::post('/login','UserController@login');
     Route::get('/preRegister','UserController@perRegister');
+    Route::get('/schools','UserController@getSchools');
 
 });
 
