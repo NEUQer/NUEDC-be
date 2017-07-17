@@ -233,8 +233,12 @@ class SchoolAdminController extends Controller
         $contestId = $request->get("contest_id");
 
         $path = $this->schoolAdminService->exportSchoolTeams($schoolId, $contestId);
+        $name = 'data';
 
-        return response()->download($path);
+        return response()->download($path,$name,[
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment;fileName='.$name."xlsx"
+        ]);
     }
 
     /**
@@ -254,8 +258,11 @@ class SchoolAdminController extends Controller
         $contestId = $request->get("contest_id");
 
         $path = $this->schoolAdminService->exportSchoolResults($schoolId, $contestId);
-
-        return response()->download($path);
+        $name = 'result';
+        return response()->download($path,$name,[
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment;fileName='.$name."xlsx"
+        ]);
     }
 
     public function getStartedContest(Request $request)
