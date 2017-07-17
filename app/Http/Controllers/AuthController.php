@@ -63,11 +63,12 @@ class AuthController extends Controller
         $privileges = ValidationHelper::checkAndGet($request,$rules);
 
 
-        $this->authService->updatePrivilegeAtDB($privileges['privilegeName'],$privileges['description'],$privileges['displayNewName']);
+
 
         return response()->json(
             [
-                'code'=>0
+                'code'=>0,
+                'data'=> ['privilege'=>$this->authService->updatePrivilegeAtDB($privileges['privilegeName'],$privileges['description'],$privileges['displayNewName'])]
             ]
         );
     }

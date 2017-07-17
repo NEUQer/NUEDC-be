@@ -68,11 +68,11 @@ class AuthService implements AuthServiceInterface
 
     function updatePrivilegeAtDB(string $privilegeExistedName,string $description , string $displayName )
     {
-        if ($this->privilegeRepo->getBy('name',$privilegeExistedName)->first() == "NULL")
+        if ($this->privilegeRepo->getBy('name',$privilegeExistedName)->first() == null)
             throw new PrivilegeNotExistException();
         DB::transaction(function ()use($privilegeExistedName,$description,$displayName){
             if ($displayName != "NULL"){
-                if ($this->privilegeRepo->getBy('display_name',$displayName)->first() != "NULL")
+                if ($this->privilegeRepo->getBy('display_name',$displayName)->first() != null)
                     throw new PrivilegeNameExisted('displayName');
                 if ($description != "NULL")
                     $this->privilegeRepo->updateWhere(['name'=>$privilegeExistedName],['display_name'=>$displayName,'description'=>$description]);
@@ -84,7 +84,7 @@ class AuthService implements AuthServiceInterface
             }
         });
 
-        return true;
+        return $this->privilegeRepo->getBy('name',$privilegeExistedName)->toArray();
     }
 
     function updateUserPrivilege(int $userId,array $privileges)
