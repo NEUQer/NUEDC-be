@@ -22,7 +22,10 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'token'],function (){
     Route::get('/verify-token',function (\Illuminate\Http\Request $request) {
-        return $request->user;
+        return [
+            'code' => 0,
+            'user' => $request->user
+        ];
     });
 });
 
