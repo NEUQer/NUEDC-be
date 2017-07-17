@@ -125,6 +125,7 @@ class SchoolAdminController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      * @throws PermissionDeniedException
+     * @throws UnknownException
      */
     public function deleteSchoolTeam(Request $request, int $id)
     {
@@ -132,11 +133,13 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        if ($this->schoolAdminService->deleteSchoolTeam($id)) {
-            return response()->json([
-                'code' => 0
-            ]);
+        if (!$this->schoolAdminService->deleteSchoolTeam($id)) {
+            throw new UnknownException("fail to delete school team.");
         }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 
     /**
@@ -273,7 +276,9 @@ class SchoolAdminController extends Controller
 
         return response()->json([
             'code' => 0,
-            'data' => $data
+            'data' => [
+                'contests' => $data
+            ]
         ]);
     }
 }
