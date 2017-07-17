@@ -54,9 +54,9 @@ return [
             'visibility' => 'public',
         ],
 
-        'uploads' => [
+        'import' => [
             'driver' => 'local',
-            'root' => storage_path('app/uploads'),
+            'root' => storage_path('import'),
         ],
 
         's3' => [

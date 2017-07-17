@@ -199,13 +199,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             $cellData = array_merge($cellData, [$temp]);
         }
 
-        if ($this->excelService->export($cellData, 'data')) {
-            return true;
-        } else {
-            return false;
-        }
+        $path = $this->excelService->export($cellData, 'data')['full'];
 
-
+        return $path;
     }
 
     function exportSchoolResults(int $schoolId, int $contestId)
@@ -239,9 +235,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             $cellData = array_merge($cellData, [$temp]);
         }
 
-        $this->excelService->export($cellData, 'result');
+        $path = $this->excelService->export($cellData, 'result')['full'];
 
-        return true;
+        return $path;
     }
 }
 

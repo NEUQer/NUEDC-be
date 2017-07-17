@@ -232,13 +232,9 @@ class SchoolAdminController extends Controller
         $schoolId = $request->user['school_id'];
         $contestId = $request->get("contest_id");
 
-        if (!$this->schoolAdminService->exportSchoolTeams($schoolId, $contestId)) {
-            throw new UnknownException("export school teams fails");
-        }
+        $path = $this->schoolAdminService->exportSchoolTeams($schoolId, $contestId);
 
-        return response()->json([
-            'code' => 0
-        ]);
+        return response()->download($path);
     }
 
     /**
@@ -257,13 +253,9 @@ class SchoolAdminController extends Controller
         $schoolId = $request->user['school_id'];
         $contestId = $request->get("contest_id");
 
-        if (!$this->schoolAdminService->exportSchoolResults($schoolId, $contestId)) {
-            throw new UnknownException("export school results fails");
-        }
+        $path = $this->schoolAdminService->exportSchoolResults($schoolId, $contestId);
 
-        return response()->json([
-            'code' => 0
-        ]);
+        return response()->download($path);
     }
 
     public function getStartedContest(Request $request)

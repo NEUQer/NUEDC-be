@@ -25,19 +25,15 @@ class ExcelService implements ExcelServiceInterface
      * @return bool
      * @throws ExcelExportFailException
      */
-    public function export(array $cellData, string $fileName): bool
+    public function export(array $cellData, string $fileName)
     {
-        $bool = Excel::create($fileName, function ($excel) use ($cellData) {
+        $result = Excel::create($fileName, function ($excel) use ($cellData) {
             $excel->sheet('sheet1', function ($sheet) use ($cellData) {
                 $sheet->rows($cellData);
             });
-        })->export('xlsx');
+        })->store('xlsx', false, true);
 
-        if (!$bool) {
-            throw new ExcelExportFailException();
-        } else {
-            return true;
-        }
+        return $result;
     }
 
     /**
@@ -56,13 +52,13 @@ class ExcelService implements ExcelServiceInterface
             // 上传文件
             $filename = uniqid() . '.' . $ext;
             // 使用uploads本地存储空间（目录）
-            $bool = Storage::disk('uploads')->put($filename, file_get_contents($realPath));
+            $bool = Storage::disk('import')->put($filename, file_get_contents($realPath));
 
             if (!$bool) {
                 throw new ExcelStoreFailException();
             }
 
-            $filePath = 'storage/app/uploads/' . $filename;
+            $filePath = 'storage/import/' . $filename;
         }
 
         $datas = null;
