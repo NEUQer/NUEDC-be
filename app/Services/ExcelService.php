@@ -10,7 +10,7 @@ namespace App\Services;
 
 use App\Exceptions\ExcelStoreFailException;
 use App\Services\Contracts\ExcelServiceInterface;
-
+use App\Exceptions\ExcelExportFailException;
 use Excel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -19,17 +19,20 @@ class ExcelService implements ExcelServiceInterface
 {
     /**
      * 导出excel
-     *
-     * @param array $cellData 表格内容  eg. $cellData = [['name','age'],['Hotown','21']]
-     * @param string $fileName 导出的excel文件名，后缀默认为xlsx   eg. $fileName = 'file'
+     * @param array $cellData
+     * @param string $fileName
+     * @return bool
+     * @throws ExcelExportFailException
      */
     public function export(array $cellData, string $fileName)
     {
-       return Excel::create($fileName, function ($excel) use ($cellData) {
+        $result = Excel::create($fileName, function ($excel) use ($cellData) {
             $excel->sheet('sheet1', function ($sheet) use ($cellData) {
                 $sheet->rows($cellData);
             });
-        })->export('xlsx');
+        })->store('xlsx', false, true);
+
+        return $result;
     }
 
     /**
@@ -48,13 +51,13 @@ class ExcelService implements ExcelServiceInterface
             // 上传文件
             $filename = uniqid() . '.' . $ext;
             // 使用uploads本地存储空间（目录）
-            $bool = Storage::disk('uploads')->put($filename, file_get_contents($realPath));
+            $bool = Storage::disk('import')->put($filename, file_get_contents($realPath));
 
             if (!$bool) {
                 throw new ExcelStoreFailException();
             }
 
-            $filePath = 'storage/app/uploads/' . $filename;
+            $filePath = 'storage/import/' . $filename;
         }
 
         $datas = null;

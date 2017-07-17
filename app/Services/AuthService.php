@@ -150,13 +150,33 @@ class AuthService implements AuthServiceInterface
 
         $privilege = [];
         $data = [];
-      //  dd($info);
         for($i = 0; $i<count($info); $i++){
-            $privilege[] = ['privilegeName' => $info[$i]['privilegeName'],'privilegeDisplayName' => $info[$i]['privilegeDisplayName'],'privilegeDescription'=>$info[$i]['privilegeDescription']];
-            if ($i != count($info) -1){
+
+            $privilege[] = ['privilegeName' => $info[$i]['privilegeName'],
+                'privilegeDisplayName' => $info[$i]['privilegeDisplayName'],
+                'privilegeDescription'=>$info[$i]['privilegeDescription']];
+
+           if ($i == count($info) -1){
+               continue;
+           }else if ($i != count($info) -1){
+
                 if ($info[$i]['roleName'] == $info[$i+1]['roleName']){
-                    continue;
-                }else{
+
+                    if ($i+1 == count($info) -1){
+
+                        $privilege[] = ['privilegeName' => $info[$i+1]['privilegeName'],
+                            'privilegeDisplayName' => $info[$i+1]['privilegeDisplayName'],
+                            'privilegeDescription'=>$info[$i+1]['privilegeDescription']];
+
+                        $data[] = [
+                            'roleName'=>$info[$i]['roleName'],
+                            'roleDisplayName' => $info[$i]['roleDisplayName'],
+                            'privilege'=> $privilege
+                        ];
+
+                    }else continue;
+
+                }else {
                     $data[] = [
                         'roleName'=>$info[$i]['roleName'],
                         'roleDisplayName' => $info[$i]['roleDisplayName'],
@@ -164,14 +184,10 @@ class AuthService implements AuthServiceInterface
                     ];
                     $privilege = [];
                 }
-            }else{
-                $data[] = [
-                    'roleName'=>$info[$i]['roleName'],
-                    'roleDisplayName' => $info[$i]['roleDisplayName'],
-                    'privilege'=> $privilege
-                ];
+
+                }
             }
-    }
+
 
         return $data;
     }
