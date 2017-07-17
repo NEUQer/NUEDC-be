@@ -56,8 +56,8 @@ class AuthController extends Controller
     function updateSysPrivilege(Request $request){
         $rules = [
             'privilegeName'=>'required',
-            'description'=>'string',
-            'displayNewName'=>'string'
+            'description'=>'required|string',
+            'displayNewName'=>'required|string'
         ];
 
         $privileges = ValidationHelper::checkAndGet($request,$rules);

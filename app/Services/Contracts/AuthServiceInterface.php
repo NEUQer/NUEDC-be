@@ -13,7 +13,7 @@ interface AuthServiceInterface
 {
     //function addPrivilegeToDB(array $privilegeInfo);
 
-    function updatePrivilegeAtDB(string $privilegeExistedName,string $description = null,string $displayName = null);
+    function updatePrivilegeAtDB(string $privilegeExistedName,string $description ,string $displayName);
 
     function updateUserPrivilege(int $userId,array $privileges);
 

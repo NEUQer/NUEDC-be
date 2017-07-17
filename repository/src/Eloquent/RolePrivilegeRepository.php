@@ -21,7 +21,7 @@ class RolePrivilegeRepository extends AbstractRepository
         return $this->model
             ->leftjoin('privileges as privilege','privilege_name','=','privilege.name')
             ->leftjoin('roles as role','role_name','=','role.name')
-            ->select('role.name as roleName','role.display_name as roleDisplayName',
+            ->select('role_name.name as roleName','role.display_name as roleDisplayName',
                 'privilege.name as privilegeName', 'privilege.display_name as privilegeDisplayName','privilege.description as privilegeDescription')
             ->get();
     }

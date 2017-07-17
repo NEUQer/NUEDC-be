@@ -66,20 +66,20 @@ class AuthService implements AuthServiceInterface
 //        return $this->privilegeRepo->insert($data);
 //    }
 
-    function updatePrivilegeAtDB(string $privilegeExistedName,string $description = null, string $displayName = null)
+    function updatePrivilegeAtDB(string $privilegeExistedName,string $description , string $displayName )
     {
-        if ($this->privilegeRepo->getBy('name',$privilegeExistedName)->first() == null)
+        if ($this->privilegeRepo->getBy('name',$privilegeExistedName)->first() == "NULL")
             throw new PrivilegeNotExistException();
         DB::transaction(function ()use($privilegeExistedName,$description,$displayName){
-            if ($displayName != null){
-                if ($this->privilegeRepo->getBy('display_name',$displayName)->first() != null)
+            if ($displayName != "NULL"){
+                if ($this->privilegeRepo->getBy('display_name',$displayName)->first() != "NULL")
                     throw new PrivilegeNameExisted('displayName');
-                if ($description != null)
+                if ($description != "NULL")
                     $this->privilegeRepo->updateWhere(['name'=>$privilegeExistedName],['display_name'=>$displayName,'description'=>$description]);
                 else
                     $this->privilegeRepo->updateWhere(['name'=>$privilegeExistedName],['display_name'=>$displayName]);
             }else{
-                if ($description != null)
+                if ($description != "NULL")
                      $this->privilegeRepo->updateWhere(['name'=>$privilegeExistedName],['description'=>$description]);
             }
         });
