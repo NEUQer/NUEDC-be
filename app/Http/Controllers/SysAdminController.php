@@ -74,7 +74,7 @@ class SysAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        if ($contest['status'] == null) {
+        if (!isset($contest['status'])) {
             $contest['status'] = '未开始报名';
         }
 
@@ -106,7 +106,7 @@ class SysAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        if ($contest['status'] == null) {
+        if (!isset($contest['status'])) {
             unset($contest['status']);
         }
 
