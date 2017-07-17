@@ -28,15 +28,21 @@ class TestController extends Controller
 
     public function export(Request $request)
     {
-        $fileName = "test";
+        $fileName = "测试文件";
         $cellData = [
             ['学号', '班级', '姓名'],
             ['2152308', '21523', '罗宏涛'],
             ['2152311', '21523', '黄文锋']
         ];
-        $path = $this->excelService->export($cellData, $fileName)['full'];
 
-        return response()->download($path);
+
+        return response($this->excelService->export($cellData, $fileName))->withHeaders([
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment;fileName='.$fileName."xlsx",
+        ]);
+
+
+
     }
 
     public function import(Request $request)
