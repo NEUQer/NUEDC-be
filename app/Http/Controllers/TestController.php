@@ -63,4 +63,12 @@ class TestController extends Controller
 
         return $userId;
     }
+
+    public function getSchoolListTemplateFile(ExcelService $excelService){
+        $name = "学校信息导入模板";
+
+        $rows =[['学校名称','学校等级','学校通信地址','学校邮编','学校负责人姓名','负责人手机号']] ;
+
+        $excelService->export($name,$rows);
+    }
 }

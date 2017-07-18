@@ -13,6 +13,8 @@ use Illuminate\Http\UploadedFile;
 interface ExcelServiceInterface
 {
     function import(UploadedFile $file);
+
+    function export(string $name,array $rows);
 }
 
 ?>

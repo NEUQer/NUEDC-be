@@ -15,6 +15,7 @@ use App\Exceptions\Auth\PasswordWrongException;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use App\Facades\Permission;
+use App\Services\ExcelService;
 use App\Services\SysAdminService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -160,7 +161,13 @@ class SysAdminController extends Controller
         ]);
 
     }
+    public function getSchoolListTemplateFile(ExcelService $excelService){
+        $name = "学校信息导入模板";
 
+        $rows =[['学校名称','学校等级','学校通信地址','学校邮编','学校负责人姓名','负责人手机号']] ;
+
+        $excelService->export($name,$rows);
+    }
     public function createSchool(Request $request)
     {
         $data = ValidationHelper::checkAndGet($request, [
