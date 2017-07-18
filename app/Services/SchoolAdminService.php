@@ -8,9 +8,8 @@
 
 namespace App\Services;
 
-use App\Common\Utils;
+use App\Exceptions\SchoolAdmin\SchoolResultsNotExistedException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
-use App\Exceptions\SchoolResultsNotExistedException;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Services\Contracts\SchoolAdminServiceInterface;
@@ -68,18 +67,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return $this->contestRecordsRepo->insert($schoolTeamInfo) == 1;
     }
 
-    function getSchoolTeams(int $schoolId, int $contestId, int $page, int $size)
+    function getSchoolTeams(array $conditions, int $page, int $size)
     {
-        $count = $this->contestRecordsRepo->getWhereCount([
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ]);
+        $count = $this->contestRecordsRepo->getWhereCount($conditions);
 
         if ($count == 0) {
             throw new SchoolTeamsNotExistedException();
         }
 
-        $teams = $this->contestRecordsRepo->paginate($page, $size, ['school_id' => $schoolId, 'contest_id' => $contestId], [
+        $teams = $this->contestRecordsRepo->paginate($page, $size, $conditions, [
             'contest_id',
             'id',
             'team_name',
@@ -142,18 +138,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return false;
     }
 
-    function getSchoolResults(int $schoolId, int $contestId, int $page, int $size)
+    function getSchoolResults(array $conditions, int $page, int $size)
     {
-        $count = $this->contestRecordsRepo->getWhereCount([
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ]);
+        $count = $this->contestRecordsRepo->getWhereCount($conditions);
 
         if ($count == 0) {
             throw new SchoolResultsNotExistedException();
         }
 
-        $results = $this->contestRecordsRepo->paginate($page, $size, ['school_id' => $schoolId, 'contest_id' => $contestId], [
+        $results = $this->contestRecordsRepo->paginate($page, $size, $conditions, [
             'contest_id',
             'id',
             'team_name',

@@ -5,10 +5,12 @@
  * Date: 17/7/14
  * Time: 下午3:32
  */
-namespace App\Exceptions;
+namespace App\Exceptions\Excel;
+
+use App\Exceptions\BaseException;
 
 class ExcelStoreFailException extends BaseException
 {
     protected $code = 50001;
-    protected $message = "excel文件储存失败";
+    protected $data = "excel文件储存失败";
 }

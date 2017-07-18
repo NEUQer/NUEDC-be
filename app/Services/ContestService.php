@@ -35,7 +35,8 @@ class ContestService implements ContestServiceInterface
     private $contestRecordRepo;
     private $contestRepo;
     private $problemRepo;
-    public function __construct(ProblemRepository $problemRepository,ContestRepository $contestRepository,UserRepository $userRepository, ContestRecordRepository $recordRepository,TokenService $tokenService,VerifyCodeService $verifyCodeService,RoleService $roleService)
+
+    public function __construct(ProblemRepository $problemRepository, ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
     {
         $this->userRepository = $userRepository;
         $this->tokenService = $tokenService;
@@ -45,67 +46,67 @@ class ContestService implements ContestServiceInterface
         $this->contestRepo = $contestRepository;
         $this->problemRepo = $problemRepository;
     }
-    function updateSignUpContest(int $userId,array $signInfo):array
+
+    function updateSignUpContest(int $userId, array $signInfo): array
     {
         $teamInfo = [
-            'register_id'=>$userId,
-            'team_name'=>$signInfo['teamName'],
-            'school_id'=>$signInfo['schoolId'],
-            'school_name'=>$signInfo['schoolName'],
-            'contest_id'=>$signInfo['contestId'],
-            'school_level'=>$signInfo['schoolLevel'],
-            'member1'=>$signInfo['member1'],
-            'member2'=>$signInfo['member2'],
-            'member3'=>$signInfo['member3'],
-            'teacher'=>$signInfo['teacher'],
-            'contact_mobile'=>$signInfo['mobile'],
-            'email'=>$signInfo['email'],
-            'status'=>'待审核'
+            'register_id' => $userId,
+            'team_name' => $signInfo['teamName'],
+            'school_id' => $signInfo['schoolId'],
+            'school_name' => $signInfo['schoolName'],
+            'contest_id' => $signInfo['contestId'],
+            'school_level' => $signInfo['schoolLevel'],
+            'member1' => $signInfo['member1'],
+            'member2' => $signInfo['member2'],
+            'member3' => $signInfo['member3'],
+            'teacher' => $signInfo['teacher'],
+            'contact_mobile' => $signInfo['mobile'],
+            'email' => $signInfo['email'],
+            'status' => '待审核'
         ];
 
 
-        $time = $this->contestRepo->get($teamInfo['contest_id'],['can_register','register_start_time','register_end_time']);
+        $time = $this->contestRepo->get($teamInfo['contest_id'], ['can_register', 'register_start_time', 'register_end_time']);
 
-        if($time  == null)
+        if ($time == null)
             throw new ContestNotExistException();
 
-        if ($time['can_register'] == -1){
+        if ($time['can_register'] == -1) {
             $now = strtotime(Carbon::now());
 
-            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])){
+            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])) {
                 throw new ContestRegisterTimeError();
             }
-        }else if ($time['can_register'] == 0){
+        } else if ($time['can_register'] == 0) {
             throw new ContestRegisterTimeError();
         }
 
 
-        $Info = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$teamInfo['contest_id']])->first();
+        $Info = $this->contestRecordRepo->getByMult(['register_id' => $userId, 'contest_id' => $teamInfo['contest_id']])->first();
         //未报过名
-        if ($Info == null){
+        if ($Info == null) {
             if ($this->contestRecordRepo->insert($teamInfo) < 1)
                 throw new UnknownException("报名失败");
-        }
-        //不为空说明已经报过名
-        else{
+        } //不为空说明已经报过名
+        else {
 
-            if ($Info['status'] == "已审核"){
+            if ($Info['status'] == "已审核") {
                 throw new ContestRegisterHavePassed();
             }
 
-            $time = $this->contestRepo->get($teamInfo['contest_id'],['register_start_time','register_end_time']);
+            $time = $this->contestRepo->get($teamInfo['contest_id'], ['register_start_time', 'register_end_time']);
 
             $now = strtotime(Carbon::now());
 
-            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])){
+            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])) {
                 throw new ContestRegisterTimeError();
             }
 
-            if ($this->contestRecordRepo->updateWhere(['register_id'=>$userId,'contest_id'=>$teamInfo['contest_id']],$teamInfo) < 1)
+            if ($this->contestRecordRepo->updateWhere(['register_id' => $userId, 'contest_id' => $teamInfo['contest_id']], $teamInfo) < 1)
                 throw new UnknownException("报名更新失败");
         }
 
-        $signInfo =  ['status' => '报名成功待审核'];
+        $signInfo = ['status' => '报名成功待审核'];
 
         return $signInfo;
     }
@@ -115,9 +116,9 @@ class ContestService implements ContestServiceInterface
         $now = strtotime(Carbon::now());
         $collection = $this->contestRepo->all();
         $data = [];
-        foreach ($collection as $value){
+        foreach ($collection as $value) {
 
-            if (strtotime($value['register_start_time']) < $now && $now < strtotime($value['register_end_time'])){
+            if (strtotime($value['register_start_time']) < $now && $now < strtotime($value['register_end_time'])) {
                 $data[] = $value;
             }
         }
@@ -126,7 +127,7 @@ class ContestService implements ContestServiceInterface
 
     function getContestSignUpStatus(int $userId, int $contestId)
     {
-        $data = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'contest_id'=>$contestId])->first();
+        $data = $this->contestRecordRepo->getByMult(['register_id' => $userId, 'contest_id' => $contestId])->first();
 
         if ($data == null)
             throw new ContestNotRegisterException();
@@ -136,53 +137,51 @@ class ContestService implements ContestServiceInterface
 
     function abandonContest(int $userId, int $contestId): bool
     {
-        return $this->contestRecordRepo->deleteWhere(['register_id'=>$userId,'contest_id'=>$contestId]) == 1;
+        return $this->contestRecordRepo->deleteWhere(['register_id' => $userId, 'contest_id' => $contestId]) == 1;
     }
 
-    function getContestProblemList(int $contestId,int $operatorId): array
+    function getContestProblemList(int $contestId, int $operatorId): array
     {
-        $info = $this->contestRecordRepo->getByMult(['contest_id'=>$contestId,'register_id'=>$operatorId,'status'=>'已审核'],['problem_selected','problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $contestId, 'register_id' => $operatorId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
-       $time = $this->contestRepo->get($contestId,['problem_start_time']);
+        $time = $this->contestRepo->get($contestId, ['problem_start_time']);
 
-       $now =  strtotime(Carbon::now());
+        $now = strtotime(Carbon::now());
 
-       if ($now < strtotime($time['problem_start_time']))
-       {
-           throw new ContestNotStartException();
-       }
+        if ($now < strtotime($time['problem_start_time'])) {
+            throw new ContestNotStartException();
+        }
 
-       $problemList = $this->problemRepo->getBy('contest_id',$contestId,['id','contest_id','title']);
+        $problemList = $this->problemRepo->getBy('contest_id', $contestId, ['id', 'contest_id', 'title']);
 
-       $data = ['problemList' => $problemList,'problemSelectInfo'=>['problemId' =>$info['problem_selected'],'selectTime'=>$info['problem_selected_at']]];
+        $data = ['problemList' => $problemList, 'problemSelectInfo' => ['problemId' => $info['problem_selected'], 'selectTime' => $info['problem_selected_at']]];
 
-       return $data;
+        return $data;
     }
 
 
     function getAllPassContestList(int $userId): array
     {
-       $contestIds = $this->contestRecordRepo->getByMult(['register_id'=>$userId,'status'=>"已审核"],['contest_id'])->toArray();
+        $contestIds = $this->contestRecordRepo->getByMult(['register_id' => $userId, 'status' => "已审核"], ['contest_id'])->toArray();
 
-       return $this->contestRepo->getIn('id',$contestIds)->toArray();
+        return $this->contestRepo->getIn('id', $contestIds)->toArray();
     }
 
     function getProblemDetail(int $userId, array $key)
     {
-        $info = $this->contestRecordRepo->getByMult(['contest_id'=>$key['contestId'],'register_id'=>$userId,'status'=>'已审核'],['problem_selected','problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
-        $time = $this->contestRepo->get($key['contestId'],['problem_start_time']);
+        $time = $this->contestRepo->get($key['contestId'], ['problem_start_time']);
 
-        $now =  strtotime(Carbon::now());
+        $now = strtotime(Carbon::now());
 
-        if ($now < strtotime($time['problem_start_time']))
-        {
+        if ($now < strtotime($time['problem_start_time'])) {
             throw new ContestNotStartException();
         }
 
@@ -195,19 +194,20 @@ class ContestService implements ContestServiceInterface
 
     function updateProblemSelect(int $userId, array $key)
     {
-        if ($this->problemRepo->get($key['problemId'])->first() == null){
+        if ($this->problemRepo->get($key['problemId'])->first() == null) {
             throw new ContestProblemNotExist();
-    }
-        $info = $this->contestRecordRepo->getByMult(['contest_id'=>$key['contestId'],'register_id'=>$userId,'status'=>'已审核'],['problem_selected','problem_selected_at'])->first();
+        }
+
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
 
-        $time = $this->contestRepo->get($key['contestId'],['can_select_problem','problem_start_time','problem_end_time']);
+        $time = $this->contestRepo->get($key['contestId'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
 
-        if ($time['can_select_problem'] == -1){
-            $now =  strtotime(Carbon::now());
+        if ($time['can_select_problem'] == -1) {
+            $now = strtotime(Carbon::now());
 
             if ($now < strtotime($time['problem_start_time']))
                 throw new ContestNotStartException();
@@ -215,22 +215,23 @@ class ContestService implements ContestServiceInterface
 
             if ($now > strtotime($time['problem_end_time']))
                 throw new ContestCloseException();
-        }elseif ($time['can_select_problem'] == 0){
+
+        } else if ($time['can_select_problem'] == 0) {
             throw new ContestCloseException();
         }
 
 
         //无论选择与否都是更新对应行数据
-        return $this->contestRecordRepo->updateWhere(['contest_id'=>$key['contestId'],'register_id'=>$userId,'status'=>'已审核'],['problem_selected'=>$key['problemId'],'problem_selected_at'=>Carbon::now()]);
+        return $this->contestRecordRepo->updateWhere(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected' => $key['problemId'], 'problem_selected_at' => Carbon::now()]);
 
     }
 
     function getContestResult(int $userId, int $contestId)
     {
-        $row = $this->contestRecordRepo->getWhereCount(['contest_id'=>$contestId,'register_id'=>$userId,'status'=>'已审核']);
+        $row = $this->contestRecordRepo->getWhereCount(['contest_id' => $contestId, 'register_id' => $userId, 'status' => '已审核']);
         if ($row == 0)
             throw new ContestRegisterHaveNotPassException();
 
-        return $this->contestRecordRepo->getResult($contestId,$userId);
+        return $this->contestRecordRepo->getResult($contestId, $userId);
     }
 }

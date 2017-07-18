@@ -45,8 +45,8 @@ class SmsService implements SmsServiceInterface
 
     /**
      * 处理返回值
-     * @param $result
-     * @return array
+     * @param string $result
+     * @return string
      */
     public function execResult(string $result): string
     {

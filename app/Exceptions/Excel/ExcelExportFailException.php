@@ -5,10 +5,12 @@
  * Date: 17/7/17
  * Time: 17:05
  */
-namespace App\Exceptions;
+namespace App\Exceptions\Excel;
+
+use App\Exceptions\BaseException;
 
 class ExcelExportFailException extends BaseException
 {
     protected $code = 50002;
-    protected $message = "excel导出失败";
+    protected $data = "excel导出失败";
 }

@@ -13,5 +13,5 @@ use App\Exceptions\BaseException;
 class SchoolTeamsNotExistedException extends BaseException
 {
     protected $code = 40001;
-    protected $data = "该学校的队伍不存在";
+    protected $data = "该学校符合条件的队伍不存在";
 }

@@ -314,6 +314,7 @@ class UserController extends Controller
         ValidationHelper::validateCheck($request->all(), $rules);
 
         $key = ValidationHelper::getInputData($request, $rules);
+
         if ($this->contestService->updateProblemSelect($request->user->id, $key) < 1)
             throw new UnknownException("选题更新失败");
 

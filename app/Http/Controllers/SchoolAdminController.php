@@ -155,13 +155,30 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
+        ValidationHelper::validateCheck($request->all(), [
+            'page' => 'integer|min:1',
+            'size' => 'integer|min:1|max:500',
+            'contest_id' => 'integer',
+            'status' => 'string|max:255',
+        ]);
+
+        //condition必须字段
         $schoolId = $request->user['school_id'];
-        $contestId = $request->get("contest_id");
-
+        $contestId = $request->get('contest_id');
         $page = $request->input('page', 1);
-        $size = $request->input('size', 2);
+        $size = $request->input('size', 20);
 
-        $data = $this->schoolAdminService->getSchoolTeams($schoolId, $contestId, $page, $size);
+        $conditions = [
+            'school_id' => $schoolId,
+            'contest_id' => $contestId
+        ];
+
+        //condition可选字段
+        if ($request->input('status', null) != null) {
+            $conditions['status'] = $request->input('status');
+        }
+
+        $data = $this->schoolAdminService->getSchoolTeams($conditions, $page, $size);
 
         return response()->json([
             'code' => 0,
@@ -180,13 +197,31 @@ class SchoolAdminController extends Controller
         if (!Permission::checkPermission($request->user->id, ['view_school_results'])) {
             throw new PermissionDeniedException();
         }
+
+        ValidationHelper::validateCheck($request->all(), [
+            'page' => 'integer|min:1',
+            'size' => 'integer|min:1|max:500',
+            'contest_id' => 'integer',
+            'result' => 'string|max:255',
+        ]);
+
+        //condition必须字段
         $schoolId = $request->user['school_id'];
         $contestId = $request->get('contest_id');
-
         $page = $request->input('page', 1);
         $size = $request->input('size', 20);
 
-        $data = $this->schoolAdminService->getSchoolResults($schoolId, $contestId, $page, $size);
+        $conditions = [
+            'school_id' => $schoolId,
+            'contest_id' => $contestId
+        ];
+
+        //condition可选字段
+        if ($request->input('result', null) != null) {
+            $conditions['result'] = $request->input('result');
+        }
+
+        $data = $this->schoolAdminService->getSchoolResults($conditions, $page, $size);
 
         return response()->json([
             'code' => 0,
@@ -268,6 +303,12 @@ class SchoolAdminController extends Controller
         ]);
     }
 
+    /**
+     * 获取已开始的比赛列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
+     */
     public function getStartedContest(Request $request)
     {
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
