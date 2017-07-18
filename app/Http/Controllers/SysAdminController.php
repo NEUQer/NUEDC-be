@@ -254,6 +254,11 @@ class SysAdminController extends Controller
         ]);
     }
 
+    public function addSchoolAdmin(Request $request)
+    {
+        // todo add it
+    }
+
     public function generateSchoolAdmin(Request $request)
     {
         $input = ValidationHelper::checkAndGet($request, [
