@@ -10,11 +10,13 @@ namespace App\Services;
 
 
 use App\Exceptions\Auth\PrivilegeNameExisted;
+use App\Exceptions\Auth\UserNotExistException;
 use App\Exceptions\Permission\PrivilegeNotExistException;
 use App\Repository\Eloquent\PrivilegeRepository;
 use App\Repository\Eloquent\RolePrivilegeRepository;
 use App\Repository\Eloquent\RoleRepository;
 use App\Repository\Eloquent\UserPrivilegeRepository;
+use App\Repository\Eloquent\UserRepository;
 use App\Services\Contracts\AuthServiceInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -33,8 +35,9 @@ class AuthService implements AuthServiceInterface
 
     private $userPrivilegeRepo;
 
+    private $userRepo;
 
-    public function __construct(PrivilegeService $privilegeService, RoleService $roleService, PrivilegeRepository $privilegeRepo, RoleRepository $roleRepo, RolePrivilegeRepository $rolePrivilegeRepo, UserPrivilegeRepository $userPrivilegeRepo)
+    public function __construct(UserRepository $userRepository,PrivilegeService $privilegeService, RoleService $roleService, PrivilegeRepository $privilegeRepo, RoleRepository $roleRepo, RolePrivilegeRepository $rolePrivilegeRepo, UserPrivilegeRepository $userPrivilegeRepo)
     {
         $this->privilegeService = $privilegeService;
         $this->roleService = $roleService;
@@ -42,6 +45,7 @@ class AuthService implements AuthServiceInterface
         $this->roleRepo = $roleRepo;
         $this->rolePrivilegeRepo = $rolePrivilegeRepo;
         $this->userPrivilegeRepo = $userPrivilegeRepo;
+        $this->userRepo = $userRepository;
     }
 
 //    function addPrivilegeToDB(array $privilegeInfo)
@@ -89,6 +93,9 @@ class AuthService implements AuthServiceInterface
 
     function updateUserPrivilege(int $userId,array $privileges)
     {
+        if ($this->userRepo->get($userId)->first() == null)
+            throw new UserNotExistException();
+
         $this->privilegeService->refreshUserPrivileges($userId,$privileges);
 
         $privileges = $this->userPrivilegeRepo->getBy('user_id',$userId,['privilege']);
