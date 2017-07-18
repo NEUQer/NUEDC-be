@@ -20,7 +20,7 @@ class FileController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('token');
+//        $this->middleware('token');
     }
 
     public function uploadPublic(Request $request)
