@@ -70,6 +70,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     function getSchoolTeams(array $conditions, int $page, int $size)
     {
         $columns = [
+            'contest_id',
             'id',
             'team_name',
             'school_id',
@@ -134,6 +135,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     function getSchoolResults(array $conditions, int $page, int $size)
     {
         $columns = [
+            'contest_id',
             'id',
             'team_name',
             'school_id',
