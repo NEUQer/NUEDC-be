@@ -27,6 +27,10 @@ Route::group(['middleware' => ['token']], function () {
      */
     Route::put("/school/team/check/{id}",'SchoolAdminController@checkSchoolTeam');
     /**
+     * 批量审核学校队伍
+     */
+    Route::put("/school/team/mult-check",'SchoolAdminController@checkSchoolTeams');
+    /**
      * 查看学校队伍获奖情况
      */
     Route::get("/school/team/awards", 'SchoolAdminController@getSchoolResults');

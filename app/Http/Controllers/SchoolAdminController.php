@@ -241,13 +241,14 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $schoolTeamIds = ValidationHelper::checkAndGet($request->all(),[
+        $schoolTeamIds = ValidationHelper::checkAndGet($request,[
             'school_team_ids' => 'required|array'
-        ]);
+        ])['school_team_ids'];
 
         $flag = -1;
 
         foreach ($schoolTeamIds as $teamId) {
+
             if (!$this->schoolAdminService->checkSchoolTeam($teamId)) {
                 $flag = $teamId;
                 break;

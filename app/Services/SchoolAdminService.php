@@ -128,15 +128,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             throw new SchoolTeamsNotExistedException();
         }
 
-        $teamStatus = $this->contestRecordsRepo->getBy('id', $schoolTeamId, [
-            'status'
-        ])->first();
-
-        if ('未审核' == $teamStatus->status) {
-            return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已审核']) == 1;
-        }
-
-        return false;
+        return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已审核']) == 1;
     }
 
     function getSchoolResults(array $conditions, int $page, int $size)
