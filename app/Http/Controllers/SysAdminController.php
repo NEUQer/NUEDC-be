@@ -291,6 +291,10 @@ class SysAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
+        if (!$this->sysAdminService->deleteUser($userId)) {
+            throw new UnknownException('fail to delete user');
+        }
+
         return response()->json([
             'code' => 0
         ]);
