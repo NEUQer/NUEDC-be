@@ -43,6 +43,20 @@ class SmsService implements SmsServiceInterface
         return $this->execResult($result);
     }
 
+    public function sendVerifyCode($mobile, $randStr)
+    {
+        $message = "您正在注册电子设计大赛系统，验证码是：$randStr.请注意保密，不要提供给他人使用。本验证码五分钟内有效。&needstatus=false";
+
+        return $this->sendSms($mobile, $message);
+    }
+
+    public function forgetPassword($mobile, $randStr)
+    {
+        $message = "忘记密码，验证码是：$randStr.请注意保密，不要提供给他人使用。本验证码五分钟内有效。&needstatus=false";
+
+        return $this->sendSms($mobile, $message);
+    }
+
     /**
      * 处理返回值
      * @param string $result

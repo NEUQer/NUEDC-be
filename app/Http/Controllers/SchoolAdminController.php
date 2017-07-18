@@ -15,7 +15,7 @@ class SchoolAdminController extends Controller
     private $schoolAdminService;
     private $excelService;
 
-    public function __construct(SchoolAdminService $schoolAdminService,ExcelService $excelService)
+    public function __construct(SchoolAdminService $schoolAdminService, ExcelService $excelService)
     {
         $this->schoolAdminService = $schoolAdminService;
         $this->excelService = $excelService;
@@ -153,7 +153,7 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolTeams(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer',
             'status' => 'string|max:255'
         ]);
@@ -183,7 +183,7 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolResults(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer',
             'result_info' => 'string|max:255'
         ]);
@@ -229,6 +229,41 @@ class SchoolAdminController extends Controller
     }
 
     /**
+     * 批量审核学校队伍
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws PermissionDeniedException
+     * @throws UnknownException
+     */
+    public function checkSchoolTeams(Request $request)
+    {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $schoolTeamIds = ValidationHelper::checkAndGet($request->all(),[
+            'school_team_ids' => 'required|array'
+        ]);
+
+        $flag = -1;
+
+        foreach ($schoolTeamIds as $teamId) {
+            if (!$this->schoolAdminService->checkSchoolTeam($teamId)) {
+                $flag = $teamId;
+                break;
+            }
+        }
+
+        if (!$flag) {
+            throw new UnknownException("fail to check school teams after $flag");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
+    }
+
+    /**
      * 导出学校队伍
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -237,7 +272,7 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolTeams(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
             'status' => 'string|max:255'
         ]);
@@ -248,16 +283,16 @@ class SchoolAdminController extends Controller
 
         $conditions['school_id'] = $request->user->school_id;
 
-        $data = $this->schoolAdminService->getSchoolTeams($conditions,1,-1)['teams']->toArray();
+        $data = $this->schoolAdminService->getSchoolTeams($conditions, 1, -1)['teams']->toArray();
 
         $rows = [];
-        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','审核状态'];
+        $rows[] = ['队伍编号', '学校编号', '学校名称', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '审核状态'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
         }
 
-        $this->excelService->export('报名情况',$rows);
+        $this->excelService->export('报名情况', $rows);
     }
 
     /**
@@ -269,7 +304,7 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolResults(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
             'result_info' => 'string|max:255'
         ]);
@@ -280,16 +315,16 @@ class SchoolAdminController extends Controller
 
         $conditions['school_id'] = $request->user->school_id;
 
-        $data = $this->schoolAdminService->getSchoolResults($conditions,1,-1)['results']->toArray();
+        $data = $this->schoolAdminService->getSchoolResults($conditions, 1, -1)['results']->toArray();
 
         $rows = [];
-        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','所选题目编号','选题时间','所得奖项','评奖状态','评奖时间','现场赛相关信息'];
+        $rows[] = ['队伍编号', '学校编号', '学校名称', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '选题时间', '所得奖项', '评奖状态', '评奖时间', '现场赛相关信息'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
         }
 
-        $this->excelService->export('获奖情况',$rows);
+        $this->excelService->export('获奖情况', $rows);
     }
 
     /**
