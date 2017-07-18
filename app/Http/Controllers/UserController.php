@@ -59,6 +59,11 @@ class UserController extends Controller
 
     }
 
+    public function viewProblem(Request $request,int $problemId)
+    {
+        
+    }
+
     public function perRegister(Request $request)
     {
         $rules = [
