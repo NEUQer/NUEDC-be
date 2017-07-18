@@ -86,35 +86,77 @@ class SysAdminService implements SysAdminServiceInterface
         ];
     }
 
-    public function generateSchoolAdmin(int $schoolId)
+    public function generateSchoolAdmin(array $schoolIds)
     {
-        $loginName = 'SCHOOL_' . $schoolId . '_' . Utils::randomString('', 6);
-        $password = Utils::randomString('', 6);
-        $school = $this->schoolRepo->get($schoolId, ['id', 'name']);
+        $succeed = [];
+        $failed = [];
+
+        foreach ($schoolIds as $schoolId) {
+
+            $school = $this->schoolRepo->get($schoolId,['id','name','level','principal','principal_mobile']);
+
+            if ($school === null||$school->principal === null||$school->principal_mobile === null) {
+                $failed[] = $schoolId;
+                break;
+            }
+
+            // 检查相应用户是否存在
+
+            $preUser = $this->userService->getRepository()->getWhereCount(['name' => $school->principal]);
+            $preUser += $this->userService->getRepository()->getWhereCount(['mobile' => $school->principal_mobile]);
+
+            if ($preUser !== 0) {
+                $failed[] = $schoolId;
+            }
+
+            DB::transaction(function () use ($school,&$succeed) {
+                $userId = $this->userService->getRepository()->insertWithId([
+                    'school_id' => $school->id,
+                    'name' => $school->principal,
+                    'mobile' => $school->principal_mobile,
+                    'school_name' => $school->name,
+                    'password' => Encrypt::encrypt('NUEDC2017'),
+                    'status' => 1,
+                    'role' => 'school_admin'
+                ]);
+                $this->authService->giveRoleTo($userId, 'school_admin');
+                $succeed[] = $school->id;
+            });
+        }
+
+        return [
+            'succeed' => $succeed,
+            'failed' => $failed
+        ];
+    }
+
+    public function createSchoolAdmins(array $user)
+    {
+        // users需要填入name,mobile,school_id,school_name
+
+        $school = $this->schoolRepo->get($user['school_id']);
 
         if ($school === null) {
-            throw new UnknownException('no such school!');
+            throw new UnknownException('no such school');
         }
 
         $userId = -1;
 
-        DB::transaction(function () use (&$userId, $password, $school, $loginName) {
+        DB::transaction(function ()use($user,$school,&$userId){
             $userId = $this->userService->getRepository()->insertWithId([
-                'login_name' => $loginName,
+                'name' => $user['name'],
                 'school_id' => $school->id,
                 'school_name' => $school->name,
-                'password' => Encrypt::encrypt($password),
+                'password' => Encrypt::encrypt($user['password']),
+                'mobile' => $user['mobile'],
                 'status' => 1,
                 'role' => 'school_admin'
             ]);
-            $this->authService->giveRoleTo($userId, 'school_admin');
+
+            $this->authService->giveRoleTo($userId,'school_admin');
         });
 
-        return [
-            'user_id' => $userId,
-            'login_name' => $loginName,
-            'password' => $password
-        ];
+        return $userId;
     }
 
     // 这个方法不仅可以修改学校管理员，对于任意用户都是可用的
@@ -133,11 +175,20 @@ class SysAdminService implements SysAdminServiceInterface
         return $this->userService->getRepository()->deleteWhere(['id' => $userId]) == 1;
     }
 
+    public function importSchools(array $schools)
+    {
+        foreach ($schools as &$school) {
+            $schoolId = $this->schoolRepo->insertWithId($school);
+            $school['school_id'] = $schoolId;
+        }
+        return $schools;
+    }
+
     public function getSchools(int $page, int $size)
     {
         $schools = $this->schoolRepo->paginate($page, $size, [], [
             'id', 'name', 'level', 'address', 'post_code', 'principal', 'principal_mobile'
-        ]);
+        ],'name','asc');
 
         $count = $this->schoolRepo->getWhereCount([]);
 

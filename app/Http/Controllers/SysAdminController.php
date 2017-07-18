@@ -136,6 +136,12 @@ class SysAdminController extends Controller
     }
 
     // 学校管理
+
+    public function importSchools(Request $request)
+    {
+        // todo import-schools
+    }
+
     public function getSchools(Request $request)
     {
         ValidationHelper::validateCheck($request->all(), [
@@ -244,7 +250,7 @@ class SysAdminController extends Controller
     public function generateSchoolAdmin(Request $request)
     {
         $input = ValidationHelper::checkAndGet($request, [
-            'school_id' => 'required|integer'
+            'school_ids' => 'required|array'
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_admins'])) {
@@ -253,7 +259,7 @@ class SysAdminController extends Controller
 
         return response()->json([
             'code' => 0,
-            'data' => $this->sysAdminService->generateSchoolAdmin($input['school_id'])
+            'data' => $this->sysAdminService->generateSchoolAdmin($input['school_ids'])
         ]);
     }
 

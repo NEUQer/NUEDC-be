@@ -58,7 +58,10 @@ return [
             'driver' => 'local',
             'root' => storage_path('import'),
         ],
-
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private')
+        ],
         's3' => [
             'driver' => 's3',
             'key' => 'your-key',

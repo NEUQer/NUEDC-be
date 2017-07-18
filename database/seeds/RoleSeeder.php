@@ -35,7 +35,7 @@ class RoleSeeder extends Seeder
         $systemAdminPrivileges = [
             'manage_schools','manage_contest','manage_problems',
             'manage_school_admins','manage_all_teams','examine_experts',
-            'manage_privilege','manage_users','manage_news','manage_notices'
+            'manage_privilege','manage_users','manage_news','manage_notices','manage_files'
         ];
 
         $privileges = [];

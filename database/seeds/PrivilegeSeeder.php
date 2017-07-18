@@ -87,6 +87,11 @@ class PrivilegeSeeder extends Seeder
                 'display_name' => '管理通知',
                 'description' => '添加，删除和修改通知'
             ],
+            [
+                'name' => 'manage_files',
+                'display_name' => '管理文件',
+                'description' => '上传、获取公开或者私密文件'
+            ]
         ]);
     }
 }

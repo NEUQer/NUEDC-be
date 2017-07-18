@@ -34,13 +34,17 @@ interface SysAdminServiceInterface
 
     function getSchoolAdmins(int $page,int $size);
 
-    function generateSchoolAdmin(int $schoolId);
+    function generateSchoolAdmin(array $schoolIds);
+
+    function createSchoolAdmins(array $user);
 
     function updateUser(int $userId,array $data):bool;
 
     function deleteUser(int $userId):bool;
 
     // todo 学校管理
+
+    function importSchools(array $schools);
 
     function createSchool(array $data):int;
 
