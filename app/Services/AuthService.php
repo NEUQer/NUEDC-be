@@ -93,7 +93,7 @@ class AuthService implements AuthServiceInterface
 
     function updateUserPrivilege(int $userId,array $privileges)
     {
-        if ($this->userRepo->get($userId)->first() == null)
+        if ($this->userRepo->get($userId) == null)
             throw new UserNotExistException();
 
         $this->privilegeService->refreshUserPrivileges($userId,$privileges);
