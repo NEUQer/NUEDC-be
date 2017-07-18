@@ -76,7 +76,17 @@ class PrivilegeSeeder extends Seeder
                 'name' => 'manage_privilege',
                 'display_name' => '管理权限',
                 'description' => '管理用户和角色的权限'
-            ]
+            ],
+            [
+                'name' => 'manage_news',
+                'display_name' => '管理新闻',
+                'description' => '添加，删除和修改新闻'
+            ],
+            [
+                'name' => 'manage_notices',
+                'display_name' => '管理通知',
+                'description' => '添加，删除和修改通知'
+            ],
         ]);
     }
 }
