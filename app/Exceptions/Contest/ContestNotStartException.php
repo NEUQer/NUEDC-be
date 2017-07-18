@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class ContestNotStartException extends BaseException
 {
-    protected $code = 30004;
+    protected $code = 20004;
 
     protected $data = "Contest Not Start,No Permission To see Problem";
 }

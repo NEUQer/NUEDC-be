@@ -147,13 +147,17 @@ class ContestService implements ContestServiceInterface
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
-        $time = $this->contestRepo->get($contestId, ['problem_start_time']);
+        $time = $this->contestRepo->get($contestId, ['can_select_problem','problem_start_time']);
 
-        $now = strtotime(Carbon::now());
+        if ($time['can_select_problem'] == -1){
+            $now = strtotime(Carbon::now());
 
-        if ($now < strtotime($time['problem_start_time'])) {
-            throw new ContestNotStartException();
-        }
+            if ($now < strtotime($time['problem_start_time'])) {
+                throw new ContestNotStartException();
+            }
+        }elseif($time['can_select_problem'] == 0)
+            throw new ContestCloseException();
+
 
         $problemList = $this->problemRepo->getBy('contest_id', $contestId, ['id', 'contest_id', 'title']);
 

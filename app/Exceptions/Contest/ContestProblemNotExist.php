@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class ContestProblemNotExist extends BaseException
 {
-    protected $code = 30007;
+    protected $code = 20007;
 
     protected $data = "Problem Not Exist";
 }

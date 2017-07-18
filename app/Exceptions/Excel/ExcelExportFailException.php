@@ -11,6 +11,6 @@ use App\Exceptions\BaseException;
 
 class ExcelExportFailException extends BaseException
 {
-    protected $code = 50002;
+    protected $code = 60002;
     protected $data = "excel导出失败";
 }

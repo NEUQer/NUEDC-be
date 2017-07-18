@@ -12,7 +12,7 @@ namespace App\Exceptions\Contest;
 use App\Exceptions\BaseException;
 class ContestRegisterTimeError extends BaseException
 {
-    protected $code = 30001;
+    protected $code = 20001;
 
     protected $data = "Contest Register close or have not open !";
 }

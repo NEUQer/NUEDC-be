@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class ContestCloseException extends BaseException
 {
-    protected $code = 30006;
+    protected $code = 20006;
 
     protected $data = "Contest Closed,Can't Select Problem";
 }

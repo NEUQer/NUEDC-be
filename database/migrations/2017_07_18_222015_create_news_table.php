@@ -13,10 +13,12 @@ class CreateNewsTable extends Migration
      */
     public function up()
     {
-        Schema::create('news', function (Blueprint $table) {
+        Schema::create('message', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
             $table->text('content');
+            //type用于区分通知和新闻0为新闻，1为通知
+            $table->tinyInteger('type');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ class CreateNewsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('news');
+        Schema::dropIfExists('message');
     }
 }

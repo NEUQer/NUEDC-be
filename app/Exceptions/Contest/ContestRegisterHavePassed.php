@@ -13,6 +13,6 @@ use App\Exceptions\BaseException;
 
 class ContestRegisterHavePassed extends BaseException
 {
-    protected $code = 30003;
+    protected $code = 20003;
     protected $data = "Contest SignUp Request Have Passed, Can't Modify Team Info";
 }

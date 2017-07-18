@@ -11,6 +11,6 @@ use App\Exceptions\BaseException;
 
 class ExcelStoreFailException extends BaseException
 {
-    protected $code = 50001;
+    protected $code = 60001;
     protected $data = "excel文件储存失败";
 }
