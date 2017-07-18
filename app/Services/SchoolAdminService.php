@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Common\Utils;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
+use App\Exceptions\SchoolResultsNotExistedException;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Services\Contracts\SchoolAdminServiceInterface;
@@ -124,6 +125,12 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function checkSchoolTeam(int $schoolTeamId): bool
     {
+        $row = $this->contestRecordsRepo->getWhereCount(['id' => $schoolTeamId]);
+
+        if ($row < 1) {
+            throw new SchoolTeamsNotExistedException();
+        }
+
         $teamStatus = $this->contestRecordsRepo->getBy('id', $schoolTeamId, [
             'status'
         ])->first();
@@ -143,7 +150,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ]);
 
         if ($count == 0) {
-            throw new SchoolTeamsNotExistedException();
+            throw new SchoolResultsNotExistedException();
         }
 
         $results = $this->contestRecordsRepo->paginate($page, $size, ['school_id' => $schoolId, 'contest_id' => $contestId], [
@@ -175,6 +182,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function exportSchoolTeams(int $schoolId, int $contestId)
     {
+        $count = $this->contestRecordsRepo->getWhereCount([
+            'school_id' => $schoolId,
+            'contest_id' => $contestId
+        ]);
+
+        if ($count == 0) {
+            throw new SchoolTeamsNotExistedException();
+        }
+
         $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
             'contest_id',
             'id',
@@ -206,6 +222,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function exportSchoolResults(int $schoolId, int $contestId)
     {
+        $count = $this->contestRecordsRepo->getWhereCount([
+            'school_id' => $schoolId,
+            'contest_id' => $contestId
+        ]);
+
+        if ($count == 0) {
+            throw new SchoolResultsNotExistedException();
+        }
+
         $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
             'contest_id',
             'id',

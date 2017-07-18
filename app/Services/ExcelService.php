@@ -32,6 +32,10 @@ class ExcelService implements ExcelServiceInterface
             });
         })->store('xlsx', false, true);
 
+        if ($result == null) {
+            throw new ExcelExportFailException();
+        }
+
         return $result;
     }
 

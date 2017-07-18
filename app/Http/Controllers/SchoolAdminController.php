@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Common\ValidationHelper;
 use App\Exceptions\Common\UnknownException;
+use App\Exceptions\ExcelExportFailException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use Permission;
 use App\Services\SchoolAdminService;
@@ -258,7 +259,9 @@ class SchoolAdminController extends Controller
         $contestId = $request->get("contest_id");
 
         $path = $this->schoolAdminService->exportSchoolResults($schoolId, $contestId);
+
         $name = 'result';
+
         return response()->download($path,$name,[
             'Content-Type' => 'application/octet-stream',
             'Content-Disposition' => 'attachment;fileName='.$name."xlsx"

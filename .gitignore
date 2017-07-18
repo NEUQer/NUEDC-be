@@ -8,3 +8,5 @@ Homestead.yaml
 .env
 .DS_Store
 /app/Http/Controllers/TestController.php
+/storage/exports/*.xlsx
+/storage/import/*.xlsx

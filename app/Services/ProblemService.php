@@ -20,22 +20,29 @@ class ProblemService implements ProblemServiceInterface
         $this->problemRepo = $problemRepository;
     }
 
-    function getProblemByContestId(int $contestId)
+    public function getProblemByContestId(int $contestId, int $page, int $size)
     {
-        $this->problemRepo->getBy('contest_id', $contestId)->all();
+        $count = $this->problemRepo->getWhereCount(['contest_id' => $contestId]);
+
+        $problems = $this->problemRepo->paginate($page, $size, ['contest_id' => $contestId]);
+
+        return [
+            'count' => $count,
+            'problems' => $problems
+        ];
     }
 
-    function addProblem(array $problemData): bool
+    public function addProblem(array $problemData): int
     {
         return $this->problemRepo->insertWithId($problemData);
     }
 
-    function updateProblem(array $condition, array $problemData): bool
+    public function updateProblem(array $condition, array $problemData): bool
     {
         return $this->problemRepo->updateWhere($condition, $problemData) == 1;
     }
 
-    function deleteProblem(array $condition): bool
+    public function deleteProblem(array $condition): bool
     {
         return $this->problemRepo->deleteWhere($condition) == 1;
     }
