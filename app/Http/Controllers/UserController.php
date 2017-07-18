@@ -6,10 +6,12 @@ use App\Common\Utils;
 use App\Common\ValidationHelper;
 use App\Exceptions\Common\MobileIllegalIException;
 use App\Exceptions\Common\UnknownException;
+use App\Exceptions\Contest\ProblemSelectTimeException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use App\Services\ContestService;
 use App\Services\PermissionService;
 use App\Services\PrivilegeService;
+use App\Services\ProblemService;
 use App\Services\SmsService;
 use App\Services\TokenService;
 use App\Services\UserService;
@@ -32,14 +34,21 @@ class UserController extends Controller
 
     private $contestService;
 
+    private $problemService;
 
-    public function __construct(UserService $userService, VerifyCodeService $verifyCodeService, TokenService $tokenService, PermissionService $permissionService, ContestService $contestService)
+
+    public function __construct(
+        UserService $userService, VerifyCodeService $verifyCodeService,
+        TokenService $tokenService, PermissionService $permissionService,
+        ContestService $contestService,ProblemService $problemService
+    )
     {
         $this->userService = $userService;
         $this->verifyCodeService = $verifyCodeService;
         $this->tokenService = $tokenService;
         $this->permissionService = $permissionService;
         $this->contestService = $contestService;
+        $this->problemService = $problemService;
     }
 
     public function getSchools(Request $request)
@@ -61,7 +70,21 @@ class UserController extends Controller
 
     public function viewProblem(Request $request,int $problemId)
     {
-        
+        // 首先检查用户是否参加了对应的比赛
+        if (!$this->problemService->canUserAccessProblem($request->user->id,$problemId)) {
+            throw new ProblemSelectTimeException();
+        }
+
+        $problem = $this->problemService->getProblem($problemId,['id','title','content']);
+
+        $path = storage_path('app/private/'.$problem->content);
+
+        return response()->file($path,[
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
     }
 
     public function perRegister(Request $request)

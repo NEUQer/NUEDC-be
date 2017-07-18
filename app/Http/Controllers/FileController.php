@@ -20,14 +20,14 @@ class FileController extends Controller
 {
     public function __construct()
     {
-//        $this->middleware('token');
+        $this->middleware('token');
     }
 
     public function uploadPublic(Request $request)
     {
-//        if (!Permission::checkPermission($request->user->id,['manage_files'])) {
-//            throw new PermissionDeniedException();
-//        }
+        if (!Permission::checkPermission($request->user->id,['manage_files'])) {
+            throw new PermissionDeniedException();
+        }
 
         if (!$request->hasFile('upload')) {
             throw new FormValidationException(['upload filed is required']);
