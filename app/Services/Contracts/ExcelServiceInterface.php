@@ -12,8 +12,6 @@ use Illuminate\Http\UploadedFile;
 
 interface ExcelServiceInterface
 {
-    function export(array $cellData, string $fileName);
-
     function import(UploadedFile $file);
 }
 

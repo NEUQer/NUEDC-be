@@ -94,7 +94,6 @@ class SysAdminController extends Controller
         $contest = ValidationHelper::checkAndGet($request, [
             'title' => 'string|max:45',
             'description' => 'string|max:255',
-            'status' => 'max:255',
             'register_start_time' => 'date',
             'register_end_time' => 'date',
             'problem_start_time' => 'date',
@@ -106,10 +105,6 @@ class SysAdminController extends Controller
 
         if (!Permission::checkPermission($request->user->id, ['manage_contest'])) {
             throw new PermissionDeniedException();
-        }
-
-        if (!isset($contest['status'])) {
-            unset($contest['status']);
         }
 
         if (!$this->sysAdminService->updateContest(['id' => $contestId], $contest)) {
@@ -413,7 +408,7 @@ class SysAdminController extends Controller
         $records = $this->sysAdminService->getRecords(1, -1, $condition)['records'];
 
 
-        $excel = Excel::create('contest-record', function ($excel) use ($records) {
+        Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 foreach ($records as $record) {
                     $sheet->appendRow(array_values($record->toArray()));

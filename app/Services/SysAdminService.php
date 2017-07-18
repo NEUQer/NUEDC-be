@@ -92,6 +92,10 @@ class SysAdminService implements SysAdminServiceInterface
         $password = Utils::randomString('', 6);
         $school = $this->schoolRepo->get($schoolId, ['id', 'name']);
 
+        if ($school === null) {
+            throw new UnknownException('no such school!');
+        }
+
         $userId = -1;
 
         DB::transaction(function () use (&$userId, $password, $school, $loginName) {

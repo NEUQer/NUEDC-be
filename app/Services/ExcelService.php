@@ -18,28 +18,6 @@ use Illuminate\Support\Facades\Storage;
 class ExcelService implements ExcelServiceInterface
 {
     /**
-     * 导出excel
-     * @param array $cellData
-     * @param string $fileName
-     * @return bool
-     * @throws ExcelExportFailException
-     */
-    public function export(array $cellData, string $fileName)
-    {
-        $result = Excel::create($fileName, function ($excel) use ($cellData) {
-            $excel->sheet('sheet1', function ($sheet) use ($cellData) {
-                $sheet->rows($cellData);
-            });
-        })->store('xlsx', false, true);
-
-        if ($result == null) {
-            throw new ExcelExportFailException();
-        }
-
-        return $result;
-    }
-
-    /**
      * 导入excel
      *
      * @param UploadedFile $file
@@ -70,5 +48,19 @@ class ExcelService implements ExcelServiceInterface
         }, 'UTF-8');
         $result = ['rows' => $datas];
         return $result;
+    }
+
+    public function export(string $name,array $rows)
+    {
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('sheet1', function ($sheet) use ($rows) {
+                $sheet->rows($rows);
+            });
+        })->download('xlsx',[
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
     }
 }

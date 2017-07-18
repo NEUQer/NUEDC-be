@@ -8,7 +8,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\SchoolAdmin\SchoolResultsNotExistedException;
+use App\Common\Utils;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
@@ -69,14 +69,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function getSchoolTeams(array $conditions, int $page, int $size)
     {
-        $count = $this->contestRecordsRepo->getWhereCount($conditions);
-
-        if ($count == 0) {
-            throw new SchoolTeamsNotExistedException();
-        }
-
-        $teams = $this->contestRecordsRepo->paginate($page, $size, $conditions, [
-            'contest_id',
+        $columns = [
             'id',
             'team_name',
             'school_id',
@@ -89,7 +82,15 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'contact_mobile',
             'email',
             'status'
-        ]);
+        ];
+
+        if ($size == -1) {
+            $teams = $this->contestRecordsRepo->getByMult($conditions,$columns);
+            $count = count($teams);
+        }else {
+            $count = $this->contestRecordsRepo->getWhereCount($conditions);
+            $teams = $this->contestRecordsRepo->paginate($page,$size,$conditions,$columns);
+        }
 
         return [
             'teams' => $teams,
@@ -140,14 +141,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function getSchoolResults(array $conditions, int $page, int $size)
     {
-        $count = $this->contestRecordsRepo->getWhereCount($conditions);
-
-        if ($count == 0) {
-            throw new SchoolResultsNotExistedException();
-        }
-
-        $results = $this->contestRecordsRepo->paginate($page, $size, $conditions, [
-            'contest_id',
+        $columns = [
             'id',
             'team_name',
             'school_id',
@@ -165,97 +159,20 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'result_info',
             'result_at',
             'onsite_info'   //现场赛信息
-        ]);
+        ];
+
+        if ($size == -1) {
+            $results = $this->contestRecordsRepo->getByMult($conditions,$columns);
+            $count = count($results);
+        }else {
+            $count = $this->contestRecordsRepo->getWhereCount($conditions);
+            $results = $this->contestRecordsRepo->paginate($page,$size,$conditions,$columns);
+        }
 
         return [
             'results' => $results,
             'count' => $count
         ];
-    }
-
-    function exportSchoolTeams(int $schoolId, int $contestId)
-    {
-        $count = $this->contestRecordsRepo->getWhereCount([
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ]);
-
-        if ($count == 0) {
-            throw new SchoolTeamsNotExistedException();
-        }
-
-        $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
-            'contest_id',
-            'id',
-            'team_name',
-            'school_id',
-            'school_name',
-            'school_level',
-            'member1',
-            'member2',
-            'member3',
-            'teacher',
-            'contact_mobile',
-            'email',
-            'status'
-        ])->all();
-
-
-        $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱', '审核状态']];
-
-        foreach ($results as $result) {
-            $temp = array_values($result['attributes']);
-            $cellData = array_merge($cellData, [$temp]);
-        }
-
-        $path = $this->excelService->export($cellData, 'data')['full'];
-
-        return $path;
-    }
-
-    function exportSchoolResults(int $schoolId, int $contestId)
-    {
-        $count = $this->contestRecordsRepo->getWhereCount([
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ]);
-
-        if ($count == 0) {
-            throw new SchoolResultsNotExistedException();
-        }
-
-        $results = $this->contestRecordsRepo->getByMult(['school_id' => $schoolId, 'contest_id' => $contestId], [
-            'contest_id',
-            'id',
-            'team_name',
-            'school_id',
-            'school_name',
-            'school_level',
-            'member1',
-            'member2',
-            'member3',
-            'teacher',
-            'contact_mobile',
-            'email',
-            'problem_selected',
-            'problem_selected_at',
-            'result',   //获奖情况
-            'result_info',  //审查状态
-            'result_at',
-            'onsite_info'   //现场赛信息
-        ])->all();
-
-        $cellData = [['比赛编号', '队伍id', '队名', '学校编号', '学校名称', '学校等级', '成员1', '成员2', '成员3', '指导老师', '联系电话', '邮箱',
-            '所选题目', '选题时间', '获奖情况', '审查状态', '奖项确定时间', '现场赛相关信息']];
-
-        foreach ($results as $result) {
-            $temp = array_values($result['attributes']);
-            $cellData = array_merge($cellData, [$temp]);
-        }
-
-        $path = $this->excelService->export($cellData, 'result')['full'];
-
-        return $path;
     }
 }
 

@@ -17,7 +17,7 @@ interface SchoolAdminServiceInterface
 
     function addSchoolTeam(array $schoolTeamInfo): bool;
 
-    function getSchoolTeams(array $conditions, int $page, int $size);
+    function getSchoolTeams(array $conditions,int $page, int $size);
 
     function updateSchoolTeam(int $schoolTeamId, array $schoolTeamInfo): bool;
 
@@ -26,10 +26,6 @@ interface SchoolAdminServiceInterface
     function checkSchoolTeam(int $schoolTeamId): bool;
 
     function getSchoolResults(array $conditions, int $page, int $size);
-
-    function exportSchoolTeams(int $schoolId, int $contestId);
-
-    function exportSchoolResults(int $schoolId, int $contestId);
 }
 
 ?>

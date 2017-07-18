@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Common\ValidationHelper;
 use App\Exceptions\Common\UnknownException;
-use App\Exceptions\ExcelExportFailException;
 use App\Exceptions\Permission\PermissionDeniedException;
+use App\Services\ExcelService;
 use Permission;
 use App\Services\SchoolAdminService;
 use Illuminate\Http\Request;
@@ -13,10 +13,12 @@ use Illuminate\Http\Request;
 class SchoolAdminController extends Controller
 {
     private $schoolAdminService;
+    private $excelService;
 
-    public function __construct(SchoolAdminService $schoolAdminService)
+    public function __construct(SchoolAdminService $schoolAdminService,ExcelService $excelService)
     {
         $this->schoolAdminService = $schoolAdminService;
+        $this->excelService = $excelService;
     }
 
     /**
@@ -151,32 +153,19 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolTeams(Request $request)
     {
+        $conditions = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'integer',
+            'status' => 'string|max:255'
+        ]);
+
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
-        ValidationHelper::validateCheck($request->all(), [
-            'page' => 'integer|min:1',
-            'size' => 'integer|min:1|max:500',
-            'contest_id' => 'integer',
-            'status' => 'string|max:255',
-        ]);
+        $conditions['school_id'] = $request->user->school_id;
 
-        //condition必须字段
-        $schoolId = $request->user['school_id'];
-        $contestId = $request->get('contest_id');
         $page = $request->input('page', 1);
-        $size = $request->input('size', 20);
-
-        $conditions = [
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ];
-
-        //condition可选字段
-        if ($request->input('status', null) != null) {
-            $conditions['status'] = $request->input('status');
-        }
+        $size = $request->input('size', -1);
 
         $data = $this->schoolAdminService->getSchoolTeams($conditions, $page, $size);
 
@@ -194,32 +183,19 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolResults(Request $request)
     {
+        $conditions = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'integer',
+            'result_info' => 'string|max:255'
+        ]);
+
         if (!Permission::checkPermission($request->user->id, ['view_school_results'])) {
             throw new PermissionDeniedException();
         }
 
-        ValidationHelper::validateCheck($request->all(), [
-            'page' => 'integer|min:1',
-            'size' => 'integer|min:1|max:500',
-            'contest_id' => 'integer',
-            'result' => 'string|max:255',
-        ]);
+        $conditions['school_id'] = $request->user->school_id;
 
-        //condition必须字段
-        $schoolId = $request->user['school_id'];
-        $contestId = $request->get('contest_id');
         $page = $request->input('page', 1);
-        $size = $request->input('size', 20);
-
-        $conditions = [
-            'school_id' => $schoolId,
-            'contest_id' => $contestId
-        ];
-
-        //condition可选字段
-        if ($request->input('result', null) != null) {
-            $conditions['result'] = $request->input('result');
-        }
+        $size = $request->input('size', -1);
 
         $data = $this->schoolAdminService->getSchoolResults($conditions, $page, $size);
 
@@ -261,20 +237,27 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolTeams(Request $request)
     {
+        $conditions = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'required|integer',
+            'status' => 'string|max:255'
+        ]);
+
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
-        $schoolId = $request->user['school_id'];
-        $contestId = $request->get("contest_id");
+        $conditions['school_id'] = $request->user->school_id;
 
-        $path = $this->schoolAdminService->exportSchoolTeams($schoolId, $contestId);
-        $name = 'data';
+        $data = $this->schoolAdminService->getSchoolTeams($conditions,1,-1)['teams']->toArray();
 
-        return response()->download($path,$name,[
-            'Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment;fileName='.$name."xlsx"
-        ]);
+        $rows = [];
+        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','审核状态'];
+
+        foreach ($data as $item) {
+            $rows[] = array_values($item);
+        }
+
+        $this->excelService->export('报名情况',$rows);
     }
 
     /**
@@ -286,21 +269,27 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolResults(Request $request)
     {
+        $conditions = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'required|integer',
+            'result_info' => 'string|max:255'
+        ]);
+
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
-        $schoolId = $request->user['school_id'];
-        $contestId = $request->get("contest_id");
+        $conditions['school_id'] = $request->user->school_id;
 
-        $path = $this->schoolAdminService->exportSchoolResults($schoolId, $contestId);
+        $data = $this->schoolAdminService->getSchoolResults($conditions,1,-1)['results']->toArray();
 
-        $name = 'result';
+        $rows = [];
+        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','所选题目编号','选题时间','所得奖项','评奖状态','评奖时间','现场赛相关信息'];
 
-        return response()->download($path,$name,[
-            'Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment;fileName='.$name."xlsx"
-        ]);
+        foreach ($data as $item) {
+            $rows[] = array_values($item);
+        }
+
+        $this->excelService->export('获奖情况',$rows);
     }
 
     /**
