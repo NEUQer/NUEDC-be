@@ -11,7 +11,7 @@ namespace App\Services;
 use App\Exceptions\ExcelStoreFailException;
 use App\Services\Contracts\ExcelServiceInterface;
 use App\Exceptions\ExcelExportFailException;
-use Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 

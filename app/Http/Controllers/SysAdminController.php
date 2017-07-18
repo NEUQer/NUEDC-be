@@ -17,6 +17,7 @@ use App\Exceptions\Permission\PermissionDeniedException;
 use App\Facades\Permission;
 use App\Services\SysAdminService;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SysAdminController extends Controller
 {
@@ -30,14 +31,14 @@ class SysAdminController extends Controller
 
     public function login(Request $request)
     {
-        $data = ValidationHelper::checkAndGet($request,[
+        $data = ValidationHelper::checkAndGet($request, [
             'identifier' => 'required|string',
             'password' => 'required|string|min:6'
         ]);
 
         return response()->json([
             'code' => 0,
-            'data' => $this->sysAdminService->login($data['identifier'],$data['password'],$request->ip())
+            'data' => $this->sysAdminService->login($data['identifier'], $data['password'], $request->ip())
         ]);
     }
 
@@ -87,6 +88,7 @@ class SysAdminController extends Controller
             ]
         ]);
     }
+
     public function updateContest(Request $request, int $contestId)
     {
         $contest = ValidationHelper::checkAndGet($request, [
@@ -160,7 +162,7 @@ class SysAdminController extends Controller
 
     public function createSchool(Request $request)
     {
-        $data = ValidationHelper::checkAndGet($request,[
+        $data = ValidationHelper::checkAndGet($request, [
             'name' => 'required|string|max:100',
             'level' => 'required|string|max:45',
             'address' => 'string|max:255',
@@ -169,7 +171,7 @@ class SysAdminController extends Controller
             'principal_mobile' => 'string|max:45'
         ]);
 
-        if (!Permission::checkPermission($request->user->id,['manage_schools'])) {
+        if (!Permission::checkPermission($request->user->id, ['manage_schools'])) {
             throw new PermissionDeniedException();
         }
 
@@ -322,19 +324,19 @@ class SysAdminController extends Controller
 
         $conditions = [];
 
-        if ($request->input('contest_id',null) != null) {
+        if ($request->input('contest_id', null) != null) {
             $conditions['contest_id'] = $request->input('contest_id');
         }
 
-        if ($request->input('status',null) != null) {
+        if ($request->input('status', null) != null) {
             $conditions['status'] = $request->input('status');
         }
 
-        if ($request->input('result',null) != null) {
+        if ($request->input('result', null) != null) {
             $conditions['result'] = $request->input('result');
         }
 
-        if ($request->input('school_id',null) != null) {
+        if ($request->input('school_id', null) != null) {
             $conditions['school_id'] = $request->input('school_id');
         }
 
@@ -392,6 +394,36 @@ class SysAdminController extends Controller
 
         return response()->json([
             'code' => 0
+        ]);
+    }
+
+    public function exportRecord(Request $request)
+    {
+        $condition = ValidationHelper::checkAndGet($request, [
+            'contest_id' => 'integer',
+            'school_id' => 'integer',
+            'result' => 'string|max:255',
+            'status' => 'string|max:255'
+        ]);
+
+        if (!Permission::checkPermission($request->user->id,['manage_all_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $records = $this->sysAdminService->getRecords(1, -1, $condition)['records'];
+
+
+        $excel = Excel::create('contest-record', function ($excel) use ($records) {
+            $excel->sheet('sheet1', function ($sheet) use ($records) {
+                foreach ($records as $record) {
+                    $sheet->appendRow(array_values($record->toArray()));
+                }
+            });
+        })->download('xlsx',[
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+            'Access-Control-Allow-Credentials' => 'true'
         ]);
     }
 }

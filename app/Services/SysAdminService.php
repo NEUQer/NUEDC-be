@@ -27,8 +27,8 @@ class SysAdminService implements SysAdminServiceInterface
     private $recordRepo;
 
     public function __construct(
-        ContestRepository $contestRepository,UserService $userService,
-        SchoolRepository $schoolRepository,AuthService $authService,
+        ContestRepository $contestRepository, UserService $userService,
+        SchoolRepository $schoolRepository, AuthService $authService,
         ContestRecordRepository $contestRecordRepository
     )
     {
@@ -41,7 +41,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function login(string $loginName, string $password, string $ip)
     {
-        return $this->userService->loginBy('login_name',$loginName,$password,$ip,1);
+        return $this->userService->loginBy('login_name', $loginName, $password, $ip, 1);
     }
 
     // 竞赛管理
@@ -49,9 +49,9 @@ class SysAdminService implements SysAdminServiceInterface
     public function getContests()
     {
         return $this->contestRepo->all([
-            'id','description','title','status','can_register',
-            'can_select_problem','can_select_problem','register_start_time',
-            'register_end_time','problem_start_time','problem_end_time'
+            'id', 'description', 'title', 'status', 'can_register',
+            'can_select_problem', 'can_select_problem', 'register_start_time',
+            'register_end_time', 'problem_start_time', 'problem_end_time'
         ]);
     }
 
@@ -62,7 +62,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function updateContest(array $condition, array $contest): bool
     {
-        return $this->contestRepo->updateWhere($condition,$contest) == 1;
+        return $this->contestRepo->updateWhere($condition, $contest) == 1;
     }
 
     public function deleteContest(array $condition): bool
@@ -74,8 +74,8 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function getSchoolAdmins(int $page, int $size)
     {
-        $schoolAdmins = $this->userService->getRepository()->paginate($page,$size,['role' => 'school_admin'],[
-            'id','name','email','mobile','school_id','school_name','sex','status','role','created_at'
+        $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin'], [
+            'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
         ]);
 
         $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin']);
@@ -88,13 +88,13 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function generateSchoolAdmin(int $schoolId)
     {
-        $loginName = 'SCHOOL_'.$schoolId.'_'.Utils::randomString('',6);
-        $password = Utils::randomString('',6);
-        $school = $this->schoolRepo->get($schoolId,['id','name']);
+        $loginName = 'SCHOOL_' . $schoolId . '_' . Utils::randomString('', 6);
+        $password = Utils::randomString('', 6);
+        $school = $this->schoolRepo->get($schoolId, ['id', 'name']);
 
         $userId = -1;
 
-        DB::transaction(function ()use(&$userId,$password,$school,$loginName){
+        DB::transaction(function () use (&$userId, $password, $school, $loginName) {
             $userId = $this->userService->getRepository()->insertWithId([
                 'login_name' => $loginName,
                 'school_id' => $school->id,
@@ -103,7 +103,7 @@ class SysAdminService implements SysAdminServiceInterface
                 'status' => 1,
                 'role' => 'school_admin'
             ]);
-            $this->authService->giveRoleTo($userId,'school_admin');
+            $this->authService->giveRoleTo($userId, 'school_admin');
         });
 
         return [
@@ -117,11 +117,11 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function updateUser(int $userId, array $data): bool
     {
-         if (isset($data['password'])) {
-             $data['password'] = Encrypt::encrypt($data['password']);
-         }
+        if (isset($data['password'])) {
+            $data['password'] = Encrypt::encrypt($data['password']);
+        }
 
-         return $this->userService->getRepository()->updateWhere(['id' => $userId],$data) == 1;
+        return $this->userService->getRepository()->updateWhere(['id' => $userId], $data) == 1;
     }
 
     public function deleteUser(int $userId): bool
@@ -131,8 +131,8 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function getSchools(int $page, int $size)
     {
-        $schools = $this->schoolRepo->paginate($page,$size,[],[
-            'id','name','level','address','post_code','principal','principal_mobile'
+        $schools = $this->schoolRepo->paginate($page, $size, [], [
+            'id', 'name', 'level', 'address', 'post_code', 'principal', 'principal_mobile'
         ]);
 
         $count = $this->schoolRepo->getWhereCount([]);
@@ -150,7 +150,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function updateSchool(int $schoolId, array $data): bool
     {
-        return $this->schoolRepo->update($data,$schoolId) == 1;
+        return $this->schoolRepo->update($data, $schoolId) == 1;
     }
 
     public function deleteSchool(int $schoolId): bool
@@ -160,11 +160,15 @@ class SysAdminService implements SysAdminServiceInterface
 
     // 参赛管理
 
-    public function getRecords(int $page, int $size,array $condition)
+    public function getRecords(int $page, int $size, array $condition)
     {
-        $records = $this->recordRepo->paginate($page,$size,$condition);
-
-        $count = $this->recordRepo->getWhereCount($condition);
+        if ($size == -1) {
+            $records = $this->recordRepo->getByMult($condition);
+            $count = count($records);
+        } else {
+            $records = $this->recordRepo->paginate($page, $size, $condition);
+            $count = $this->recordRepo->getWhereCount($condition);
+        }
 
         return [
             'records' => $records,
@@ -172,13 +176,18 @@ class SysAdminService implements SysAdminServiceInterface
         ];
     }
 
-    public function updateRecord(int $recordId,array $data): bool
+    public function updateRecord(int $recordId, array $data): bool
     {
-        return $this->recordRepo->update($data,$recordId) == 1;
+        return $this->recordRepo->update($data, $recordId) == 1;
     }
 
     public function deleteRecord(int $recordId): bool
     {
         return $this->recordRepo->deleteWhere(['id' => $recordId]) == 1;
+    }
+
+    public function updateResults(array $results): bool
+    {
+        // TODO: Implement updateResults() method.
     }
 }

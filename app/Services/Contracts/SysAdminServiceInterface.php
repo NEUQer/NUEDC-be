@@ -60,4 +60,6 @@ interface SysAdminServiceInterface
 
     // todo 成绩录入
 
+    function updateResults(array $results):bool;
+
 }

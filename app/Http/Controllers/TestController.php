@@ -54,7 +54,7 @@ class TestController extends Controller
     public function test(Request $request,AuthService $service)
     {
        $userId =  DB::table('users')->insertGetId([
-            'login_name' => 'admin',
+            'login_name' => 'admin2',
             'password' => Encrypt::encrypt('123456'),
             'status' => 1,
         ]);
