@@ -196,7 +196,8 @@ class UserService implements UserServiceInterface
 
     public function updateUserPassword(array $userInfo)
     {
-        $user = $this->userRepository->get($userInfo['userId'])->first();
+        $user = $this->userRepository->get($userInfo['userId']);
+
 
         if ($user == null) {
             throw new UserNotExistException();
