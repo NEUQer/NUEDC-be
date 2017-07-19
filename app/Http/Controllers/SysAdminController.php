@@ -147,7 +147,44 @@ class SysAdminController extends Controller
 
     public function importSchools(Request $request)
     {
-        // todo import-schools
+        if ($request->isMethod('post')) {
+            $file = $request->file('file');
+            $data = $this->excelService->import($file);
+        }
+
+        $contestRecords = $data['rows'];
+
+        //去掉表头
+        array_pull($contestRecords, 0);
+        //用于保存成功与失败记录
+        $success = [];
+        $fail = [];
+
+        foreach ($contestRecords as $contestRecord) {
+            //根据模板填充信息
+            $condition = [
+                'name' => $contestRecord[0],
+                'level' => $contestRecord[1],
+                'address' => $contestRecord[2],
+                'post_code' => $contestRecord[3],
+                'principal' => $contestRecord[4],
+                'principal_mobile' => $contestRecord[5]
+            ];
+
+            if ($this->sysAdminService->createSchool($condition)) {
+                $success[] = $contestRecord;
+            } else {
+                $fail[] = $contestRecord;
+            }
+        }
+
+        return response()->json([
+            'code' => 0,
+            'data' => [
+                'success' => $success,
+                'fail' => $fail
+            ]
+        ]);
     }
 
     public function getSchools(Request $request)
@@ -168,13 +205,16 @@ class SysAdminController extends Controller
         ]);
 
     }
-    public function getSchoolListTemplateFile(ExcelService $excelService){
+
+    public function getSchoolListTemplateFile(ExcelService $excelService)
+    {
         $name = "学校信息导入模板";
 
-        $rows =[['学校名称','学校等级','学校通信地址','学校邮编','学校负责人姓名','负责人手机号']] ;
+        $rows = [['学校名称', '学校等级', '学校通信地址', '学校邮编', '学校负责人姓名', '负责人手机号']];
 
-        $excelService->export($name,$rows);
+        $excelService->export($name, $rows);
     }
+
     public function createSchool(Request $request)
     {
         $data = ValidationHelper::checkAndGet($request, [
@@ -263,7 +303,7 @@ class SysAdminController extends Controller
 
     public function addSchoolAdmin(Request $request)
     {
-        $inputs = ValidationHelper::checkAndGet($request,[
+        $inputs = ValidationHelper::checkAndGet($request, [
             'school_id' => 'required|integer',
             'name' => 'required|string|max:255|unique:users',
             'mobile' => 'required|string|max:45|unique:users',
@@ -452,7 +492,7 @@ class SysAdminController extends Controller
             'status' => 'string|max:255'
         ]);
 
-        if (!Permission::checkPermission($request->user->id,['manage_all_teams'])) {
+        if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
             throw new PermissionDeniedException();
         }
 
@@ -460,14 +500,14 @@ class SysAdminController extends Controller
 
 
         Excel::create('contest-record', function ($excel) use ($records) {
-            $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号','学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
+            $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
                 '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 foreach ($records as $record) {
-                    $sheet->    appendRow(array_values($record->toArray()));
+                    $sheet->appendRow(array_values($record->toArray()));
                 }
             });
-        })->download('xlsx',[
+        })->download('xlsx', [
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
             'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
@@ -477,7 +517,7 @@ class SysAdminController extends Controller
 
     public function importRecord(Request $request)
     {
-        if (!Permission::checkPermission($request->user->id,['manage_all_teams'])) {
+        if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
             throw new PermissionDeniedException();
         }
 
@@ -485,27 +525,55 @@ class SysAdminController extends Controller
             $file = $request->file('data');
             $data = $this->excelService->import($file);
         }
-        //TODO: 处理表格数据，更新数据库
+
+        $contestRecords = $data['rows'];
+        //去除表头
+        array_pull($contestRecords, 0);
+
+        //创建数组用于保存记录
+        $success = [];
+        $fail = [];
+
+        foreach ($contestRecords as $contestRecord) {
+            $condition = [
+                'result' => $contestRecord[15],
+                'result_info' => $contestRecord[16],
+                'result_at' => $contestRecord[19]
+            ];
+
+            if (!$this->sysAdminService->updateRecord($contestRecord[0], $condition)) {
+                $fail[] = $contestRecord;
+            }else {
+                $success[] = $contestRecord;
+            }
+        }
+
         return response()->json([
             'code' => 0,
-            'data' => $data
+            'data' => [
+                'success' => $success,
+                'fail' => $fail
+            ]
         ]);
     }
 
     public function sendMessages(Request $request)
     {
+        if (!Permission::checkPermission($request->user->id, ['send_message'])) {
+            throw new PermissionDeniedException();
+        }
+
         $params = ValidationHelper::checkAndGet($request, [
             'user_ids' => 'required|array',
             'message' => 'required|string|max:70'
         ]);
-
 
         $userIds = $params['user_ids'];
         $message = $params['message'];
 
         foreach ($userIds as $userId) {
             $mobile = $this->userService->getUserInfo(['id' => $userId])->toArray()['mobile'];
-            //TODO: 增加验证逻辑
+            //TODO: 根据sendSms的返回码做状态判断，用fail和success数组保存
             $this->Sms::sendSms($mobile, $message);
         }
 
