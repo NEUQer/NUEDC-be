@@ -35,7 +35,8 @@ class SmsService implements SmsServiceInterface
             'account' => self::API_ACCOUNT,
             'pswd' => self::API_PASSWORD,
             'mobile' => $mobile,
-            'msg' => $msg
+            'msg' => $msg,
+            'needstatus' => false
         );
 
         $result = $this->curlPost(self::API_SEND_URI, $postArr);
@@ -45,14 +46,14 @@ class SmsService implements SmsServiceInterface
 
     public function sendVerifyCode($mobile, $randStr)
     {
-        $message = "您正在注册电子设计大赛系统，验证码是：$randStr.请注意保密，不要提供给他人使用。本验证码五分钟内有效。&needstatus=false";
+        $message = "您正在注册电子设计大赛系统，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
 
         return $this->sendSms($mobile, $message);
     }
 
     public function forgetPassword($mobile, $randStr)
     {
-        $message = "忘记密码，验证码是：$randStr.请注意保密，不要提供给他人使用。本验证码五分钟内有效。&needstatus=false";
+        $message = "忘记密码，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
 
         return $this->sendSms($mobile, $message);
     }

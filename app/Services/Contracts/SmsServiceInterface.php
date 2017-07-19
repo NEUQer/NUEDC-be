@@ -11,6 +11,7 @@ interface SmsServiceInterface
     function sendVerifyCode($mobile, $randStr);
 
     function forgetPassword($mobile, $randStr);
+
 }
 
 ?>
