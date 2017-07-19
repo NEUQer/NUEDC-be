@@ -35,12 +35,7 @@ class FileController extends Controller
 
         $path = $request->upload->store('upload','public');
 
-        return response([
-            'code' => 0,
-            'data' => [
-                'url' => url('/storage/'.$path)
-            ]
-        ]);
+        return response(url('/storage/'.$path));
     }
 
     public function uploadPrivate(Request $request)
