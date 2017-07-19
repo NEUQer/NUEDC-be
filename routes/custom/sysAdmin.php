@@ -21,7 +21,7 @@ Route::group(['prefix' => 'sysadmin'],function (){
 
     Route::get('/school-admins','SysAdminController@getSchoolAdmins');
     Route::post('/school-admin/generate','SysAdminController@generateSchoolAdmin');
-    Route::post('/school-admin/create','SysAdminController@createSchoolAdmin');
+    Route::post('/school-admin/create','SysAdminController@addSchoolAdmin');
 
     Route::post('/user/{id}/update','SysAdminController@updateUser');
     Route::get('/user/{id}/delete','SysAdminController@deleteUser');

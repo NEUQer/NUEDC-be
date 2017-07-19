@@ -273,16 +273,21 @@ class SysAdminController extends Controller
             'add_on' => 'string|max:255'
         ]);
 
-        if (!Permission::checkPermission($request->user->id,['manage_school_admin'])) {
+        if (!Permission::checkPermission($request->user->id,['manage_school_admins'])) {
             throw new PermissionDeniedException();
         }
 
-        if (!$this->sysAdminService->createSchoolAdmins($inputs)){
+        $userId = $this->sysAdminService->createSchoolAdmins($inputs);
+
+        if ($userId === -1){
             throw new UnknownException('Fail to add school admin');
         }
 
         return response()->json([
-            'code' => 0
+            'code' => 0,
+            'data' => [
+                'user_id' => $userId
+            ]
         ]);
 
     }
