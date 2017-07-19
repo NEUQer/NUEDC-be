@@ -91,6 +91,11 @@ class PrivilegeSeeder extends Seeder
                 'name' => 'manage_files',
                 'display_name' => '管理文件',
                 'description' => '上传、获取公开或者私密文件'
+            ],
+            [
+                'name' => 'send_message',
+                'display_name' => '群发短信',
+                'description' => '发送应急短信'
             ]
         ]);
     }
