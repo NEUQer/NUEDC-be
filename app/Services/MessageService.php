@@ -41,8 +41,7 @@ class MessageService implements MessageServiceInterface
     function getAllMessage(int $type,int $page,int $size)
     {
         $messages = $this->messageRepo->paginate($page, $size, ['type'=>$type], [
-            'id', 'type', 'title', 'created_at', 'update_at'
-        ]);
+            'id', 'type', 'title', 'created_at', 'updated_at']);
 
         $count = $this->messageRepo->getWhereCount(['type'=>$type]);
 
