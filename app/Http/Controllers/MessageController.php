@@ -70,12 +70,18 @@ class MessageController extends Controller
         );
     }
 
-    public function getMessageDetail(int $messageId){
+    public function getMessageDetail(Request $request){
 
+
+        ValidationHelper::validateCheck($request->all(),['messageId'=>'required','type'=>'required']);
+
+        $messageId = $request->input('messageId');
+
+        $type = $request->input('type');
         return response()->json(
             [
                 'code'=>0,
-                'data'=>$this->messageService->getMessageDetail($messageId)
+                'data'=>$this->messageService->getMessageDetail($messageId,$type)
             ]
         );
 

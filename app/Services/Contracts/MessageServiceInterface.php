@@ -17,7 +17,7 @@ Interface MessageServiceInterface
 
     function getAllMessage(int $type,int $page,int $size);
 
-    function getMessageDetail(int $messageId);
+    function getMessageDetail(int $messageId,int $type);
 
     function deleteMessage(int $messageId);
 }

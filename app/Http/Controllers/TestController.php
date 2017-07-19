@@ -145,7 +145,7 @@ class TestController extends Controller
         foreach ($userIds as $userId) {
             $mobile = $this->userService->getUserInfo(['id' => $userId])->toArray()['mobile'];
             //TODO: 增加验证逻辑
-            $this->Sms::sendSms($mobile, $message);
+           // $this->Sms::sendSms($mobile, $message);
         }
 
         return response()->json([

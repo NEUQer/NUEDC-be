@@ -16,4 +16,4 @@ Route::group(['middleware' => 'token', 'prefix' => '/sysadmin'], function () {
 });
 
 Route::get('/sysadmin/message/all', 'MessageController@getAllMessage');
-Route::get('/sysadmin/message/info/{id}', 'MessageController@getMessageDetail');
+Route::get('/sysadmin/message/info', 'MessageController@getMessageDetail');

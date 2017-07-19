@@ -52,14 +52,20 @@ class MessageService implements MessageServiceInterface
     }
 
 
-    function getMessageDetail(int $messageId)
+    function getMessageDetail(int $messageId,int $type)
     {
         $message = $this -> messageRepo->get($messageId);
         if ( $message == null)
             throw new MessageNotExistedException();
+        $pre = $this->messageRepo->getPre($messageId,$type);
 
+        $next = $this->messageRepo->getNext($messageId,$type);
 
-       return $message;
+        return [
+            'current'=>$message,
+            'pre'=>$pre,
+            'next'=>$next
+        ];
     }
 
 
