@@ -41,7 +41,7 @@ class MessageController extends Controller
 
         $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
-        $this->permissionService->checkPermission($request->user->id,$permission);
+        $this->permissionService->checkPermission($request->user->id,[$permission]);
 
         return response()->json([
             'code'=>0,
@@ -92,7 +92,7 @@ class MessageController extends Controller
 
         $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
-        $this->permissionService->checkPermission($request->user->id,$permission);
+        $this->permissionService->checkPermission($request->user->id,[$permission]);
 
         $this->messageService->updateMessage($messageInfo,$messageId);
 
@@ -109,7 +109,7 @@ class MessageController extends Controller
 
         $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
-        $this->permissionService->checkPermission($request->user->id,$permission);
+        $this->permissionService->checkPermission($request->user->id,[$permission]);
 
 
         $this->messageService->deleteMessage($messageId);
