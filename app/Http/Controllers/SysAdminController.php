@@ -256,7 +256,28 @@ class SysAdminController extends Controller
 
     public function addSchoolAdmin(Request $request)
     {
-        // todo add it
+        $inputs = ValidationHelper::checkAndGet($request,[
+            'school_id' => 'required|integer',
+            'name' => 'required|string|max:255|unique:users',
+            'mobile' => 'required|string|max:45|unique:users',
+            'email' => 'string|max:100',
+            'password' => 'required|string|min:6',
+            'sex' => 'string|max:4',
+            'add_on' => 'string|max:255'
+        ]);
+
+        if (!Permission::checkPermission($request->user->id,['manage_school_admin'])) {
+            throw new PermissionDeniedException();
+        }
+
+        if (!$this->sysAdminService->createSchoolAdmins($inputs)){
+            throw new UnknownException('Fail to add school admin');
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
+
     }
 
     public function generateSchoolAdmin(Request $request)

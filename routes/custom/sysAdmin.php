@@ -20,7 +20,8 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::get('/school/{id}/delete','SysAdminController@deleteSchool');
 
     Route::get('/school-admins','SysAdminController@getSchoolAdmins');
-    Route::post('/school-admin/create','SysAdminController@generateSchoolAdmin');
+    Route::post('/school-admin/generate','SysAdminController@generateSchoolAdmin');
+    Route::post('/school-admin/create','SysAdminController@createSchoolAdmin');
 
     Route::post('/user/{id}/update','SysAdminController@updateUser');
     Route::get('/user/{id}/delete','SysAdminController@deleteUser');
