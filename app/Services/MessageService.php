@@ -34,7 +34,7 @@ class MessageService implements MessageServiceInterface
 
     function deleteMessage(int $messageId)
     {
-        return $this->messageRepo->delete($messageId);
+        return $this->messageRepo->delete($messageId) == 1;
     }
 
 
