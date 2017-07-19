@@ -25,6 +25,8 @@ interface UserServiceInterface
 
     function logout(int $userId,int $client);
 
+    function getUserInfo(array $condition);
+
     // 辅助类函数
 
     function isUserExist(array $condition):bool;

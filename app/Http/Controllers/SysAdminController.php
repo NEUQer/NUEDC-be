@@ -17,6 +17,7 @@ use App\Exceptions\Permission\PermissionDeniedException;
 use App\Facades\Permission;
 use App\Services\ExcelService;
 use App\Services\SysAdminService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -24,9 +25,15 @@ class SysAdminController extends Controller
 {
     private $sysAdminService;
 
-    public function __construct(SysAdminService $sysAdminService)
+    private $excelService;
+
+    private $userService;
+
+    public function __construct(SysAdminService $sysAdminService, ExcelService $excelService, UserService $userService)
     {
         $this->sysAdminService = $sysAdminService;
+        $this->excelService = $excelService;
+        $this->userService = $userService;
         $this->middleware('token')->except('login');
     }
 
@@ -448,9 +455,11 @@ class SysAdminController extends Controller
 
 
         Excel::create('contest-record', function ($excel) use ($records) {
+            $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号','学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
+                '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 foreach ($records as $record) {
-                    $sheet->appendRow(array_values($record->toArray()));
+                    $sheet->    appendRow(array_values($record->toArray()));
                 }
             });
         })->download('xlsx',[
@@ -460,4 +469,44 @@ class SysAdminController extends Controller
             'Access-Control-Allow-Credentials' => 'true'
         ]);
     }
+
+    public function importRecord(Request $request)
+    {
+        if (!Permission::checkPermission($request->user->id,['manage_all_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        if ($request->isMethod('post')) {
+            $file = $request->file('data');
+            $data = $this->excelService->import($file);
+        }
+        //TODO: 处理表格数据，更新数据库
+        return response()->json([
+            'code' => 0,
+            'data' => $data
+        ]);
+    }
+
+    public function sendMessages(Request $request)
+    {
+        $params = ValidationHelper::checkAndGet($request, [
+            'user_ids' => 'required|array',
+            'message' => 'required|string|max:70'
+        ]);
+
+
+        $userIds = $params['user_ids'];
+        $message = $params['message'];
+
+        foreach ($userIds as $userId) {
+            $mobile = $this->userService->getUserInfo(['id' => $userId])->toArray()['mobile'];
+            //TODO: 增加验证逻辑
+            $this->Sms::sendSms($mobile, $message);
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
+    }
+
 }

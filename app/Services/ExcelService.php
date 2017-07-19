@@ -8,9 +8,8 @@
 
 namespace App\Services;
 
-use App\Exceptions\ExcelStoreFailException;
+use App\Exceptions\Excel\ExcelStoreFailException;
 use App\Services\Contracts\ExcelServiceInterface;
-use App\Exceptions\ExcelExportFailException;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -44,10 +43,12 @@ class ExcelService implements ExcelServiceInterface
 
         $datas = null;
         Excel::load($filePath, function ($reader) use (&$datas) {
-            $datas = $reader->get();
+            $datas = $reader->toArray();
         }, 'UTF-8');
-        $result = ['rows' => $datas];
-        return $result;
+
+        return [
+            'rows' => $datas
+        ];
     }
 
     public function export(string $name,array $rows)

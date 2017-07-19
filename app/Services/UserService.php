@@ -183,6 +183,11 @@ class UserService implements UserServiceInterface
         $this->tokenService->destoryToken($userId, $client);
     }
 
+    public function getUserInfo(array $condition)
+    {
+        return $this->userRepository->getByMult($condition)->first();
+    }
+
     public function isUserExist(array $condition): bool
     {
         return $this->userRepository->getWhereCount($condition) == 1;

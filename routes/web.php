@@ -36,3 +36,4 @@ Route::get('/test','TestController@test');
 Route::get('/test/excel/export','TestController@export');
 Route::post('/test/excel/import','TestController@import');
 Route::get('/getSchoolListTemplateFile','TestController@getSchoolListTemplateFile');
+Route::post('/test/send','TestController@sendMessages');

@@ -112,4 +112,18 @@ class ProblemController extends Controller
             'data' => $data
         ]);
     }
+
+    public function getProblemInfo(Request $request, $id)
+    {
+        if (!Permission::checkPermission($request->user->id, ['manage_problems'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $data = $this->problemService->getProblem($id);
+
+        return response()->json([
+            'code' => 0,
+            'data' => $data
+        ]);
+    }
 }
