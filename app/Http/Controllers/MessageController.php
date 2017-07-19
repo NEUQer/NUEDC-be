@@ -39,7 +39,7 @@ class MessageController extends Controller
 
         $messageInfo = ValidationHelper::checkAndGet($request,$rules);
 
-        $permission =  ($messageInfo['type'] >0) ? "manage_notice" : 'manage_news';
+        $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
         $this->permissionService->checkPermission($request->user->id,$permission);
 
@@ -90,7 +90,7 @@ class MessageController extends Controller
 
         $messageInfo = ValidationHelper::checkAndGet($request,$rules);
 
-        $permission =  ($messageInfo['type'] >0) ? "manage_notice" : 'manage_news';
+        $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
         $this->permissionService->checkPermission($request->user->id,$permission);
 
@@ -107,7 +107,7 @@ class MessageController extends Controller
 
         $messageInfo = $this->messageService->getMessageDetail($messageId);
 
-        $permission =  ($messageInfo['type'] >0) ? "manage_notice" : 'manage_news';
+        $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 
         $this->permissionService->checkPermission($request->user->id,$permission);
 
