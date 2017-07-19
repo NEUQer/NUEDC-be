@@ -17,6 +17,7 @@ include 'custom/schoolAdmin.php';
 include 'custom/auth.php';
 include 'custom/problem.php';
 include 'custom/file.php';
+include 'custom/message.php';
 
 Route::get('/', function () {
     return view('welcome');
