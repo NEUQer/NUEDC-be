@@ -69,6 +69,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function getSchoolTeams(array $conditions, int $page, int $size)
     {
+        if ($conditions['contest_id'] === -1) {
+            $conditions['contest_id'] = $this->contestRepo->getMaxId();
+        }
+
         $columns = [
             'contest_id',
             'id',

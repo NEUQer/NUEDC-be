@@ -163,6 +163,7 @@ class SchoolAdminController extends Controller
         }
 
         $conditions['school_id'] = $request->user->school_id;
+        $conditions['contest_id'] = $request->input('contest_id',-1);
 
         $page = $request->input('page', 1);
         $size = $request->input('size', -1);

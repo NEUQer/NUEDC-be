@@ -28,4 +28,9 @@ class ContestRepository extends AbstractRepository
 
 
     use InsertWithIdTrait;
+
+    function getMaxId():int
+    {
+        return $this->model->max('id');
+    }
 }

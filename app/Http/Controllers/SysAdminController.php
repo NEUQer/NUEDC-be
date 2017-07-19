@@ -134,7 +134,7 @@ class SysAdminController extends Controller
             throw new PasswordWrongException();
         }
 
-        if (!$this->sysAdminService->deleteContest(['id' => $contestId])) {
+        if (!$this->sysAdminService->deleteContest($contestId)){
             throw new UnknownException('fail to delete contest');
         }
 
@@ -305,7 +305,7 @@ class SysAdminController extends Controller
     {
         $inputs = ValidationHelper::checkAndGet($request, [
             'school_id' => 'required|integer',
-            'name' => 'required|string|max:255|unique:users',
+            'name' => 'required|string|max:255',
             'mobile' => 'required|string|max:45|unique:users',
             'email' => 'string|max:100',
             'password' => 'required|string|min:6',
@@ -351,8 +351,8 @@ class SysAdminController extends Controller
     public function updateUser(Request $request, int $userId)
     {
         $data = ValidationHelper::checkAndGet($request, [
-            'name' => 'string|max:100|unique:users',
-            'email' => 'string|max:100|unique:users',
+            'name' => 'string|max:100',
+            'email' => 'string|max:100',
             'mobile' => 'string|max:45|unique:users',
             'password' => 'string|max:6',
             'sex' => 'string|max:4',
@@ -404,15 +404,12 @@ class SysAdminController extends Controller
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
             throw new PermissionDeniedException();
         }
-
         $page = $request->input('page', 1);
         $size = $request->input('size', 20);
 
         $conditions = [];
 
-        if ($request->input('contest_id', null) != null) {
-            $conditions['contest_id'] = $request->input('contest_id');
-        }
+        $conditions['contest_id'] = $request->input('contest_id',-1);
 
         if ($request->input('status', null) != null) {
             $conditions['status'] = $request->input('status');
@@ -432,9 +429,16 @@ class SysAdminController extends Controller
         ]);
     }
 
-    public function updateRecord(Request $request, int $recordId)
+    public function updateRecord(Request $request)
     {
-        $data = ValidationHelper::checkAndGet($request, [
+        // 究极表单验证！
+
+        $inputs = ValidationHelper::checkAndGet($request,[
+            'updates' => 'array|required'
+        ])['updates'];
+
+        $rules = [
+            'record_id' => 'required|integer',
             'team_name' => 'string|max:255',
             'school_id' => 'integer',
             'school_name' => 'string|max:100',
@@ -453,13 +457,17 @@ class SysAdminController extends Controller
             'onsite_info' => 'string|max:255',
             'problem_selected_at' => 'date',
             'result_at' => 'date'
-        ]);
+        ];
+
+        foreach ($inputs as $update) {
+            ValidationHelper::validateCheck($update,$rules);
+        }
 
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
             throw new PermissionDeniedException();
         }
 
-        if (!$this->sysAdminService->updateRecord($recordId, $data)) {
+        if (!$this->sysAdminService->updateRecord($inputs)) {
             throw new UnknownException('fail to update record');
         }
 
@@ -468,13 +476,17 @@ class SysAdminController extends Controller
         ]);
     }
 
-    public function deleteRecord(Request $request, int $recordId)
+    public function deleteRecord(Request $request)
     {
+        $recordIds = ValidationHelper::checkAndGet($request,[
+            'record_ids' => 'required|array'
+        ])['record_ids'];
+
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
             throw new PermissionDeniedException();
         }
 
-        if (!$this->sysAdminService->deleteRecord($recordId)) {
+        if (!$this->sysAdminService->deleteRecord($recordIds)) {
             throw new UnknownException('fail to update record');
         }
 
@@ -500,9 +512,9 @@ class SysAdminController extends Controller
 
 
         Excel::create('contest-record', function ($excel) use ($records) {
-            $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
-                '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
             $excel->sheet('sheet1', function ($sheet) use ($records) {
+                $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
+                    '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
                 foreach ($records as $record) {
                     $sheet->appendRow(array_values($record->toArray()));
                 }

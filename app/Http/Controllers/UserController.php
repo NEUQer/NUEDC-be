@@ -167,16 +167,16 @@ class UserController extends Controller
 
         $identifier = $request->identifier;
 
-        if (Utils::isEmail($identifier)) {
-            $loginMethod = 'email';
-        } else if (Utils::isMobile($identifier)) {
-            $loginMethod = 'mobile';
-        } else {
-            $loginMethod = 'name';
-        }
+//        if (Utils::isEmail($identifier)) {
+//            $loginMethod = 'email';
+//        } else if (Utils::isMobile($identifier)) {
+//            $loginMethod = 'mobile';
+//        } else {
+//            $loginMethod = 'name';
+//        }
 
         $data = $this->userService
-            ->loginBy($loginMethod, $identifier, $request->password, $request->ip(), 1);
+            ->loginBy('mobile', $identifier, $request->password, $request->ip(), 1);
 
         // 在下面定制要取出的字段
 

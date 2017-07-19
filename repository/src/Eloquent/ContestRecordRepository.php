@@ -23,4 +23,9 @@ class ContestRecordRepository extends AbstractRepository {
             select('contest_records.*','contests.title as contestTitle','problems.title as problemTitle')->get();
     }
 
+    function deleteWhereIn(string $param,array $values)
+    {
+        return $this->model->whereIn($param,$values)->delete();
+    }
+
 }

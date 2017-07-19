@@ -78,7 +78,7 @@ class UserService implements UserServiceInterface
         // 在这里设置需要检测的字段
 
         $uniques = [
-            'name', 'mobile', 'email'
+            'mobile'
         ];
 
         foreach ($uniques as $unique) {

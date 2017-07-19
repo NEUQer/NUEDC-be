@@ -28,8 +28,8 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::get('/user/{id}/delete','SysAdminController@deleteUser');
 
     Route::get('/contest-records','SysAdminController@getRecords');
-    Route::post('/contest-record/{id}/update','SysAdminController@updateRecord');
-    Route::get('/contest-record/{id}/delete','SysAdminController@deleteRecord');
+    Route::post('/contest-record/update','SysAdminController@updateRecord');
+    Route::get('/contest-record/delete','SysAdminController@deleteRecord');
     Route::get('/contest-record/export','SysAdminController@exportRecord');
 
     Route::get('/getSchoolListTemplateFile','SysAdminController@getSchoolListTemplateFile');

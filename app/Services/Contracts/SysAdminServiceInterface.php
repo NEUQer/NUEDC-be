@@ -20,7 +20,7 @@ interface SysAdminServiceInterface
 
     function updateContest(array $condition,array $contest):bool;
 
-    function deleteContest(array $condition):bool;
+    function deleteContest(int $id):bool;
 
     // todo 题目管理
 
@@ -58,9 +58,9 @@ interface SysAdminServiceInterface
 
     function getRecords(int $page,int $size,array $condition);
 
-    function updateRecord(int $recordId,array $data):bool;
+    function updateRecord(array $update):bool;
 
-    function deleteRecord(int $recordId):bool;
+    function deleteRecord(array $recordIds):bool;
 
     // todo 成绩录入
 

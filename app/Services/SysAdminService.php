@@ -65,9 +65,17 @@ class SysAdminService implements SysAdminServiceInterface
         return $this->contestRepo->updateWhere($condition, $contest) == 1;
     }
 
-    public function deleteContest(array $condition): bool
+    public function deleteContest(int $id): bool
     {
-        return $this->contestRepo->deleteWhere($condition) == 1;
+        $flag = false;
+
+        DB::transaction(function () use ($id, &$flag) {
+            $this->contestRepo->deleteWhere(['id' => $id]);
+            $this->recordRepo->deleteWhere(['contest_id' => $id]);
+            $flag = true;
+        });
+
+        return $flag;
     }
 
     // 学校管理员
@@ -93,23 +101,22 @@ class SysAdminService implements SysAdminServiceInterface
 
         foreach ($schoolIds as $schoolId) {
 
-            $school = $this->schoolRepo->get($schoolId,['id','name','level','principal','principal_mobile']);
+            $school = $this->schoolRepo->get($schoolId, ['id', 'name', 'level', 'principal', 'principal_mobile']);
 
-            if ($school === null||$school->principal === null||$school->principal_mobile === null) {
+            if ($school === null || $school->principal === null || $school->principal_mobile === null) {
                 $failed[] = $schoolId;
                 break;
             }
 
             // 检查相应用户是否存在
 
-            $preUser = $this->userService->getRepository()->getWhereCount(['name' => $school->principal]);
-            $preUser += $this->userService->getRepository()->getWhereCount(['mobile' => $school->principal_mobile]);
+            $preUser = $this->userService->getRepository()->getWhereCount(['mobile' => $school->principal_mobile]);
 
             if ($preUser !== 0) {
                 $failed[] = $schoolId;
             }
 
-            DB::transaction(function () use ($school,&$succeed) {
+            DB::transaction(function () use ($school, &$succeed) {
                 $userId = $this->userService->getRepository()->insertWithId([
                     'school_id' => $school->id,
                     'name' => $school->principal,
@@ -140,13 +147,15 @@ class SysAdminService implements SysAdminServiceInterface
             throw new UnknownException('no such school');
         }
 
-        if ($school === null) {
-            throw new UnknownException('no such school!');
+        $preUser = $this->userService->getRepository()->getWhereCount(['mobile' => $user['mobile']]);
+
+        if ($preUser !== 0) {
+            return -1;
         }
 
         $userId = -1;
 
-        DB::transaction(function ()use($user,$school,&$userId){
+        DB::transaction(function () use ($user, $school, &$userId) {
             $userId = $this->userService->getRepository()->insertWithId([
                 'name' => $user['name'],
                 'school_id' => $school->id,
@@ -157,7 +166,7 @@ class SysAdminService implements SysAdminServiceInterface
                 'role' => 'school_admin'
             ]);
 
-            $this->authService->giveRoleTo($userId,'school_admin');
+            $this->authService->giveRoleTo($userId, 'school_admin');
         });
 
         return $userId;
@@ -192,7 +201,7 @@ class SysAdminService implements SysAdminServiceInterface
     {
         $schools = $this->schoolRepo->paginate($page, $size, [], [
             'id', 'name', 'level', 'address', 'post_code', 'principal', 'principal_mobile'
-        ],'name','asc');
+        ], 'name', 'asc');
 
         $count = $this->schoolRepo->getWhereCount([]);
 
@@ -214,13 +223,28 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function deleteSchool(int $schoolId): bool
     {
-        return $this->schoolRepo->deleteWhere(['id' => $schoolId]) == 1;
+        $flag = false;
+        // 级联删除
+        DB::transaction(function () use ($schoolId, &$flag) {
+            $this->schoolRepo->deleteWhere(['id' => $schoolId]);
+            $this->recordRepo->deleteWhere(['school_id' => $schoolId]);
+            $this->userService->getRepository()->deleteWhere(['school_id' => $schoolId]);
+            $flag = true;
+        });
+
+        return $flag;
     }
 
     // 参赛管理
 
     public function getRecords(int $page, int $size, array $condition)
     {
+        // 如果没有填写contest_id，就默认取出数据库中最新的那个
+
+        if ($condition['contest_id'] === -1) {
+            $condition['contest_id'] = $this->contestRepo->getMaxId();
+        }
+
         if ($size == -1) {
             $records = $this->recordRepo->getByMult($condition);
             $count = count($records);
@@ -235,14 +259,24 @@ class SysAdminService implements SysAdminServiceInterface
         ];
     }
 
-    public function updateRecord(int $recordId, array $data): bool
+    public function updateRecord(array $updates): bool
     {
-        return $this->recordRepo->update($data, $recordId) == 1;
+        $flag = false;
+        DB::transaction(function ()use($updates,&$flag){
+            foreach ($updates as &$update) {
+                $recordId = $update['record_id'];
+                unset($update['record_id']);
+                $this->recordRepo->update($update,$recordId);
+            }
+            $flag = true;
+        });
+
+        return $flag;
     }
 
-    public function deleteRecord(int $recordId): bool
+    public function deleteRecord(array $recordIds): bool
     {
-        return $this->recordRepo->deleteWhere(['id' => $recordId]) == 1;
+        return $this->recordRepo->deleteWhereIn('id',$recordIds) == count($recordIds);
     }
 
     public function updateResults(array $results): bool
