@@ -14,13 +14,14 @@ use App\Common\ValidationHelper;
 use App\Exceptions\Common\FormValidationException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use App\Facades\Permission;
+use App\Services\TokenService;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('token');
+        $this->middleware('token')->except('getPrivate');
     }
 
     public function uploadPublic(Request $request)
@@ -42,6 +43,8 @@ class FileController extends Controller
 
     public function uploadPrivate(Request $request)
     {
+//        dd($request->user->id);
+
         if (!Permission::checkPermission($request->user->id,['manage_files'])) {
             throw new PermissionDeniedException();
         }
@@ -60,15 +63,22 @@ class FileController extends Controller
         ]);
     }
 
-    public function getPrivate(Request $request)
+    public function getPrivate(Request $request,TokenService $tokenService)
     {
         if (!Permission::checkPermission($request->user->id,['manage_files'])) {
             throw new PermissionDeniedException();
         }
 
         $input = ValidationHelper::checkAndGet($request,[
-            'path' => 'required|string'
+            'path' => 'required|string',
+            'token' => 'required|string'
         ]);
+
+        $userId = $tokenService->getUserIdByToken($input['token']);
+
+        if (!Permission::checkPermission($userId,['manage_files'])) {
+            throw new PermissionDeniedException();
+        }
 
         $path = storage_path('app/private/'.$input['path']);
 

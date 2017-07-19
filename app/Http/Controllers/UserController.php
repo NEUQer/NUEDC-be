@@ -8,6 +8,7 @@ use App\Exceptions\Common\MobileIllegalIException;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Contest\ProblemSelectTimeException;
 use App\Exceptions\Permission\PermissionDeniedException;
+use App\Repository\Models\Token;
 use App\Services\ContestService;
 use App\Services\PermissionService;
 use App\Services\PrivilegeService;
@@ -68,10 +69,18 @@ class UserController extends Controller
 
     }
 
-    public function viewProblem(Request $request,int $problemId)
+    public function viewProblem(Request $request,TokenService $tokenService,int $problemId)
     {
+        $input = ValidationHelper::checkAndGet($request,[
+            'token' => 'required|string',
+            'download' => 'boolean'
+        ]);
+
+        $userId = $tokenService->getUserIdByToken($input['token']);
+        $download = $request->input('download',false);
+
         // 首先检查用户是否参加了对应的比赛
-        if (!$this->problemService->canUserAccessProblem($request->user->id,$problemId)) {
+        if (!$this->problemService->canUserAccessProblem($userId,$problemId)) {
             throw new ProblemSelectTimeException();
         }
 
@@ -79,12 +88,18 @@ class UserController extends Controller
 
         $path = storage_path('app/private/'.$problem->content);
 
-        return response()->file($path,[
+        $corsHeaders = [
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
             'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
             'Access-Control-Allow-Credentials' => 'true'
-        ]);
+        ];
+
+        if ($download) {
+            return response()->download($path,$corsHeaders);
+        }
+
+        return response()->file($path,$corsHeaders);
     }
 
     public function perRegister(Request $request)

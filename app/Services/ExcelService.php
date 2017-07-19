@@ -64,4 +64,18 @@ class ExcelService implements ExcelServiceInterface
             'Access-Control-Allow-Credentials' => 'true'
         ]);
     }
+
+    public function export(string $name,array $rows)
+    {
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('sheet1', function ($sheet) use ($rows) {
+                $sheet->rows($rows);
+            });
+        })->download('xlsx',[
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
+    }
 }

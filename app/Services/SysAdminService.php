@@ -140,6 +140,10 @@ class SysAdminService implements SysAdminServiceInterface
             throw new UnknownException('no such school');
         }
 
+        if ($school === null) {
+            throw new UnknownException('no such school!');
+        }
+
         $userId = -1;
 
         DB::transaction(function ()use($user,$school,&$userId){

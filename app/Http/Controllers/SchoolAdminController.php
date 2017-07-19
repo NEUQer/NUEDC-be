@@ -165,7 +165,7 @@ class SchoolAdminController extends Controller
         $conditions['school_id'] = $request->user->school_id;
 
         $page = $request->input('page', 1);
-        $size = $request->input('size', 2);
+        $size = $request->input('size', -1);
 
         $data = $this->schoolAdminService->getSchoolTeams($conditions, $page, $size);
 
