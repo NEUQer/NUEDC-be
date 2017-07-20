@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Common\Encrypt;
 use App\Common\Utils;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
+use App\Facades\Permission;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Repository\Eloquent\SchoolRepository;
@@ -28,10 +29,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     private $userService;
     private $userRepo;
     private $schoolRepo;
+    private $roleService;
     public function __construct(ContestRecordRepository $contestRecordsRepository,
                                 ContestRepository $contestRepository,
                                 ExcelService $excelService,
-                                UserService $userService,UserRepository $userRepository,SchoolRepository $schoolRepository)
+                                UserService $userService,UserRepository $userRepository,SchoolRepository $schoolRepository,RoleService $roleService)
     {
         $this->contestRecordsRepo = $contestRecordsRepository;
         $this->contestRepo = $contestRepository;
@@ -39,6 +41,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $this->userService = $userService;
         $this->userRepo = $userRepository;
         $this->schoolRepo= $schoolRepository;
+        $this->roleService =$roleService;
     }
 
     function getStartedContest()
@@ -78,7 +81,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         DB::transaction(function ()use($user,$schoolTeamInfo,&$bool){
             $userId = $this->userRepo->insertWithId($user);
-
+            $this->roleService->giveRoleTo($userId,'student');
             $currentTime = new Carbon();
             $schoolTeamInfo['created_at'] = $currentTime;
             $schoolTeamInfo['updated_at'] = $currentTime;
