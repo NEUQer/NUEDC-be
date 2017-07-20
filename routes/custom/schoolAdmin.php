@@ -50,17 +50,18 @@ Route::group(['middleware' => ['token']], function () {
     /*
      * 获取队伍导入模板Excel
      */
-
-
+    Route::get('/school/admin/team/getImportTemplate','SchoolAdminController@getTeamListTemplateFile');
     /*
      * 批量导入队伍
      */
     Route::post('/school/admin/team/import/{contestId}','SchoolAdminController@importTeams');
+
+
+
 });
 
 /**
  * 校管理员登录
  */
 Route::post('/school/admin/login','SchoolAdminController@login');
-Route::get('/school/admin/team/getImportTemplate','SchoolAdminController@getTeamListTemplateFile');
 
