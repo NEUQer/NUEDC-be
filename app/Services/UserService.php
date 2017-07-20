@@ -89,7 +89,7 @@ class UserService implements UserServiceInterface
 
 
         if ($this->verifyCodeService->checkVerifyCode($userInfo['mobile'], 1, $userInfo['code']))
-            $userInfo['status'] = 1;
+                 $userInfo['status'] = 1;
 
 
         $userInfo['password'] = Encrypt::encrypt($userInfo['password']); // 对密码加密
@@ -174,7 +174,7 @@ class UserService implements UserServiceInterface
 
         return [
             'user' => $user,
-            'token' => $this->tokenService->makeToken($userId, $ip, $client)
+            'token' => $this->tokenService->makeToken($userId, $ip,$client)
         ];
     }
 

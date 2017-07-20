@@ -354,4 +354,71 @@ class SchoolAdminController extends Controller
             ]
         ]);
     }
+
+    public function getTeamListTemplateFile(ExcelService $excelService)
+    {
+        $name = "参赛队伍信息导入模板";
+
+        $rows = [['队伍名称', '队长', '成员2','成员3','指导老师', '联系人手机号', '邮箱']];
+
+        $excelService->export($name, $rows);
+    }
+
+    public function importTeams(Request $request,int $contestId)
+    {
+
+
+
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        if ($request->isMethod('post')) {
+            $file = $request->file('file');
+            $data = $this->excelService->import($file);
+        }
+
+        $contestTeams = $data['rows'];
+
+        //去掉表头
+        array_pull($contestTeams, 0);
+        //用于保存成功与失败记录
+        $success = [];
+        $fail = [];
+
+        $schoolInfo = $this->schoolAdminService->getSchoolDetail($request->user->school_id);
+        foreach ($contestTeams as $contestTeam) {
+            $contestTeam[5] = (string) $contestTeam[5];
+
+            //根据模板填充信息
+            $condition = [
+                'contest_id'=>$contestId,
+                'team_name' => $contestTeam[0],
+                'member1' => $contestTeam[1],
+                'member2' => $contestTeam[2],
+                'member3' => $contestTeam[3],
+                'teacher' => $contestTeam[4],
+                'contact_mobile' => $contestTeam[5],
+                'email'=>$contestTeam[6],
+                'school_name'=>$request->user->school_name,
+                'school_id'=>$request->user->school_id,
+                'school_level'=>$schoolInfo['level']
+            ];
+
+            if ($this->schoolAdminService->addSchoolTeam($condition)) {
+                $success[] = $contestTeam;
+            } else {
+                $fail[] = $contestTeam;
+            }
+        }
+
+        return response()->json([
+            'code' => 0,
+            'data' => [
+                'success' => $success,
+                'fail' => $fail
+            ]
+        ]);
+    }
+
 }

@@ -46,11 +46,21 @@ Route::group(['middleware' => ['token']], function () {
      * 获取竞赛列表
      */
     Route::get('/school/admin/contest','SchoolAdminController@getStartedContest');
+
+    /*
+     * 获取队伍导入模板Excel
+     */
+
+
+    /*
+     * 批量导入队伍
+     */
+    Route::post('/school/admin/team/import/{contestId}','SchoolAdminController@importTeams');
 });
 
 /**
  * 校管理员登录
  */
 Route::post('/school/admin/login','SchoolAdminController@login');
-
+Route::get('/school/admin/team/getImportTemplate','SchoolAdminController@getTeamListTemplateFile');
 

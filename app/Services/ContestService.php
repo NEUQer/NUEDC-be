@@ -94,14 +94,6 @@ class ContestService implements ContestServiceInterface
                 throw new ContestRegisterHavePassed();
             }
 
-            $time = $this->contestRepo->get($teamInfo['contest_id'], ['register_start_time', 'register_end_time']);
-
-            $now = strtotime(Carbon::now());
-
-            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])) {
-                throw new ContestRegisterTimeError();
-            }
-
             if ($this->contestRecordRepo->updateWhere(['register_id' => $userId, 'contest_id' => $teamInfo['contest_id']], $teamInfo) < 1)
                 throw new UnknownException("报名更新失败");
         }
@@ -118,7 +110,7 @@ class ContestService implements ContestServiceInterface
         $data = [];
         foreach ($collection as $value) {
 
-            if (strtotime($value['register_start_time']) < $now && $now < strtotime($value['register_end_time'])) {
+            if ($value['can_register'] == 1||($value['can_register']!= 0 && strtotime($value['register_start_time']) < $now && $now < strtotime($value['register_end_time']))) {
                 $data[] = $value;
             }
         }
@@ -198,7 +190,7 @@ class ContestService implements ContestServiceInterface
 
     function updateProblemSelect(int $userId, array $key)
     {
-        if ($this->problemRepo->get($key['problemId'])->first() == null) {
+        if ($this->problemRepo->get($key['problemId']) == null) {
             throw new ContestProblemNotExist();
         }
 

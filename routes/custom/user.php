@@ -20,6 +20,7 @@ Route::group(['middleware'=>'token'],function (){
        Route::post('/updatePassword','UserController@updateUserPassword');
        Route::get('/logout','UserController@logout');
     });
+
 });
 
 Route::group(['middleware' => 'user'], function() {
