@@ -32,7 +32,7 @@ interface SysAdminServiceInterface
 
     // 学校管理员
 
-    function getSchoolAdmins(int $page,int $size);
+    function getSchoolAdmins(int $schoolId,int $page,int $size);
 
     function generateSchoolAdmin(array $schoolIds);
 

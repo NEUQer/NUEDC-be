@@ -283,17 +283,19 @@ class SysAdminController extends Controller
     {
         ValidationHelper::validateCheck($request->all(), [
             'page' => 'integer|min:1',
-            'size' => 'integer|min:1|max:500'
+            'size' => 'integer|min:1|max:500',
+            'school_id' => 'integer'
         ]);
 
         $page = $request->input('page', 1);
         $size = $request->input('size', 20);
+        $schoolId = $request->input('school_id',-1);
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_admins'])) {
             throw new PermissionDeniedException();
         }
 
-        $data = $this->sysAdminService->getSchoolAdmins($page, $size);
+        $data = $this->sysAdminService->getSchoolAdmins($schoolId,$page, $size);
 
         return response()->json([
             'code' => 0,

@@ -80,13 +80,22 @@ class SysAdminService implements SysAdminServiceInterface
 
     // 学校管理员
 
-    public function getSchoolAdmins(int $page, int $size)
+    public function getSchoolAdmins(int $schoolId,int $page, int $size)
     {
-        $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin'], [
-            'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
-        ]);
+        if($schoolId === -1) {
+            $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin'], [
+                'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
+            ],'school_name','asc');
 
-        $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin']);
+            $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin']);
+        }else {
+            $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin',
+                'school_id' => $schoolId], [
+                'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
+            ]);
+
+            $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin','school_id' => $schoolId]);
+        }
 
         return [
             'school_admins' => $schoolAdmins,
