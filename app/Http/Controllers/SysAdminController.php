@@ -134,7 +134,7 @@ class SysAdminController extends Controller
             throw new PasswordWrongException();
         }
 
-        if (!$this->sysAdminService->deleteContest($contestId)){
+        if (!$this->sysAdminService->deleteContest($contestId)) {
             throw new UnknownException('fail to delete contest');
         }
 
@@ -289,13 +289,13 @@ class SysAdminController extends Controller
 
         $page = $request->input('page', 1);
         $size = $request->input('size', 20);
-        $schoolId = $request->input('school_id',-1);
+        $schoolId = $request->input('school_id', -1);
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_admins'])) {
             throw new PermissionDeniedException();
         }
 
-        $data = $this->sysAdminService->getSchoolAdmins($schoolId,$page, $size);
+        $data = $this->sysAdminService->getSchoolAdmins($schoolId, $page, $size);
 
         return response()->json([
             'code' => 0,
@@ -315,13 +315,13 @@ class SysAdminController extends Controller
             'add_on' => 'string|max:255'
         ]);
 
-        if (!Permission::checkPermission($request->user->id,['manage_school_admins'])) {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_admins'])) {
             throw new PermissionDeniedException();
         }
 
         $userId = $this->sysAdminService->createSchoolAdmins($inputs);
 
-        if ($userId === -1){
+        if ($userId === -1) {
             throw new UnknownException('Fail to add school admin');
         }
 
@@ -411,7 +411,7 @@ class SysAdminController extends Controller
 
         $conditions = [];
 
-        $conditions['contest_id'] = $request->input('contest_id',-1);
+        $conditions['contest_id'] = $request->input('contest_id', -1);
 
         if ($request->input('status', null) != null) {
             $conditions['status'] = $request->input('status');
@@ -435,7 +435,7 @@ class SysAdminController extends Controller
     {
         // 究极表单验证！
 
-        $inputs = ValidationHelper::checkAndGet($request,[
+        $inputs = ValidationHelper::checkAndGet($request, [
             'updates' => 'array|required'
         ])['updates'];
 
@@ -462,7 +462,7 @@ class SysAdminController extends Controller
         ];
 
         foreach ($inputs as $update) {
-            ValidationHelper::validateCheck($update,$rules);
+            ValidationHelper::validateCheck($update, $rules);
         }
 
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
@@ -480,7 +480,7 @@ class SysAdminController extends Controller
 
     public function deleteRecord(Request $request)
     {
-        $recordIds = ValidationHelper::checkAndGet($request,[
+        $recordIds = ValidationHelper::checkAndGet($request, [
             'record_ids' => 'required|array'
         ])['record_ids'];
 
@@ -557,7 +557,7 @@ class SysAdminController extends Controller
 
             if (!$this->sysAdminService->updateRecord($contestRecord[0], $condition)) {
                 $fail[] = $contestRecord;
-            }else {
+            } else {
                 $success[] = $contestRecord;
             }
         }
@@ -570,6 +570,29 @@ class SysAdminController extends Controller
             ]
         ]);
     }
+
+    public function updateResults(Request $request)
+    {
+        if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $rules = [
+            'results' => 'required|array'
+        ];
+
+        $condition = ValidationHelper::checkAndGet($request, $rules);
+
+        if (!$this->sysAdminService->updateResults($condition['results'])) {
+            throw new UnknownException("fail to update results");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
+    }
+
+    //短信群发
 
     public function sendMessages(Request $request)
     {

@@ -35,5 +35,7 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::get('/getSchoolListTemplateFile','SysAdminController@getSchoolListTemplateFile');
 
     Route::post('/contest-record/import','SysAdminController@importRecord');
+
+    Route::put('/results/update', 'SysAdminController@updateResults');
 });
 

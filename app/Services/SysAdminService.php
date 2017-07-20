@@ -16,6 +16,7 @@ use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
 use App\Repository\Eloquent\SchoolRepository;
 use App\Services\Contracts\SysAdminServiceInterface;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SysAdminService implements SysAdminServiceInterface
@@ -80,21 +81,21 @@ class SysAdminService implements SysAdminServiceInterface
 
     // 学校管理员
 
-    public function getSchoolAdmins(int $schoolId,int $page, int $size)
+    public function getSchoolAdmins(int $schoolId, int $page, int $size)
     {
-        if($schoolId === -1) {
+        if ($schoolId === -1) {
             $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin'], [
                 'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
-            ],'school_name','asc');
+            ], 'school_name', 'asc');
 
             $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin']);
-        }else {
+        } else {
             $schoolAdmins = $this->userService->getRepository()->paginate($page, $size, ['role' => 'school_admin',
                 'school_id' => $schoolId], [
                 'id', 'name', 'email', 'mobile', 'school_id', 'school_name', 'sex', 'status', 'role', 'created_at', 'login_name'
             ]);
 
-            $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin','school_id' => $schoolId]);
+            $count = $this->userService->getRepository()->getWhereCount(['role' => 'school_admin', 'school_id' => $schoolId]);
         }
 
         return [
@@ -271,11 +272,11 @@ class SysAdminService implements SysAdminServiceInterface
     public function updateRecord(array $updates): bool
     {
         $flag = false;
-        DB::transaction(function ()use($updates,&$flag){
+        DB::transaction(function () use ($updates, &$flag) {
             foreach ($updates as &$update) {
                 $recordId = $update['record_id'];
                 unset($update['record_id']);
-                $this->recordRepo->update($update,$recordId);
+                $this->recordRepo->update($update, $recordId);
             }
             $flag = true;
         });
@@ -285,11 +286,25 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function deleteRecord(array $recordIds): bool
     {
-        return $this->recordRepo->deleteWhereIn('id',$recordIds) == count($recordIds);
+        return $this->recordRepo->deleteWhereIn('id', $recordIds) == count($recordIds);
     }
 
     public function updateResults(array $results): bool
     {
-        // TODO: Implement updateResults() method.
+        $flag = false;
+
+        DB::transaction(function () use ($results, &$flag) {
+            $resultTime = new Carbon();
+            foreach ($results as $result) {
+                $this->recordRepo->updateWhere(['id' => $result['record_id']], [
+                    'result' => $result['result'],
+                    'result_info' => $result['result_info'],
+                    'result_at' => $resultTime
+                ]);
+            }
+            $flag = true;
+        });
+
+        return $flag;
     }
 }
