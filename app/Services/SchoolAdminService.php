@@ -69,6 +69,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                 return false;
 
         $user = [
+            'name'=>$schoolTeamInfo['member1'],
             'mobile'=>$schoolTeamInfo['contact_mobile'],
             'password'=> Encrypt::encrypt("NUEDC2017"),
             'email'=>$schoolTeamInfo['email'],
@@ -77,6 +78,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'school_name'=>$schoolTeamInfo['school_name'],
             'status'=>1
         ];
+
         $bool = false;
 
         DB::transaction(function ()use($user,$schoolTeamInfo,&$bool){
