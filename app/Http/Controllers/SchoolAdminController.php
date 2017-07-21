@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Common\ValidationHelper;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Permission\PermissionDeniedException;
+use App\Exceptions\SchoolAdmin\SchoolNotExistedException;
 use App\Services\ExcelService;
 use Permission;
 use App\Services\SchoolAdminService;
@@ -387,6 +388,10 @@ class SchoolAdminController extends Controller
         $fail = [];
 
         $schoolInfo = $this->schoolAdminService->getSchoolDetail($request->user->school_id);
+
+        if ($schoolInfo == null)
+            throw new SchoolNotExistedException();
+
         foreach ($contestTeams as $contestTeam) {
             $contestTeam[5] = (string) $contestTeam[5];
 
