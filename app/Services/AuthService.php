@@ -9,7 +9,7 @@
 namespace App\Services;
 
 
-use App\Exceptions\Auth\PrivilegeNameExisted;
+use App\Exceptions\Permission\PrivilegeNameExisted;
 use App\Exceptions\Auth\UserNotExistException;
 use App\Exceptions\Permission\PrivilegeNotExistException;
 use App\Repository\Eloquent\PrivilegeRepository;

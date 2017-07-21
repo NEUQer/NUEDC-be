@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class ContestNotExistException extends BaseException
 {
-    protected $code = 20002;
+    protected $code = 80002;
 
     protected $data = "竞赛不存在";
 }

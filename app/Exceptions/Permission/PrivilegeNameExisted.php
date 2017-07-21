@@ -6,14 +6,14 @@
  * Time: 上午1:12
  */
 
-namespace App\Exceptions\Auth;
+namespace App\Exceptions\Permission;
 
 
 use App\Exceptions\BaseException;
 
 class PrivilegeNameExisted extends BaseException
 {
-    protected $code = 20007;
+    protected $code = 30005;
 
     protected $data = 'privilege name have existed,can not add';
 

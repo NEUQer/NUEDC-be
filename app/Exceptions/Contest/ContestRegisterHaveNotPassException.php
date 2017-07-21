@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class ContestRegisterHaveNotPassException extends BaseException
 {
-    protected $code = 20005;
+    protected $code = 80005;
 
     protected $data = "Contest Sign Up Have Not Pass,Permission Denied";
 }

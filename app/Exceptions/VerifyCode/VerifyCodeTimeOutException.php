@@ -13,7 +13,7 @@ use App\Exceptions\BaseException;
 
 class VerifyCodeTimeOutException extends BaseException
 {
-    protected $code = 50003;
+    protected $code = 50002;
 
     protected $data = "VerifyCode Time Out !";
 }

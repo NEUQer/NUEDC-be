@@ -11,7 +11,7 @@ namespace App\Exceptions\Contest;
 use App\Exceptions\BaseException;
 class ProblemSelectTimeException extends BaseException
 {
-    protected $code = 20009;
+    protected $code = 80009;
 
     protected $data = "Problem select close or have not open !";
 }
