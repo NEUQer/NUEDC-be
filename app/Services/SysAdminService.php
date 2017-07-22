@@ -274,7 +274,7 @@ class SysAdminService implements SysAdminServiceInterface
         $flag = false;
         DB::transaction(function () use ($updates, &$flag) {
             foreach ($updates as &$update) {
-                $recordId = $update['record_id'];
+                $recordId = (int)$update['record_id'];
                 unset($update['record_id']);
                 $this->recordRepo->update($update, $recordId);
             }

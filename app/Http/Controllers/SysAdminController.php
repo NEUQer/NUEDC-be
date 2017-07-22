@@ -550,12 +550,16 @@ class SysAdminController extends Controller
 
         foreach ($contestRecords as $contestRecord) {
             $condition = [
+                'record_id' => $contestRecord[0],
                 'result' => $contestRecord[15],
                 'result_info' => $contestRecord[16],
                 'result_at' => $contestRecord[19]
             ];
 
-            if (!$this->sysAdminService->updateRecord($contestRecord[0], $condition)) {
+            //适应updateRecord接口
+            $updates = [$condition];
+
+            if (!$this->sysAdminService->updateRecord($updates)) {
                 $fail[] = $contestRecord;
             } else {
                 $success[] = $contestRecord;
