@@ -69,24 +69,28 @@ class UserController extends Controller
 
     }
 
-    public function viewProblem(Request $request,TokenService $tokenService,int $problemId)
+    public function getProblemAttach(Request $request,TokenService $tokenService,int $problemId)
     {
         $input = ValidationHelper::checkAndGet($request,[
             'token' => 'required|string',
-            'download' => 'boolean'
+//            'download' => 'boolean'
         ]);
 
         $userId = $tokenService->getUserIdByToken($input['token']);
-        $download = $request->input('download',false);
+//        $download = $request->input('download',false);
 
         // 首先检查用户是否参加了对应的比赛
         if (!$this->problemService->canUserAccessProblem($userId,$problemId)) {
             throw new ProblemSelectTimeException();
         }
 
-        $problem = $this->problemService->getProblem($problemId,['id','title','content']);
+        $problem = $this->problemService->getProblem($problemId,['id','title','attach_path']);
 
-        $path = storage_path('app/private/'.$problem->content);
+        if ($problem->attach_path === null) {
+            throw new UnknownException("no attachment to download!");
+        }
+
+        $path = storage_path('app/private/'.$problem->attach_path);
 
         $corsHeaders = [
             'Access-Control-Allow-Origin' => '*',
@@ -95,11 +99,11 @@ class UserController extends Controller
             'Access-Control-Allow-Credentials' => 'true'
         ];
 
-        if ($download) {
+//        if ($download) {
             return response()->download($path,$corsHeaders);
-        }
+//        }
 
-        return response()->file($path,$corsHeaders);
+//        return response()->file($path,$corsHeaders);
     }
 
     public function perRegister(Request $request)
