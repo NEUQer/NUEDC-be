@@ -269,6 +269,14 @@ class SysAdminService implements SysAdminServiceInterface
         ];
     }
 
+    public function getResults(array $condition)
+    {
+        return $this->recordRepo->getByMult($condition,[
+            'id','team_name','school_name','member1','member2','member3',
+            'teacher','contact_mobile','email','problem_selected','result','result_info',
+            'onsite_info']);
+    }
+
     public function updateRecord(array $updates): bool
     {
         $flag = false;
@@ -306,5 +314,14 @@ class SysAdminService implements SysAdminServiceInterface
         });
 
         return $flag;
+    }
+
+    public function getResultedTeamIdsFrom(array $teamIds)
+    {
+        $ids = array_values($this->recordRepo->getResultedTeamIdsFrom($teamIds)->toArray());
+        $checked = [];
+        foreach ($ids as $id) {
+            $checked[$id] = true;
+        }
     }
 }

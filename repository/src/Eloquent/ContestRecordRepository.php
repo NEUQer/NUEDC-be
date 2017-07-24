@@ -28,4 +28,9 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model->whereIn($param,$values)->delete();
     }
 
+    function getResultedTeamIdsFrom(array $teamIds)
+    {
+        return $this->model->wehreIn('id',$teamIds)->where('result_info','已审核');
+    }
+
 }

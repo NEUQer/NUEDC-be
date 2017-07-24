@@ -18,6 +18,7 @@ use App\Facades\Permission;
 use App\Services\ExcelService;
 use App\Services\SysAdminService;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -500,7 +501,7 @@ class SysAdminController extends Controller
     public function exportRecord(Request $request)
     {
         $condition = ValidationHelper::checkAndGet($request, [
-            'contest_id' => 'integer',
+            'contest_id' => 'integer|required',
             'school_id' => 'integer',
             'result' => 'string|max:255',
             'status' => 'string|max:255'
@@ -510,13 +511,14 @@ class SysAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $records = $this->sysAdminService->getRecords(1, -1, $condition)['records'];
+        $records = $this->sysAdminService->getResults($condition);
 
 
         Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
-                $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
-                    '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
+                $sheet->appendRow([
+                    '队伍编号', '创建人编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
+                    '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '现场赛相关信息']);
                 foreach ($records as $record) {
                     $sheet->appendRow(array_values($record->toArray()));
                 }
@@ -544,17 +546,32 @@ class SysAdminController extends Controller
         //去除表头
         array_pull($contestRecords, 0);
 
+        // 获取所有已审核的
+
+        $checkedIds = [];
+
+        foreach ($contestRecords as $record) {
+            $checkedIds[] = intval($record[0]);
+        }
+
+        $checkedIds = $this->sysAdminService->getResultedTeamIdsFrom($checkedIds);
+
         //创建数组用于保存记录
         $success = [];
         $fail = [];
 
+        $current = Carbon::now();
+
         foreach ($contestRecords as $contestRecord) {
             $condition = [
                 'record_id' => $contestRecord[0],
-                'result' => $contestRecord[15],
-                'result_info' => $contestRecord[16],
-                'result_at' => $contestRecord[19]
+                'result' => $contestRecord[11],
+                'result_info' => $contestRecord[12],
             ];
+
+            if (!isset($checkedIds[$contestRecord[0]])&&$contestRecord[12] == '已审核') {
+                $condition['result_at'] = $current;
+            }
 
             //适应updateRecord接口
             $updates = [$condition];
@@ -622,5 +639,4 @@ class SysAdminController extends Controller
             'code' => 0
         ]);
     }
-
 }
