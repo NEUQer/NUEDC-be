@@ -321,7 +321,7 @@ class SysAdminService implements SysAdminServiceInterface
         $ids = array_values($this->recordRepo->getResultedTeamIdsFrom($teamIds)->toArray());
         $checked = [];
         foreach ($ids as $id) {
-            $checked[$id] = true;
+            $checked[$id['id']] = true;
         }
     }
 }
