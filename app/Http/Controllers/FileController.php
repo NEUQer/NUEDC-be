@@ -67,10 +67,13 @@ class FileController extends Controller
     {
         $input = ValidationHelper::checkAndGet($request,[
             'path' => 'required|string',
-            'token' => 'required|string'
+            'token' => 'required|string',
+            'download' => 'boolean'
         ]);
 
         $userId = $tokenService->getUserIdByToken($input['token']);
+
+        $download = $request->input('download',false);
 
         if (!Permission::checkPermission($userId,['manage_files'])) {
             throw new PermissionDeniedException();
@@ -78,11 +81,21 @@ class FileController extends Controller
 
         $path = storage_path('app/private/'.$input['path']);
 
-        return response()->file($path,[
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
-            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
-            'Access-Control-Allow-Credentials' => 'true'
-        ]);
+        if ($download) {
+           return response()->download($path,[
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+                'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+                'Access-Control-Allow-Credentials' => 'true'
+            ]);
+        }
+        else {
+            return response()->file($path,[
+                'Access-Control-Allow-Origin' => '*',
+                'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
+                'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
+                'Access-Control-Allow-Credentials' => 'true'
+            ]);
+        }
     }
 }
