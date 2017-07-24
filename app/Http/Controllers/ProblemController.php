@@ -34,7 +34,7 @@ class ProblemController extends Controller
             'contest_id' => 'required|integer|max:11',
             'title' => 'required|string',
             'content' => 'required|string',
-            'attach_path' => 'string,max:255',
+            'attach_path' => 'string|max:255',
             'add_on' => 'string'
         ];
 
