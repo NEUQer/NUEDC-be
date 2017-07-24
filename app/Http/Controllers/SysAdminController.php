@@ -517,7 +517,7 @@ class SysAdminController extends Controller
         Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 $sheet->appendRow([
-                    '队伍编号', '创建人编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
+                    '队伍编号','队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
                     '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '现场赛相关信息']);
                 foreach ($records as $record) {
                     $sheet->appendRow(array_values($record->toArray()));
@@ -565,11 +565,11 @@ class SysAdminController extends Controller
         foreach ($contestRecords as $contestRecord) {
             $condition = [
                 'record_id' => $contestRecord[0],
-                'result' => $contestRecord[11],
-                'result_info' => $contestRecord[12],
+                'result' => $contestRecord[10],
+                'result_info' => $contestRecord[11],
             ];
 
-            if (!isset($checkedIds[$contestRecord[0]])&&$contestRecord[12] == '已审核') {
+            if (!isset($checkedIds[$contestRecord[0]])&&$contestRecord[11] == '已审核') {
                 $condition['result_at'] = $current;
             }
 
