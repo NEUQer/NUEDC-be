@@ -93,7 +93,7 @@ class SysAdminController extends Controller
         return response()->json([
             'code' => 0,
             'data' => [
-                'colentest_id' => $contestId
+                'contest_id' => $contestId
             ]
         ]);
     }
