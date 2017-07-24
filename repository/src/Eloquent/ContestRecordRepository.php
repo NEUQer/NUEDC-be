@@ -30,7 +30,7 @@ class ContestRecordRepository extends AbstractRepository {
 
     function getResultedTeamIdsFrom(array $teamIds)
     {
-        return $this->model->whereIn('id',$teamIds)->where('result_info','已审核');
+        return $this->model->whereIn('id',$teamIds)->where('result_info','已审核')->get(['id']);
     }
 
 }
