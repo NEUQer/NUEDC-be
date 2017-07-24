@@ -65,10 +65,6 @@ class FileController extends Controller
 
     public function getPrivate(Request $request,TokenService $tokenService)
     {
-        if (!Permission::checkPermission($request->user->id,['manage_files'])) {
-            throw new PermissionDeniedException();
-        }
-
         $input = ValidationHelper::checkAndGet($request,[
             'path' => 'required|string',
             'token' => 'required|string'
