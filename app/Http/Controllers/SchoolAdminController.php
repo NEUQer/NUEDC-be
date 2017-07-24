@@ -324,8 +324,12 @@ class SchoolAdminController extends Controller
 
         $data = $this->schoolAdminService->getSchoolResults($conditions,1,-1)['results']->toArray();
 
+        foreach ($data as &$datum) {
+            unset($datum['contest_id']);
+        }
+
         $rows = [];
-        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','所选题目编号','选题时间','所得奖项','评奖状态','评奖时间','现场赛相关信息'];
+        $rows[] = ['队伍编号','队伍名称','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','所选题目编号','选题时间','所得奖项','评奖状态','评奖时间','现场赛相关信息'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
