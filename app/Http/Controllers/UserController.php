@@ -69,22 +69,22 @@ class UserController extends Controller
 
     }
 
-    public function getProblemAttach(Request $request,TokenService $tokenService,int $problemId)
+    public function viewProblem(Request $request,TokenService $tokenService,int $problemId)
     {
         $input = ValidationHelper::checkAndGet($request,[
             'token' => 'required|string',
-//            'download' => 'boolean'
+            'download' => 'boolean'
         ]);
 
         $userId = $tokenService->getUserIdByToken($input['token']);
-//        $download = $request->input('download',false);
+        $download = $request->input('download',false);
 
         // 首先检查用户是否参加了对应的比赛
         if (!$this->problemService->canUserAccessProblem($userId,$problemId)) {
             throw new ProblemSelectTimeException();
         }
 
-        $problem = $this->problemService->getProblem($problemId,['id','title','attach_path']);
+        $problem = $this->problemService->getProblem($problemId,['id','title','content','attach_path','add_on']);
 
         if ($problem->attach_path === null) {
             throw new UnknownException("no attachment to download!");
@@ -377,6 +377,15 @@ class UserController extends Controller
             [
                 'code' => 0,
                 'data' => $this->contestService->getContestResult($request->user->id, $contestId)
+            ]
+        );
+    }
+
+    public function getSignedUpContest(Request $request){
+        return response()->json(
+            [
+                'code'=>0,
+                'data'=>$this->contestService->getSignedUpContest($request->user->id)
             ]
         );
     }

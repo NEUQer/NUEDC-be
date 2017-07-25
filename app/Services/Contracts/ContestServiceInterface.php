@@ -28,4 +28,6 @@ interface ContestServiceInterface
     function updateProblemSelect(int $userId,array $key);
 
     function getContestResult(int $userId,int $contestId);
+
+    function getSignedUpContest(int $userId);
 }
