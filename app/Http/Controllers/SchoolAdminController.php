@@ -292,10 +292,11 @@ class SchoolAdminController extends Controller
             unset($datum['contest_id']);
             unset($datum['school_id']);
             unset($datum['school_level']);
+            unset($datum['school_name']);
         }
 
         $rows = [];
-        $rows[] = ['队伍编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '审核状态'];
+        $rows[] = ['队伍编号', '队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '队伍审核状态'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
@@ -329,12 +330,13 @@ class SchoolAdminController extends Controller
         foreach ($data as &$datum) {
             unset($datum['contest_id']);
             unset($datum['school_id']);
+            unset($datum['school_name']);
             unset($datum['school_level']);
             unset($datum['problem_selected_at']);
         }
 
         $rows = [];
-        $rows[] = ['队伍编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '评奖时间', '现场赛相关信息'];
+        $rows[] = ['队伍编号', '队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '评奖时间', '现场赛相关信息'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
