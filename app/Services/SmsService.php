@@ -16,12 +16,6 @@ class SmsService implements SmsServiceInterface
     //发送短信接口URL
     const API_SEND_URI = 'http://zapi.253.com/msg/HttpBatchSendSM';
 
-    //SMSClient账号
-    const API_ACCOUNT = '';
-
-    //SMSClient密码
-    const API_PASSWORD = '';
-
     /**
      * 发送短信
      * @param $mobile
@@ -32,8 +26,8 @@ class SmsService implements SmsServiceInterface
     {
         //SMSClient接口参数
         $postArr = array(
-            'account' => self::API_ACCOUNT,
-            'pswd' => self::API_PASSWORD,
+            'account' => config('sms.sms_account'),
+            'pswd' => config('sms.sms_password'),
             'mobile' => $mobile,
             'msg' => $msg,
             'needstatus' => false
