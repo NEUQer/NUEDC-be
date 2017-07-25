@@ -29,20 +29,20 @@ class ExcelService implements ExcelServiceInterface
             // 获取文件相关信息
             $ext = $file->getClientOriginalExtension();     // 扩展名
             $realPath = $file->getRealPath();   //临时文件的绝对路径
-            // 上传文件
-            $filename = uniqid() . '.' . $ext;
-            // 使用uploads本地存储空间（目录）
-            $bool = Storage::disk('import')->put($filename, file_get_contents($realPath));
-
-            if (!$bool) {
-                throw new ExcelStoreFailException();
-            }
-
-            $filePath = 'storage/import/' . $filename;
+//            // 上传文件
+//            $filename = uniqid() . '.' . $ext;
+//            // 使用uploads本地存储空间（目录）
+//            $bool = Storage::disk('import')->put($filename, file_get_contents($realPath));
+//
+//            if (!$bool) {
+//                throw new ExcelStoreFailException();
+//            }
+//
+//            $filePath = 'storage/import/' . $filename;
         }
 
         $datas = null;
-        Excel::load($filePath, function ($reader) use (&$datas) {
+        Excel::load($realPath, function ($reader) use (&$datas) {
             $datas = $reader->toArray();
         }, 'UTF-8');
 

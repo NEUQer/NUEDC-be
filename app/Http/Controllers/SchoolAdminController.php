@@ -16,7 +16,7 @@ class SchoolAdminController extends Controller
     private $schoolAdminService;
     private $excelService;
 
-    public function __construct(SchoolAdminService $schoolAdminService,ExcelService $excelService)
+    public function __construct(SchoolAdminService $schoolAdminService, ExcelService $excelService)
     {
         $this->schoolAdminService = $schoolAdminService;
         $this->excelService = $excelService;
@@ -154,7 +154,7 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolTeams(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer',
             'status' => 'string|max:255'
         ]);
@@ -164,7 +164,7 @@ class SchoolAdminController extends Controller
         }
 
         $conditions['school_id'] = $request->user->school_id;
-        $conditions['contest_id'] = $request->input('contest_id',-1);
+        $conditions['contest_id'] = $request->input('contest_id', -1);
 
         $page = $request->input('page', 1);
         $size = $request->input('size', -1);
@@ -185,7 +185,7 @@ class SchoolAdminController extends Controller
      */
     public function getSchoolResults(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer',
             'result_info' => 'string|max:255'
         ]);
@@ -243,7 +243,7 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $schoolTeamIds = ValidationHelper::checkAndGet($request,[
+        $schoolTeamIds = ValidationHelper::checkAndGet($request, [
             'school_team_ids' => 'required|array'
         ])['school_team_ids'];
 
@@ -275,7 +275,7 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolTeams(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
             'status' => 'string|max:255'
         ]);
@@ -286,20 +286,20 @@ class SchoolAdminController extends Controller
 
         $conditions['school_id'] = $request->user->school_id;
 
-        $data = $this->schoolAdminService->getSchoolTeams($conditions,1,-1)['teams']->toArray();
+        $data = $this->schoolAdminService->getSchoolTeams($conditions, 1, -1)['teams']->toArray();
 
         foreach ($data as &$datum) {
             unset($datum['contest_id']);
         }
 
         $rows = [];
-        $rows[] = ['队伍编号','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','审核状态'];
+        $rows[] = ['队伍编号', '学校编号', '学校名称', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '审核状态'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
         }
 
-        $this->excelService->export('报名情况',$rows);
+        $this->excelService->export('报名情况', $rows);
     }
 
     /**
@@ -311,7 +311,7 @@ class SchoolAdminController extends Controller
      */
     public function exportSchoolResults(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
             'result_info' => 'string|max:255'
         ]);
@@ -322,20 +322,20 @@ class SchoolAdminController extends Controller
 
         $conditions['school_id'] = $request->user->school_id;
 
-        $data = $this->schoolAdminService->getSchoolResults($conditions,1,-1)['results']->toArray();
+        $data = $this->schoolAdminService->getSchoolResults($conditions, 1, -1)['results']->toArray();
 
         foreach ($data as &$datum) {
             unset($datum['contest_id']);
         }
 
         $rows = [];
-        $rows[] = ['队伍编号','队伍名称','学校编号','学校名称','学校类别','成员1姓名','成员2姓名','成员3姓名','指导教师','联系电话','邮件','所选题目编号','选题时间','所得奖项','评奖状态','评奖时间','现场赛相关信息'];
+        $rows[] = ['队伍编号', '队伍名称', '学校编号', '学校名称', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '选题时间', '所得奖项', '评奖状态', '评奖时间', '现场赛相关信息'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);
         }
 
-        $this->excelService->export('获奖情况',$rows);
+        $this->excelService->export('获奖情况', $rows);
     }
 
     /**
@@ -364,16 +364,13 @@ class SchoolAdminController extends Controller
     {
         $name = "参赛队伍信息导入模板";
 
-        $rows = [['队伍名称', '队长', '成员2','成员3','指导老师', '联系人手机号', '邮箱']];
+        $rows = [['队伍名称', '队长', '成员2', '成员3', '指导老师', '联系人手机号', '邮箱']];
 
         $excelService->export($name, $rows);
     }
 
-    public function importTeams(Request $request,int $contestId)
+    public function importTeams(Request $request, int $contestId)
     {
-
-
-
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
@@ -397,21 +394,21 @@ class SchoolAdminController extends Controller
             throw new SchoolNotExistedException();
 
         foreach ($contestTeams as $contestTeam) {
-            $contestTeam[5] = (string) $contestTeam[5];
+            $contestTeam[5] = (string)$contestTeam[5];
 
             //根据模板填充信息
             $condition = [
-                'contest_id'=>$contestId,
+                'contest_id' => $contestId,
                 'team_name' => $contestTeam[0],
                 'member1' => $contestTeam[1],
                 'member2' => $contestTeam[2],
                 'member3' => $contestTeam[3],
                 'teacher' => $contestTeam[4],
                 'contact_mobile' => $contestTeam[5],
-                'email'=>$contestTeam[6],
-                'school_name'=>$request->user->school_name,
-                'school_id'=>$request->user->school_id,
-                'school_level'=>$schoolInfo['level']
+                'email' => $contestTeam[6],
+                'school_name' => $request->user->school_name,
+                'school_id' => $request->user->school_id,
+                'school_level' => $schoolInfo['level']
             ];
 
             if ($this->schoolAdminService->addSchoolTeam($condition)) {
