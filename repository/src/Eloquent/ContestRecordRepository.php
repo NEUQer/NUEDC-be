@@ -37,7 +37,7 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model
             ->where('register_id',$userId)
             ->leftjoin('contests','contest_records.contest_id','=','contests.id')
-            ->select('contest.*','contest_records.status as signUpStatus');
+            ->select('contests.*','contest_records.status as signUpStatus')->get();
     }
 
 }
