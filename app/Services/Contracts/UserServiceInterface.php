@@ -33,6 +33,6 @@ interface UserServiceInterface
 
     function updateUserPassword(array $userInfo);
 
-
+    function forgetPassword($mobile,$password,$code);
 
 }

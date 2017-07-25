@@ -216,4 +216,11 @@ class UserService implements UserServiceInterface
 
         return $this->userRepository->update(['password' => Encrypt::encrypt($userInfo['newPassword'])], $userInfo['userId']);
     }
+
+    function forgetPassword($mobile, $password,$code)
+    {
+        $this->verifyCodeService->checkVerifyCode($mobile,2,$code);
+
+        return $this->userRepository->updateWhere(['mobile'=>$mobile],['password'=>Encrypt::encrypt($password)]);
+    }
 }

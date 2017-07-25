@@ -12,7 +12,7 @@ Route::group(['prefix' => '/user'], function() {
     Route::post('/login','UserController@login');
     Route::get('/preRegister','UserController@perRegister');
     Route::get('/schools','UserController@getSchools');
-
+    Route::get('/problem/{id}/attachment','UserController@getProblemAttach');
 });
 
 Route::group(['middleware'=>'token'],function (){
@@ -35,8 +35,9 @@ Route::group(['middleware' => 'user'], function() {
         Route::get('/{contestId}/getContestSignUpStatus','UserController@getContestSignUpStatus');
         Route::get('/{contestId}/abandonContest','UserController@abandonContest');
         Route::get('/getAllPassContest','UserController@getAllPassContest');
-        Route::get('/problem/{id}/attachment','UserController@getProblemAttach');
         Route::get('/getSignedUpContest','UserController@getSignedUpContest');
+        Route::post('/password/forget','UserController@forgetPassword');
+        Route::get('/verifyCode','UserController@getVerifyCode');
     });
 
 });

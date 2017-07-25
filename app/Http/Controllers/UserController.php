@@ -389,4 +389,45 @@ class UserController extends Controller
             ]
         );
     }
+
+    public function getVerifyCode(Request $request){
+
+            $rules = [
+                'mobile' => 'required|mobile|max:100',
+                'type'=>'required|min:1|max:2'
+            ];
+
+            ValidationHelper::validateCheck($request->all(), $rules);
+
+            $data = ValidationHelper::getInputData($request, $rules);
+
+
+            $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], $data['type']);
+
+            return response()->json(
+                [
+                    'code' => 0,
+                    'data' => [
+                        'verifyCode' => $verifyCode
+                    ]
+                ]
+            );
+    }
+
+    public function forgetPassword(Request $request){
+        $rules =[
+            'mobile' => 'required|mobile|max:100',
+            'code'=>'required',
+            'newPassword'=>'required|min:6|max:20'
+        ];
+        $data = ValidationHelper::checkAndGet($request,$rules);
+
+        $this->userService->forgetPassword($data['mobile'],$data['newPassword'],$data['code']);
+
+        return response()->json(
+            [
+                'code'=>0
+            ]
+        );
+    }
 }
