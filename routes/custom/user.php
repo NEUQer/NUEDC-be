@@ -36,6 +36,7 @@ Route::group(['middleware' => 'user'], function() {
         Route::get('/{contestId}/abandonContest','UserController@abandonContest');
         Route::get('/getAllPassContest','UserController@getAllPassContest');
         Route::get('/problem/{id}/attachment','UserController@getProblemAttach');
+        Route::get('/getSignedUpContest','UserController@getSignedUpContest');
     });
 
 });
