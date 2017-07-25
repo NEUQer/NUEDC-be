@@ -151,7 +151,7 @@ class ContestService implements ContestServiceInterface
             throw new ContestCloseException();
 
 
-        $problemList = $this->problemRepo->getBy('contest_id', $contestId, ['id', 'contest_id', 'title']);
+        $problemList = $this->problemRepo->getBy('contest_id', $contestId);
 
         $data = ['problemList' => $problemList, 'problemSelectInfo' => ['problemId' => $info['problem_selected'], 'selectTime' => $info['problem_selected_at']]];
 
