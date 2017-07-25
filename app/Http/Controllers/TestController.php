@@ -16,6 +16,7 @@ use App\Facades\Permission;
 use App\Services\AuthService;
 use App\Services\ContestService;
 use App\Services\ExcelService;
+use App\Services\SchoolAdminService;
 use App\Services\SysAdminService;
 use App\Services\UserService;
 use Carbon\Carbon;
@@ -33,38 +34,39 @@ class TestController extends Controller
 
     private $userService;
 
-    public function __construct(ExcelService $excelService, SysAdminService $sysAdminService, UserService $userService)
+    private $schoolAdminService;
+
+    public function __construct(ExcelService $excelService, SysAdminService $sysAdminService, UserService $userService, SchoolAdminService $schoolAdminService)
     {
         $this->excelService = $excelService;
         $this->sysAdminService = $sysAdminService;
         $this->userService = $userService;
+        $this->schoolAdminService = $schoolAdminService;
     }
 
     public function export(Request $request)
     {
-        $condition = ValidationHelper::checkAndGet($request, [
-            'contest_id' => 'integer',
-            'school_id' => 'integer',
-            'result' => 'string|max:255',
+        $conditions = ValidationHelper::checkAndGet($request, [
+            'contest_id' => 'required|integer',
             'status' => 'string|max:255'
         ]);
 
-        $records = $this->sysAdminService->getRecords(1, -1, $condition)['records'];
+        $conditions['school_id'] = 1;
 
-        Excel::create('contest-record', function ($excel) use ($records) {
-            $excel->sheet('sheet1', function ($sheet) use ($records) {
-                $sheet->appendRow(['队伍编号', '创建人编号', '队伍名称', '学校编号', '学校名称', '竞赛编号', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '队伍状态', '所得奖项',
-                    '评奖状态', '现场赛相关信息', '选题时间', '评奖时间', '创建时间', '更新时间']);
-                foreach ($records as $record) {
-                    $sheet->appendRow(array_values($record->toArray()));
-                }
-            });
-        })->download('xlsx', [
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
-            'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',
-            'Access-Control-Allow-Credentials' => 'true'
-        ]);
+        $data = $this->schoolAdminService->getSchoolTeams($conditions, 1, -1)['teams']->toArray();
+
+        foreach ($data as &$datum) {
+            unset($datum['contest_id']);
+        }
+
+        $rows = [];
+        $rows[] = ['队伍编号', '队伍名称', '学校编号', '学校名称', '学校类别', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '审核状态'];
+
+        foreach ($data as $item) {
+            $rows[] = array_values($item);
+        }
+
+        $this->excelService->export('报名情况', $rows);
     }
 
     public function import(Request $request)
