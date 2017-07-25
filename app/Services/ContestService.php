@@ -233,6 +233,6 @@ class ContestService implements ContestServiceInterface
 
     function getSignedUpContest(int $userId)
     {
-        return $this->contestRecordRepo->getBy('register_id',$userId);
+        return $this->contestRecordRepo->getContestInfoAndSignStatus($userId);
     }
 }
