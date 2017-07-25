@@ -82,7 +82,7 @@ class FileController extends Controller
         $path = storage_path('app/private/'.$input['path']);
 
         if ($download) {
-           return response()->download($path,[
+           return response()->download($path,null,[
                 'Access-Control-Allow-Origin' => '*',
                 'Access-Control-Allow-Headers' => 'Origin, Content-Type, Cookie, Accept,token,Accept,X-Requested-With',
                 'Access-Control-Allow-Methods' => 'GET, POST, DELETE, PATCH, PUT, OPTIONS',

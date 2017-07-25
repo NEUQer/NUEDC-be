@@ -73,11 +73,11 @@ class UserController extends Controller
     {
         $input = ValidationHelper::checkAndGet($request,[
             'token' => 'required|string',
-//            'download' => 'boolean'
+            'download' => 'boolean'
         ]);
 
         $userId = $tokenService->getUserIdByToken($input['token']);
-//        $download = $request->input('download',false);
+        $download = $request->input('download',false);
 
         // 首先检查用户是否参加了对应的比赛
         if (!$this->problemService->canUserAccessProblem($userId,$problemId)) {
@@ -99,11 +99,11 @@ class UserController extends Controller
             'Access-Control-Allow-Credentials' => 'true'
         ];
 
-//        if ($download) {
-        return response()->download($path,$corsHeaders);
-//        }
+        if ($download) {
+            return response()->download($path,null,$corsHeaders);
+        }
 
-//        return response()->file($path,$corsHeaders);
+        return response()->file($path,$corsHeaders);
     }
 
     public function perRegister(Request $request)
