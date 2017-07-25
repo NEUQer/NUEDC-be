@@ -59,7 +59,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function login(string $loginName, string $password, string $ip, string $client)
     {
-        return $this->userService->loginBy('login_name', $loginName, $password, $ip, $client);
+        return $this->userService->loginBy('mobile', $loginName, $password, $ip, $client);
     }
 
     function addSchoolTeam(array $schoolTeamInfo): bool
