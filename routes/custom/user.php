@@ -13,6 +13,7 @@ Route::group(['prefix' => '/user'], function() {
     Route::get('/preRegister','UserController@perRegister');
     Route::get('/schools','UserController@getSchools');
     Route::get('/problem/{id}/attachment','UserController@getProblemAttach');
+    Route::get('/verifyCode','UserController@getVerifyCode');
 });
 
 Route::group(['middleware'=>'token'],function (){
@@ -37,7 +38,7 @@ Route::group(['middleware' => 'user'], function() {
         Route::get('/getAllPassContest','UserController@getAllPassContest');
         Route::get('/getSignedUpContest','UserController@getSignedUpContest');
         Route::post('/password/forget','UserController@forgetPassword');
-        Route::get('/verifyCode','UserController@getVerifyCode');
+
     });
 
 });
