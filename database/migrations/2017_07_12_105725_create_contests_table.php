@@ -20,6 +20,7 @@ class CreateContestsTable extends Migration
             $table->string('title',45);
             $table->text('description')->nullable();
             $table->string('status');
+            $table->string('result_check',45)->default('未审核');
             $table->tinyInteger('can_register')->default(-1);
             $table->tinyInteger('can_select_problem')->default(-1);
             // 报名时间
@@ -30,7 +31,7 @@ class CreateContestsTable extends Migration
             $table->timestamp('problem_start_time')->default($current);
             $table->timestamp('problem_end_time')->default($current);
             // 附加
-            $table->json('add_on')->nullable();
+            $table->text('add_on')->nullable();
             $table->timestamps();
         });
     }

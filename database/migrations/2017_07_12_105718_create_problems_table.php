@@ -19,7 +19,7 @@ class CreateProblemsTable extends Migration
             $table->string('title',100);
             $table->text('content');
             $table->string('attach_path'); // 用于记录附件在服务器上的位置
-            $table->json('add_on')->nullable(); // 附加配置
+            $table->text('add_on')->nullable(); // 附加配置
             $table->timestamps();
         });
     }

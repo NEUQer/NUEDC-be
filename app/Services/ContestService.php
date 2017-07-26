@@ -11,6 +11,7 @@ namespace App\Services;
 
 use App\Exceptions\Contest\ContestCloseException;
 use App\Exceptions\Contest\ContestNotRegisterException;
+use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestProblemNotExist;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
@@ -62,7 +63,7 @@ class ContestService implements ContestServiceInterface
             'teacher' => $signInfo['teacher'],
             'contact_mobile' => $signInfo['mobile'],
             'email' => $signInfo['email'],
-            'status' => '待审核'
+            'status' => '未审核'
         ];
 
 
@@ -227,6 +228,12 @@ class ContestService implements ContestServiceInterface
         $row = $this->contestRecordRepo->getWhereCount(['contest_id' => $contestId, 'register_id' => $userId, 'status' => '已审核']);
         if ($row == 0)
             throw new ContestRegisterHaveNotPassException();
+
+        $contest = $this->contestRepo->get($contestId,['id','result_check']);
+
+        if ($contest === null||$contest->result_check !== '已审核') {
+            throw new ContestNotResultException();
+        }
 
         return $this->contestRecordRepo->getResult($contestId, $userId);
     }

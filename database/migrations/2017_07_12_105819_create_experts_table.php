@@ -27,7 +27,7 @@ class CreateExpertsTable extends Migration
             $table->string('major',100);
             $table->string('occupation',100);
             $table->string('status');
-            $table->json('add_on');
+            $table->text('add_on');
             $table->timestamps();
         });
     }

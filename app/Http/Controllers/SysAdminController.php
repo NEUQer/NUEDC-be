@@ -646,4 +646,30 @@ class SysAdminController extends Controller
             ]
         ]);
     }
+
+    public function checkContestResult(Request $request,int $contestId)
+    {
+        $input = ValidationHelper::getInputData($request,[
+            'password' => 'required|string',
+            'result_check' => 'required|string' // 已审核，未审核
+        ]);
+
+        // 检查密码
+
+        if (!Encrypt::check($input['password'],$request->user->password)) {
+            throw new PasswordWrongException();
+        }
+
+        if (!Permission::checkPermission($request->user->id,['manage_contest'])){
+            throw new PermissionDeniedException();
+        }
+
+        if (!$this->sysAdminService->checkContestResult($contestId,$input['result_check'])) {
+            throw new UnknownException("无法审核竞赛结果");
+        }
+
+        return response()->json([
+            'code' => 0
+        ]);
+    }
 }

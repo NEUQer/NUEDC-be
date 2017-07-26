@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Common\Encrypt;
 use App\Common\Utils;
+use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
 use App\Repository\Eloquent\ContestRecordRepository;
@@ -172,6 +173,14 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function getSchoolResults(array $conditions, int $page, int $size)
     {
+        // 增加逻辑判断：比赛没出结果时会抛出异常
+
+        $contest = $this->contestRepo->get($conditions['contest_id'],['id','result_check']);
+
+        if ($contest == null||$contest->result_check !== '已审核') {
+            throw new ContestNotResultException();
+        }
+
         $columns = [
             'contest_id',
             'id',

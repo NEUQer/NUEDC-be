@@ -324,4 +324,11 @@ class SysAdminService implements SysAdminServiceInterface
             $checked[$id['id']] = true;
         }
     }
+
+    // 最终确认审核完毕，公开成绩
+
+    public function checkContestResult(int $contestId,string $value):bool
+    {
+        return $this->contestRepo->update(['result_check' => $value],$contestId) == 1;
+    }
 }
