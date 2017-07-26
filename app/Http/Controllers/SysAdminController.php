@@ -502,9 +502,6 @@ class SysAdminController extends Controller
     {
         $condition = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer|required',
-            'school_id' => 'integer',
-            'result' => 'string|max:255',
-            'status' => 'string|max:255'
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
@@ -517,7 +514,7 @@ class SysAdminController extends Controller
         Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 $sheet->appendRow([
-                    '队伍编号','队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
+                    '队伍编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
                     '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '现场赛相关信息']);
                 foreach ($records as $record) {
                     $sheet->appendRow(array_values($record->toArray()));
@@ -547,7 +544,6 @@ class SysAdminController extends Controller
         array_pull($contestRecords, 0);
 
         // 获取所有已审核的
-
         $checkedIds = [];
 
         foreach ($contestRecords as $record) {
@@ -569,7 +565,7 @@ class SysAdminController extends Controller
                 'result_info' => $contestRecord[11],
             ];
 
-            if (!isset($checkedIds[$contestRecord[0]])&&$contestRecord[11] == '已审核') {
+            if (!isset($checkedIds[$contestRecord[0]]) && $contestRecord[11] == '已审核') {
                 $condition['result_at'] = $current;
             }
 
@@ -577,9 +573,9 @@ class SysAdminController extends Controller
             $updates = [$condition];
 
             if (!$this->sysAdminService->updateRecord($updates)) {
-                $fail[] = $contestRecord;
+                $fail[] = $condition['record_id'];
             } else {
-                $success[] = $contestRecord;
+                $success[] = $condition['record_id'];
             }
         }
 
@@ -629,14 +625,25 @@ class SysAdminController extends Controller
         $userIds = $params['user_ids'];
         $message = $params['message'];
 
+
+        $fail = [];
+        $success = [];
         foreach ($userIds as $userId) {
             $mobile = $this->userService->getUserInfo(['id' => $userId])->toArray()['mobile'];
             //TODO: 根据sendSms的返回码做状态判断，用fail和success数组保存
-            Sms::sendSms($mobile, $message);
+            if (Sms::sendSms($mobile, $message)[1] != '0') {
+                $fail[] = $mobile;
+            } else {
+                $success[] = $mobile;
+            }
         }
 
         return response()->json([
-            'code' => 0
+            'code' => 0,
+            'data' => [
+                'success' => $success,
+                'fail' => $fail
+            ]
         ]);
     }
 }

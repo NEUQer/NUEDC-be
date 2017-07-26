@@ -16,6 +16,7 @@ use App\Repository\Eloquent\PrivilegeRepository;
 use App\Repository\Eloquent\RolePrivilegeRepository;
 use App\Repository\Eloquent\RoleRepository;
 use App\Repository\Eloquent\UserPrivilegeRepository;
+use App\Repository\Eloquent\UserRepository;
 use App\Services\Contracts\RoleServiceInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -25,17 +26,20 @@ class RoleService implements RoleServiceInterface
     private $privilegeRepo;
     private $rolePriRepo;
     private $userPriRepo;
+    private $userRepo;
 
     public function __construct(
         RoleRepository $roleRepository, PrivilegeRepository $privilegeRepository,
         RolePrivilegeRepository $rolePrivilegeRepository,
-        UserPrivilegeRepository $userPrivilegeRepository
+        UserPrivilegeRepository $userPrivilegeRepository,
+        UserRepository $userRepository
     )
     {
         $this->roleRepo = $roleRepository;
         $this->privilegeRepo = $privilegeRepository;
         $this->rolePriRepo = $rolePrivilegeRepository;
         $this->userPriRepo = $userPrivilegeRepository;
+        $this->userRepo = $userRepository;
     }
 
     public function createRole(array $role, array $privileges): bool
@@ -142,7 +146,7 @@ class RoleService implements RoleServiceInterface
 
         $flag = false;
 
-        DB::transaction(function () use ($userId, $privileges, &$flag) {
+        DB::transaction(function () use ($userId, $roleName, $privileges, &$flag) {
             // 删除之前全部权限，重新生成
             $this->userPriRepo->deleteWhere(['user_id' => $userId]);
             $relations = [];
@@ -154,7 +158,7 @@ class RoleService implements RoleServiceInterface
             }
 
             $this->userPriRepo->insert($relations);
-
+            $this->userRepo->updateWhere(['id' => $userId], ['role' => $roleName]);
             $flag = true;
         });
 
