@@ -22,7 +22,7 @@ class SmsService implements SmsServiceInterface
      * @param $msg
      * @return mixed
      */
-    public function sendSms(string $mobile, string $msg): string
+    public function sendSms(string $mobile, string $msg)
     {
         //SMSClient接口参数
         $postArr = array(
@@ -40,14 +40,14 @@ class SmsService implements SmsServiceInterface
 
     public function sendVerifyCode($mobile, $randStr)
     {
-        $message = "您正在注册电子设计大赛系统，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
+        $message = "【电子设计竞赛】您正在注册电子设计竞赛系统，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
 
         return $this->sendSms($mobile, $message);
     }
 
     public function forgetPassword($mobile, $randStr)
     {
-        $message = "忘记密码，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
+        $message = "【电子设计竞赛】忘记密码，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
 
         return $this->sendSms($mobile, $message);
     }
@@ -57,7 +57,7 @@ class SmsService implements SmsServiceInterface
      * @param string $result
      * @return string
      */
-    public function execResult(string $result): string
+    public function execResult(string $result)
     {
         $result = preg_split("/[,\r\n]/", $result);
         return $result;

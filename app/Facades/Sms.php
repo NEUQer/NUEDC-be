@@ -13,6 +13,6 @@ class Sms extends Facade
 {
     public static function getFacadeAccessor()
     {
-        return "App\Service\SmsService";
+        return "App\Services\SmsService";
     }
 }

@@ -8,7 +8,7 @@
 
 return [
     //SMSClient账号
-    'sms_account' => '',
+    'sms_account' => 'N4665371',
     //SMSClient密码
-    'sms_password' => ''
+    'sms_password' => '2k7Vc9tOoy88a2'
 ];

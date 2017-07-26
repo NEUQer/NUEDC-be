@@ -41,7 +41,7 @@ class UserController extends Controller
     public function __construct(
         UserService $userService, VerifyCodeService $verifyCodeService,
         TokenService $tokenService, PermissionService $permissionService,
-        ContestService $contestService,ProblemService $problemService
+        ContestService $contestService, ProblemService $problemService
     )
     {
         $this->userService = $userService;
@@ -54,43 +54,43 @@ class UserController extends Controller
 
     public function getSchools(Request $request)
     {
-        ValidationHelper::validateCheck($request->all(),[
+        ValidationHelper::validateCheck($request->all(), [
             'page' => 'integer|min:1',
             'size' => 'integer|min:1'
         ]);
 
-        $page = $request->input('page',1);
-        $size = $request->input('size',-1);
+        $page = $request->input('page', 1);
+        $size = $request->input('size', -1);
 
         return response()->json([
             'code' => 0,
-            'data' => $this->userService->getSchools($page,$size)
+            'data' => $this->userService->getSchools($page, $size)
         ]);
 
     }
 
-    public function getProblemAttach(Request $request,TokenService $tokenService,int $problemId)
+    public function getProblemAttach(Request $request, TokenService $tokenService, int $problemId)
     {
-        $input = ValidationHelper::checkAndGet($request,[
+        $input = ValidationHelper::checkAndGet($request, [
             'token' => 'required|string',
             'download' => 'boolean'
         ]);
 
         $userId = $tokenService->getUserIdByToken($input['token']);
-        $download = $request->input('download',false);
+        $download = $request->input('download', false);
 
         // 首先检查用户是否参加了对应的比赛
-        if (!$this->problemService->canUserAccessProblem($userId,$problemId)) {
+        if (!$this->problemService->canUserAccessProblem($userId, $problemId)) {
             throw new ProblemSelectTimeException();
         }
 
-        $problem = $this->problemService->getProblem($problemId,['id','title','attach_path']);
+        $problem = $this->problemService->getProblem($problemId, ['id', 'title', 'attach_path']);
 
         if ($problem->attach_path === null) {
             throw new UnknownException("no attachment to download!");
         }
 
-        $path = storage_path('app/private/'.$problem->attach_path);
+        $path = storage_path('app/private/' . $problem->attach_path);
 
         $corsHeaders = [
             'Access-Control-Allow-Origin' => '*',
@@ -100,10 +100,10 @@ class UserController extends Controller
         ];
 
         if ($download) {
-            return response()->download($path,null,$corsHeaders);
+            return response()->download($path, null, $corsHeaders);
         }
 
-        return response()->file($path,$corsHeaders);
+        return response()->file($path, $corsHeaders);
     }
 
     public function perRegister(Request $request)
@@ -117,14 +117,11 @@ class UserController extends Controller
         $data = ValidationHelper::getInputData($request, $rules);
 
 
-        $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], 1);
+        $this->verifyCodeService->sendVerifyCode($data['mobile'], 1);
 
         return response()->json(
             [
                 'code' => 0,
-                'data' => [
-                    'verifyCode' => $verifyCode
-                ]
             ]
         );
 
@@ -224,7 +221,6 @@ class UserController extends Controller
 
     public function getAllContest()
     {
-
         $data = $this->contestService->getAllContest();
 
         return response()->json(
@@ -242,8 +238,6 @@ class UserController extends Controller
      */
     public function signUpContest(Request $request)
     {
-
-
         $rules = [
             'teamName' => 'required',
             'schoolId' => 'required|integer',
@@ -272,7 +266,6 @@ class UserController extends Controller
 
     public function getContestSignUpStatus(Request $request, int $contestId)
     {
-
         return response()->json(
             [
                 'code' => 0,
@@ -296,8 +289,6 @@ class UserController extends Controller
 
     public function getAllPassContest(Request $request)
     {
-
-
         return response()->json(
             [
                 'code' => 0,
@@ -319,8 +310,6 @@ class UserController extends Controller
                 'code' => 0,
                 'data' => $this->contestService->getContestProblemList($contestId, $request->user->id)
             ]
-
-
         );
 
     }
@@ -381,52 +370,54 @@ class UserController extends Controller
         );
     }
 
-    public function getSignedUpContest(Request $request){
+    public function getSignedUpContest(Request $request)
+    {
         return response()->json(
             [
-                'code'=>0,
-                'data'=>$this->contestService->getSignedUpContest($request->user->id)
+                'code' => 0,
+                'data' => $this->contestService->getSignedUpContest($request->user->id)
             ]
         );
     }
 
-    public function getVerifyCode(Request $request){
-
-            $rules = [
-                'mobile' => 'required|mobile|max:100',
-                'type'=>'required|min:1|max:2'
-            ];
-
-            ValidationHelper::validateCheck($request->all(), $rules);
-
-            $data = ValidationHelper::getInputData($request, $rules);
-
-
-            $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], $data['type']);
-
-            return response()->json(
-                [
-                    'code' => 0,
-                    'data' => [
-                        'verifyCode' => $verifyCode
-                    ]
-                ]
-            );
-    }
-
-    public function forgetPassword(Request $request){
-        $rules =[
+    public function getVerifyCode(Request $request)
+    {
+        $rules = [
             'mobile' => 'required|mobile|max:100',
-            'code'=>'required',
-            'newPassword'=>'required|min:6|max:20'
+            'type' => 'required|min:1|max:2'
         ];
-        $data = ValidationHelper::checkAndGet($request,$rules);
 
-        $this->userService->forgetPassword($data['mobile'],$data['newPassword'],$data['code']);
+        ValidationHelper::validateCheck($request->all(), $rules);
+
+        $data = ValidationHelper::getInputData($request, $rules);
+
+
+        $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], $data['type']);
 
         return response()->json(
             [
-                'code'=>0
+                'code' => 0,
+                'data' => [
+                    'verifyCode' => $verifyCode
+                ]
+            ]
+        );
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $rules = [
+            'mobile' => 'required|mobile|max:100',
+            'code' => 'required',
+            'newPassword' => 'required|min:6|max:20'
+        ];
+        $data = ValidationHelper::checkAndGet($request, $rules);
+
+        $this->userService->forgetPassword($data['mobile'], $data['newPassword'], $data['code']);
+
+        return response()->json(
+            [
+                'code' => 0
             ]
         );
     }
