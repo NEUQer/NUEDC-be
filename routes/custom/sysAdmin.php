@@ -37,5 +37,7 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::post('/contest-record/import','SysAdminController@importRecord');
 
     Route::put('/results/update', 'SysAdminController@updateResults');
+
+    Route::post('/contest/{id}/result/check','SysAdminController@checkContestResult');
 });
 
