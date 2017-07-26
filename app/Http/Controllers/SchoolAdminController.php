@@ -186,7 +186,7 @@ class SchoolAdminController extends Controller
     public function getSchoolResults(Request $request)
     {
         $conditions = ValidationHelper::checkAndGet($request, [
-            'contest_id' => 'integer',
+            'contest_id' => 'required|integer',
             'result_info' => 'string|max:255'
         ]);
 
