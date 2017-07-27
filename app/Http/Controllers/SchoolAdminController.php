@@ -63,9 +63,9 @@ class SchoolAdminController extends Controller
 
         $rules = [
             'team_name' => 'required|string|max:255',
-            'school_id' => 'required|integer|max:11',
+            'school_id' => 'required|integer',
             'school_name' => 'required|string|max:255',
-            'contest_id' => 'required|integer|max:11',
+            'contest_id' => 'required|integer',
             'school_level' => 'required|string|max:45',
             'member1' => 'required|string|max:255',
             'member2' => 'required|string|max:255',
@@ -100,9 +100,9 @@ class SchoolAdminController extends Controller
         }
         $rules = [
             'team_name' => 'required|string|max:255',
-            'school_id' => 'required|integer|max:11',
+            'school_id' => 'required|integer',
             'school_name' => 'required|string|max:255',
-            'contest_id' => 'required|integer|max:11',
+            'contest_id' => 'required|integer',
             'school_level' => 'required|string|max:45',
             'member1' => 'required|string|max:255',
             'member2' => 'required|string|max:255',

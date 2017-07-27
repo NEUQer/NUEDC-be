@@ -31,18 +31,19 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     private $userRepo;
     private $schoolRepo;
     private $roleService;
+
     public function __construct(ContestRecordRepository $contestRecordsRepository,
                                 ContestRepository $contestRepository,
                                 ExcelService $excelService,
-                                UserService $userService,UserRepository $userRepository,SchoolRepository $schoolRepository,RoleService $roleService)
+                                UserService $userService, UserRepository $userRepository, SchoolRepository $schoolRepository, RoleService $roleService)
     {
         $this->contestRecordsRepo = $contestRecordsRepository;
         $this->contestRepo = $contestRepository;
         $this->excelService = $excelService;
         $this->userService = $userService;
         $this->userRepo = $userRepository;
-        $this->schoolRepo= $schoolRepository;
-        $this->roleService =$roleService;
+        $this->schoolRepo = $schoolRepository;
+        $this->roleService = $roleService;
     }
 
     function getStartedContest()
@@ -66,25 +67,25 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     function addSchoolTeam(array $schoolTeamInfo): bool
     {
 
-        if ($this->userRepo->getBy('mobile',$schoolTeamInfo['contact_mobile'],['id'])->first() != null)
-                return false;
+        if ($this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first() != null)
+            return false;
 
         $user = [
-            'name'=>$schoolTeamInfo['member1'],
-            'mobile'=>$schoolTeamInfo['contact_mobile'],
-            'password'=> Encrypt::encrypt("NUEDC2017"),
-            'email'=>$schoolTeamInfo['email'],
-            'sex'=>'男',
-            'school_id'=>$schoolTeamInfo['school_id'],
-            'school_name'=>$schoolTeamInfo['school_name'],
-            'status'=>1
+            'name' => $schoolTeamInfo['member1'],
+            'mobile' => $schoolTeamInfo['contact_mobile'],
+            'password' => Encrypt::encrypt("NUEDC2017"),
+            'email' => $schoolTeamInfo['email'],
+            'sex' => '男',
+            'school_id' => $schoolTeamInfo['school_id'],
+            'school_name' => $schoolTeamInfo['school_name'],
+            'status' => 1
         ];
 
         $bool = false;
 
-        DB::transaction(function ()use($user,$schoolTeamInfo,&$bool){
+        DB::transaction(function () use ($user, $schoolTeamInfo, &$bool) {
             $userId = $this->userRepo->insertWithId($user);
-            $this->roleService->giveRoleTo($userId,'student');
+            $this->roleService->giveRoleTo($userId, 'student');
             $currentTime = new Carbon();
             $schoolTeamInfo['created_at'] = $currentTime;
             $schoolTeamInfo['updated_at'] = $currentTime;
@@ -95,11 +96,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
             $schoolTeamInfo['register_id'] = $userId;
 
-            if ( $this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
-                    $bool = true;
+            if ($this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
+                $bool = true;
         });
 
-       return $bool;
+        return $bool;
     }
 
     function getSchoolTeams(array $conditions, int $page, int $size)
@@ -125,11 +126,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ];
 
         if ($size == -1) {
-            $teams = $this->contestRecordsRepo->getByMult($conditions,$columns);
+            $teams = $this->contestRecordsRepo->getByMult($conditions, $columns);
             $count = count($teams);
-        }else {
+        } else {
             $count = $this->contestRecordsRepo->getWhereCount($conditions);
-            $teams = $this->contestRecordsRepo->paginate($page,$size,$conditions,$columns);
+            $teams = $this->contestRecordsRepo->paginate($page, $size, $conditions, $columns);
         }
 
         return [
@@ -175,9 +176,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     {
         // 增加逻辑判断：比赛没出结果时会抛出异常
 
-        $contest = $this->contestRepo->get($conditions['contest_id'],['id','result_check']);
+        $contest = $this->contestRepo->get($conditions['contest_id'], ['id', 'result_check']);
 
-        if ($contest == null||$contest->result_check !== '已审核') {
+        if ($contest == null || $contest->result_check !== '已审核') {
             throw new ContestNotResultException();
         }
 
@@ -203,11 +204,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ];
 
         if ($size == -1) {
-            $results = $this->contestRecordsRepo->getByMult($conditions,$columns);
+            $results = $this->contestRecordsRepo->getByMult($conditions, $columns);
             $count = count($results);
-        }else {
+        } else {
             $count = $this->contestRecordsRepo->getWhereCount($conditions);
-            $results = $this->contestRecordsRepo->paginate($page,$size,$conditions,$columns);
+            $results = $this->contestRecordsRepo->paginate($page, $size, $conditions, $columns);
         }
 
         return [
@@ -216,7 +217,8 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ];
     }
 
-    function getSchoolDetail($schoolId){
+    function getSchoolDetail($schoolId)
+    {
         return $this->schoolRepo->get($schoolId);
     }
 }
