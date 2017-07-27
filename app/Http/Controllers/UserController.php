@@ -19,6 +19,7 @@ use App\Services\UserService;
 use App\Services\VerifyCodeService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
 class UserController extends Controller
 {
@@ -418,6 +419,43 @@ class UserController extends Controller
         return response()->json(
             [
                 'code' => 0
+            ]
+        );
+    }
+
+    public function updateUserInfo(Request $request){
+        $rules = [
+            'email' => 'email|max:100',
+            'name' => 'max:100'
+        ];
+
+        $info = ValidationHelper::checkAndGet($request,$rules);
+
+        $this->userService->updateUserInfo($request->user->id,$info);
+
+        return response()->json(
+            [
+                'code'=>0
+            ]
+        );
+    }
+
+    public function updateUserMobile(Request $request){
+        $rules = [
+            'newMobile'=>'required|mobile|max:100',
+            'code'=>'required'
+        ];
+        $info = ValidationHelper::checkAndGet($request,$rules);
+
+        $mobile = $request->user->mobile;
+
+        $userId = $request->user->id;
+
+        $this->userService->updateUserMobile($userId,$mobile,$info['newMobile'],$info['code']);
+
+        return response()->json(
+            [
+                'code'=>0
             ]
         );
     }

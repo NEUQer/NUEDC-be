@@ -35,4 +35,8 @@ interface UserServiceInterface
 
     function forgetPassword($mobile,$password,$code);
 
+    function updateUserInfo($userId,$info);
+
+    function updateUserMobile($userId,$oldMobile,$mobile,$code);
+
 }

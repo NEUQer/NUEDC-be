@@ -21,6 +21,8 @@ Route::group(['middleware'=>'token'],function (){
     Route::group(['prefix' => '/user'],function (){
        Route::post('/updatePassword','UserController@updateUserPassword');
        Route::get('/logout','UserController@logout');
+       Route::post('/update/info','UserController@updateUserInfo');
+       Route::post('/update/mobile','UserController@updateUserMobile');
     });
 
 });

@@ -43,7 +43,7 @@ class VerifyCodeService implements VerifyCodeServiceInterface
 
         $user = $this->userRepository->getBy('mobile', $mobile)->count();
 
-        //1=>注册，2=>忘记密码
+        //1=>注册，2=>忘记密码,3=>修改手机
         if ($type == 1) {
             if ($user >= 1) {
                 throw new UserExistedException("mobile has been registered");
@@ -56,6 +56,13 @@ class VerifyCodeService implements VerifyCodeServiceInterface
                 throw new UserNotExistException("mobile not Exist");
             } else {
                 if (Sms::forgetPassword($mobile, $verifyCode)[1] != "0")
+                    throw new VerifyCodeSendException();
+            }
+        } else if ($type == 3) {
+            if ($user != 1) {
+                throw new UserExistedException("mobile not Exist");
+            } else {
+                if (Sms::updateUserMobile($mobile, $verifyCode)[1] != "0")
                     throw new VerifyCodeSendException();
             }
         }

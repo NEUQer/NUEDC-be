@@ -12,6 +12,8 @@ interface SmsServiceInterface
 
     function forgetPassword($mobile, $randStr);
 
+    function updateUserMobile($mobile,$randStr);
+
 }
 
 ?>

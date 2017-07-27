@@ -52,6 +52,11 @@ class SmsService implements SmsServiceInterface
         return $this->sendSms($mobile, $message);
     }
 
+    public function updateUserMobile($mobile,$randStr){
+        $message = "【电子设计竞赛】修改手机号，验证码是：$randStr.请注意保密，不要提供给他人使用。验证码五分钟内有效。";
+
+        return $this->sendSms($mobile, $message);
+    }
     /**
      * 处理返回值
      * @param string $result
