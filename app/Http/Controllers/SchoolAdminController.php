@@ -79,11 +79,13 @@ class SchoolAdminController extends Controller
 
         $schoolTeamInfo = ValidationHelper::getInputData($request, $rules);
 
-        if ($this->schoolAdminService->addSchoolTeam($schoolTeamInfo)) {
-            return response()->json([
-                'code' => 0
-            ]);
+        if (!$this->schoolAdminService->addSchoolTeam($schoolTeamInfo)) {
+            throw new UnknownException("fail to add school team");
         }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 
     /**
@@ -116,11 +118,13 @@ class SchoolAdminController extends Controller
 
         $schoolTeamData = ValidationHelper::getInputData($request, $rules);
 
-        if ($this->schoolAdminService->updateSchoolTeam($id, $schoolTeamData)) {
-            return response()->json([
-                'code' => 0
-            ]);
+        if (!$this->schoolAdminService->updateSchoolTeam($id, $schoolTeamData)) {
+            throw new UnknownException("fail to update school team");
         }
+
+        return response()->json([
+            'code' => 0
+        ]);
     }
 
     /**

@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Common\Encrypt;
 use App\Common\Utils;
+use App\Exceptions\Auth\UserExistedException;
 use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
@@ -66,26 +67,44 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function addSchoolTeam(array $schoolTeamInfo): bool
     {
+        $tempUserId = $this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first();
 
-        if ($this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first() != null)
-            return false;
+        $flag = false;
 
-        $user = [
-            'name' => $schoolTeamInfo['member1'],
-            'mobile' => $schoolTeamInfo['contact_mobile'],
-            'password' => Encrypt::encrypt("NUEDC2017"),
-            'email' => $schoolTeamInfo['email'],
-            'sex' => '男',
-            'school_id' => $schoolTeamInfo['school_id'],
-            'school_name' => $schoolTeamInfo['school_name'],
-            'status' => 1
-        ];
+        //当该用户已经存在时
+        if ($tempUserId != null) {
+            $user = [
+                'id' => $tempUserId,
+                'name' => $schoolTeamInfo['member1'],
+                'email' => $schoolTeamInfo['email'],
+                'school_name' => $schoolTeamInfo['school_name'],
+            ];
+
+            $flag = true;
+        } else {
+            $user = [
+                'name' => $schoolTeamInfo['member1'],
+                'mobile' => $schoolTeamInfo['contact_mobile'],
+                'password' => Encrypt::encrypt("NUEDC2017"),
+                'email' => $schoolTeamInfo['email'],
+                'sex' => '男',
+                'school_id' => $schoolTeamInfo['school_id'],
+                'school_name' => $schoolTeamInfo['school_name'],
+                'status' => 1
+            ];
+        }
 
         $bool = false;
 
-        DB::transaction(function () use ($user, $schoolTeamInfo, &$bool) {
-            $userId = $this->userRepo->insertWithId($user);
-            $this->roleService->giveRoleTo($userId, 'student');
+        DB::transaction(function () use ($user, $schoolTeamInfo,$flag, &$bool) {
+            if ($flag == false) {
+                $userId = $this->userRepo->insertWithId($user);
+                $this->roleService->giveRoleTo($userId, 'student');
+            } else {
+                $userId = $user['id']->toArray()['id'];
+                unset($user['id']);
+                $this->userRepo->updateWhere(['id' => $userId], $user);
+            }
             $currentTime = new Carbon();
             $schoolTeamInfo['created_at'] = $currentTime;
             $schoolTeamInfo['updated_at'] = $currentTime;
