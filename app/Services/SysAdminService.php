@@ -223,6 +223,10 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function createSchool(array $data): int
     {
+        $count = $this->schoolRepo->getWhereCount(['name' => $data['name']]);
+        if ($count !== 0) {
+            return -1;
+        }
         return $this->schoolRepo->insertWithId($data);
     }
 

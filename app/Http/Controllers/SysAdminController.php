@@ -145,7 +145,6 @@ class SysAdminController extends Controller
     }
 
     // 学校管理
-
     public function importSchools(Request $request)
     {
         if ($request->isMethod('post')) {
@@ -172,7 +171,7 @@ class SysAdminController extends Controller
                 'principal_mobile' => $contestRecord[5]
             ];
 
-            if ($this->sysAdminService->createSchool($condition)) {
+            if ($this->sysAdminService->createSchool($condition) > 0) {
                 $success[] = $contestRecord;
             } else {
                 $fail[] = $contestRecord;
@@ -231,10 +230,16 @@ class SysAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
+        $schoolId = $this->sysAdminService->createSchool($data);
+
+        if ($schoolId < 1) {
+            throw new UnknownException("fail to create school, maybe your school is exist");
+        }
+
         return response()->json([
             'code' => 0,
             'data' => [
-                'school_id' => $this->sysAdminService->createSchool($data)
+                'school_id' => $schoolId
             ]
         ]);
     }
@@ -647,24 +652,24 @@ class SysAdminController extends Controller
         ]);
     }
 
-    public function checkContestResult(Request $request,int $contestId)
+    public function checkContestResult(Request $request, int $contestId)
     {
-        $input = ValidationHelper::getInputData($request,[
+        $input = ValidationHelper::getInputData($request, [
             'password' => 'required|string',
             'result_check' => 'required|string' // 已审核，未审核
         ]);
 
         // 检查密码
 
-        if (!Encrypt::check($input['password'],$request->user->password)) {
+        if (!Encrypt::check($input['password'], $request->user->password)) {
             throw new PasswordWrongException();
         }
 
-        if (!Permission::checkPermission($request->user->id,['manage_contest'])){
+        if (!Permission::checkPermission($request->user->id, ['manage_contest'])) {
             throw new PermissionDeniedException();
         }
 
-        if (!$this->sysAdminService->checkContestResult($contestId,$input['result_check'])) {
+        if (!$this->sysAdminService->checkContestResult($contestId, $input['result_check'])) {
             throw new UnknownException("无法审核竞赛结果");
         }
 

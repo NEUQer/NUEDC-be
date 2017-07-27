@@ -375,7 +375,7 @@ class SchoolAdminController extends Controller
     {
         $name = "参赛队伍信息导入模板";
 
-        $rows = [['队伍名称', '队长', '成员2', '成员3', '指导老师', '联系人手机号', '邮箱']];
+        $rows = [['队伍名称', '队长', '成员2', '成员3', '指导老师', '队长手机号', '邮箱']];
 
         $excelService->export($name, $rows);
     }
