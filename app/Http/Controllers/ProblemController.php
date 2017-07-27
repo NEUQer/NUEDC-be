@@ -31,7 +31,7 @@ class ProblemController extends Controller
         }
 
         $rules = [
-            'contest_id' => 'required|integer|max:11',
+            'contest_id' => 'required|integer',
             'title' => 'required|string',
             'content' => 'required|string',
             'attach_path' => 'string|max:255',
