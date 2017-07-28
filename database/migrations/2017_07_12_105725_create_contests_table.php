@@ -20,7 +20,7 @@ class CreateContestsTable extends Migration
             $table->string('title',45);
             $table->text('description')->nullable();
             $table->string('status');
-            $table->string('result_check',45)->default('未审核');
+            $table->string('result_check',45)->default('未公布');
             $table->tinyInteger('can_register')->default(-1);
             $table->tinyInteger('can_select_problem')->default(-1);
             // 报名时间

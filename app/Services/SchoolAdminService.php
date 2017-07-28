@@ -220,7 +220,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         $contest = $this->contestRepo->get($conditions['contest_id'], ['id', 'result_check']);
 
-        if ($contest == null || $contest->result_check !== '已审核') {
+        if ($contest == null || $contest->result_check !== '已公布') {
             throw new ContestNotResultException();
         }
 

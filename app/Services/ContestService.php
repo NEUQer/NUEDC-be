@@ -231,7 +231,7 @@ class ContestService implements ContestServiceInterface
 
         $contest = $this->contestRepo->get($contestId,['id','result_check']);
 
-        if ($contest === null||$contest->result_check !== '已审核') {
+        if ($contest === null||$contest->result_check !== '已公布') {
             throw new ContestNotResultException();
         }
 
