@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 use App\Common\Encrypt;
 use App\Common\ValidationHelper;
 use App\Exceptions\Auth\PasswordWrongException;
+use App\Exceptions\Auth\UserExistedException;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use App\Facades\Permission;
@@ -314,12 +315,16 @@ class SysAdminController extends Controller
         $inputs = ValidationHelper::checkAndGet($request, [
             'school_id' => 'required|integer',
             'name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:45|unique:users',
+            'mobile' => 'required|string|max:45',
             'email' => 'string|max:100',
             'password' => 'required|string|min:6',
             'sex' => 'string|max:4',
             'add_on' => 'string|max:255'
         ]);
+
+        if ($this->userService->isUserExist(['mobile' => $inputs['mobile']])) {
+            throw new UserExistedException('mobile');
+        }
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_admins'])) {
             throw new PermissionDeniedException();
