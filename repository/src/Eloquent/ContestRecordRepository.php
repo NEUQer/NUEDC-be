@@ -55,6 +55,8 @@ class ContestRecordRepository extends AbstractRepository {
             $newCondition['contest_records.'.$item] = $value;
         }
 
+        $orderBy = 'contest_records.'.$orderBy;
+
         if (!empty($param))
             return $this->model
                 ->where($newCondition)
