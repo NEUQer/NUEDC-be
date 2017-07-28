@@ -115,7 +115,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                     //-1作为未选题的标识
                     $schoolTeamInfo['problem_selected'] = -1;
                     //中文字符标记状态
-                    $schoolTeamInfo['status'] = '待审核';
+                    $schoolTeamInfo['status'] = '未审核';
 
                     $schoolTeamInfo['register_id'] = $flag;
 
@@ -132,7 +132,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                 //-1作为未选题的标识
                 $schoolTeamInfo['problem_selected'] = -1;
                 //中文字符标记状态
-                $schoolTeamInfo['status'] = '待审核';
+                $schoolTeamInfo['status'] = '未审核';
 
                 $schoolTeamInfo['register_id'] = $userId;
 
