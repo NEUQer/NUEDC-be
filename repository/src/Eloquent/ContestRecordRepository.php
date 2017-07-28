@@ -33,11 +33,28 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model->whereIn('id',$teamIds)->where('result_info','已审核')->get(['id']);
     }
 
-    function getContestInfoAndSignStatus($userId){
+    function getContestInfoAndSignStatus($userId)
+    {
         return $this->model
             ->where('register_id',$userId)
             ->leftjoin('contests','contest_records.contest_id','=','contests.id')
             ->select('contests.*','contest_records.status as signUpStatus')->get();
+    }
+
+    function getRecentContestId($userId)
+    {
+        $record = $this->model
+            ->where('register_id',$userId)
+            ->where('status','已审核')
+            ->orderBy('created_at','desc')
+            ->take(1)
+            ->get(['contest_id']);
+
+        if ($record === null) {
+            return -1;
+        }else {
+            return $record->contest_id;
+        }
     }
 
 }

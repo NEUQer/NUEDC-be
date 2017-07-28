@@ -242,4 +242,9 @@ class ContestService implements ContestServiceInterface
     {
         return $this->contestRecordRepo->getContestInfoAndSignStatus($userId);
     }
+
+    function getRecentContestId(int $userId):int
+    {
+        return $this->contestRecordRepo->getRecentContestId($userId);
+    }
 }

@@ -145,7 +145,6 @@ class UserController extends Controller
 
         $userInfo = ValidationHelper::getInputData($request, $rules);
 
-
         $userId = $this->userService->register($userInfo);
 
         return response()->json([

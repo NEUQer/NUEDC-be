@@ -361,8 +361,8 @@ class SysAdminController extends Controller
         $data = ValidationHelper::checkAndGet($request, [
             'name' => 'string|max:100',
             'email' => 'string|max:100',
-            'mobile' => 'string|max:45|unique:users',
-            'password' => 'string|max:6',
+//            'mobile' => 'string|max:45|unique:users',
+//            'password' => 'string|max:6',
             'sex' => 'string|max:4',
             'add_on' => 'string|max:255',
             'status' => 'integer'
