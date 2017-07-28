@@ -253,6 +253,8 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             $results = $this->contestRecordsRepo->paginateWithProblemTitle($page, $size, $conditions, $columns);
         }
 
+        //dd($results);
+        
         return [
             'results' => $results,
             'count' => $count

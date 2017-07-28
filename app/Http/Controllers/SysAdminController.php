@@ -527,10 +527,11 @@ class SysAdminController extends Controller
                     '联系电话', '邮件', '所选题目编号','所选题目名称','所得奖项', '现场赛相关信息']);
                 foreach ($records as &$record) {
                     $record = array_values($record->toArray());
-                    array_splice($record,10,0,$record[12]);
+//                    dd($record);
+                    array_splice($record,10,0,$record[12]===null?'':$record[12]);
                     unset($record[13]);
 //                    dd($record);
-                    $sheet->appendRow();
+                    $sheet->appendRow($record);
                 }
             });
         })->download('xlsx', [
