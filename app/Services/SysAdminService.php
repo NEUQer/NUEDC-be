@@ -282,6 +282,11 @@ class SysAdminService implements SysAdminServiceInterface
             'onsite_info']);
     }
 
+    public function updateSingleRecord(int $recordId,array $updates)
+    {
+        return $this->recordRepo->update($updates,$recordId) == 1;
+    }
+
     public function updateRecord(array $updates): bool
     {
         $flag = false;

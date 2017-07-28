@@ -584,9 +584,9 @@ class SysAdminController extends Controller
 //            }
 
             //适应updateRecord接口
-            $updates = [$condition];
+//            $updates = [$condition];
 
-            if (!$this->sysAdminService->updateRecord($updates)) {
+            if (!$this->sysAdminService->updateSingleRecord($condition['record_id'],['result' => $condition['result']])) {
                 $fail[] = $condition['record_id'];
             } else {
                 $success[] = $condition['record_id'];
