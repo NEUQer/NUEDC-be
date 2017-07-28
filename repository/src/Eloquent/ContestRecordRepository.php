@@ -55,8 +55,6 @@ class ContestRecordRepository extends AbstractRepository {
             $newCondition['contest_records.'.$item] = $value;
         }
 
-        dd($columns,$newCondition);
-
         if (!empty($param))
             return $this->model
                 ->where($newCondition)
