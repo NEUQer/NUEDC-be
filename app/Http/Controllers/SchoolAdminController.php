@@ -340,10 +340,16 @@ class SchoolAdminController extends Controller
         }
 
         $rows = [];
-        $rows[] = ['队伍编号', '队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目编号', '所得奖项', '评奖状态', '评奖时间', '现场赛相关信息'];
+        $rows[] = ['队伍编号', '队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '所选题目', '所得奖项', '现场赛相关信息'];
 
-        foreach ($data as $item) {
-            $rows[] = array_values($item);
+        foreach ($data as &$item) {
+            $item = array_values($item);
+            $item[8] = $item[13];
+            unset($item[10]);
+            unset($item[11]);
+            unset($item[13]);
+//            dd($item);
+            $rows[] = $item;
         }
 
         $this->excelService->export('获奖情况', $rows);

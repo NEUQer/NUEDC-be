@@ -39,8 +39,8 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model
             ->where($newCondition)
             ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
-            ->select('contest_records.*','problems.title as problem_title')
-            ->get($columns);
+            ->select($columns)
+            ->get();
     }
 
     function paginateWithProblemTitle(int $page = 1, int $size = 20, array $param = [], array $columns = ['*'], $orderBy = 'created_at', $order = 'desc')
@@ -59,17 +59,18 @@ class ContestRecordRepository extends AbstractRepository {
             return $this->model
                 ->where($newCondition)
                 ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
-                ->select('contest_records.*','problems.title as problem_title')
+                ->select($columns)
                 ->orderBy($orderBy,$order)
                 ->skip($size * --$page)
                 ->take($size)
-                ->get($columns);
+                ->get();
         else
             return $this->model
                 ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
+                ->select($columns)
                 ->skip($size * --$page)
                 ->take($size)
-                ->get($columns);
+                ->get();
     }
 
     function deleteWhereIn(string $param,array $values)
