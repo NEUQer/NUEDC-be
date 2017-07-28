@@ -529,7 +529,7 @@ class SysAdminController extends Controller
                     $record = array_values($record->toArray());
                     array_splice($record,10,0,$record[12]);
                     unset($record[13]);
-                    dd($record);
+//                    dd($record);
                     $sheet->appendRow();
                 }
             });
