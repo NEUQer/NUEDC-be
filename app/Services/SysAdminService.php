@@ -260,10 +260,10 @@ class SysAdminService implements SysAdminServiceInterface
         }
 
         if ($size == -1) {
-            $records = $this->recordRepo->getByMult($condition);
+            $records = $this->recordRepo->getResultWithProblemTitle($condition,['*']);
             $count = count($records);
         } else {
-            $records = $this->recordRepo->paginate($page, $size, $condition);
+            $records = $this->recordRepo->paginateWithProblemTitle($page, $size, $condition);
             $count = $this->recordRepo->getWhereCount($condition);
         }
 
@@ -275,7 +275,7 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function getResults(array $condition)
     {
-        return $this->recordRepo->getByMult($condition,[
+        return $this->recordRepo->getResultWithProblemTitle($condition,[
             'id','team_name','school_name','member1','member2','member3',
             'teacher','contact_mobile','email','problem_selected','result','result_info',
             'onsite_info']);

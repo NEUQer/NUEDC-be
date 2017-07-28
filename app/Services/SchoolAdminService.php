@@ -168,11 +168,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ];
 
         if ($size == -1) {
-            $teams = $this->contestRecordsRepo->getByMult($conditions, $columns);
+            $teams = $this->contestRecordsRepo->getResultWithProblemTitle($conditions, $columns);
             $count = count($teams);
         } else {
             $count = $this->contestRecordsRepo->getWhereCount($conditions);
-            $teams = $this->contestRecordsRepo->paginate($page, $size, $conditions, $columns);
+            $teams = $this->contestRecordsRepo->paginateWithProblemTitle($page, $size, $conditions, $columns);
         }
 
         return [
@@ -246,11 +246,11 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         ];
 
         if ($size == -1) {
-            $results = $this->contestRecordsRepo->getByMult($conditions, $columns);
+            $results = $this->contestRecordsRepo->getResultWithProblemTitle($conditions, $columns);
             $count = count($results);
         } else {
             $count = $this->contestRecordsRepo->getWhereCount($conditions);
-            $results = $this->contestRecordsRepo->paginate($page, $size, $conditions, $columns);
+            $results = $this->contestRecordsRepo->paginateWithProblemTitle($page, $size, $conditions, $columns);
         }
 
         return [

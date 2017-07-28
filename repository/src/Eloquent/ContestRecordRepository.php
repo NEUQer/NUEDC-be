@@ -23,6 +23,57 @@ class ContestRecordRepository extends AbstractRepository {
             select('contest_records.*','contests.title as contestTitle','problems.title as problemTitle')->get();
     }
 
+    function getResultWithProblemTitle(array $condition,array $columns)
+    {
+        // 临时补充方法
+        foreach ($columns as &$column){
+            $column = 'contest_records.'.$column;
+        }
+        $columns[] = 'problems.title';
+
+        $newCondition = [];
+        foreach ($condition as $item => $value){
+            $newCondition['contest_records.'.$item] = $value;
+        }
+
+        return $this->model
+            ->where($newCondition)
+            ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
+            ->select('contest_records.*','problems.title as problem_title')
+            ->get($columns);
+    }
+
+    function paginateWithProblemTitle(int $page = 1, int $size = 20, array $param = [], array $columns = ['*'], $orderBy = 'created_at', $order = 'desc')
+    {
+        // 临时补充方法
+        foreach ($columns as &$column){
+            $column = 'contest_records.'.$column;
+        }
+        $columns[] = 'problems.title';
+        $newCondition = [];
+        foreach ($param as $item => $value){
+            $newCondition['contest_records.'.$item] = $value;
+        }
+
+        dd($columns,$newCondition);
+
+        if (!empty($param))
+            return $this->model
+                ->where($newCondition)
+                ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
+                ->select('contest_records.*','problems.title as problem_title')
+                ->orderBy($orderBy,$order)
+                ->skip($size * --$page)
+                ->take($size)
+                ->get($columns);
+        else
+            return $this->model
+                ->leftJoin('problems','contest_records.problem_selected','=','problems.id')
+                ->skip($size * --$page)
+                ->take($size)
+                ->get($columns);
+    }
+
     function deleteWhereIn(string $param,array $values)
     {
         return $this->model->whereIn($param,$values)->delete();
