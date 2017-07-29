@@ -17,6 +17,7 @@ class CreateProblemChecksTable extends Migration
             $table->integer('school_id');
             $table->integer('contest_id');
             $table->string('status',45)->default('未审核');
+            $table->timestamps();
             $table->primary(['school_id','contest_id']);
         });
     }
