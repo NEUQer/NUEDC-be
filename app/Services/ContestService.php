@@ -16,6 +16,7 @@ use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestProblemNotExist;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterHavePassed;
+use App\Repository\Eloquent\ProblemCheckRepository;
 use App\Repository\Eloquent\ProblemRepository;
 use App\Services\Contracts\ContestServiceInterface;
 use App\Exceptions\Common\UnknownException;
@@ -36,8 +37,9 @@ class ContestService implements ContestServiceInterface
     private $contestRecordRepo;
     private $contestRepo;
     private $problemRepo;
+    private $problemCheckRepo;
 
-    public function __construct(ProblemRepository $problemRepository, ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
+    public function __construct(ProblemCheckRepository $problemCheckRepository,ProblemRepository $problemRepository, ContestRepository $contestRepository, UserRepository $userRepository, ContestRecordRepository $recordRepository, TokenService $tokenService, VerifyCodeService $verifyCodeService, RoleService $roleService)
     {
         $this->userRepository = $userRepository;
         $this->tokenService = $tokenService;
@@ -46,6 +48,7 @@ class ContestService implements ContestServiceInterface
         $this->contestRecordRepo = $recordRepository;
         $this->contestRepo = $contestRepository;
         $this->problemRepo = $problemRepository;
+        $this->problemCheckRepo = $problemCheckRepository;
     }
 
     function updateSignUpContest(int $userId, array $signInfo): array
@@ -191,15 +194,20 @@ class ContestService implements ContestServiceInterface
 
     function updateProblemSelect(int $userId, array $key)
     {
+
         if ($this->problemRepo->get($key['problemId']) == null) {
             throw new ContestProblemNotExist();
         }
 
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['school_id','problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
+        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$key['contestId'],'school_id'=>$info['school_id'],'status'=>'已审核'])->first();
+
+        if ($status != null)
+            throw new ContestCloseException();
 
         $time = $this->contestRepo->get($key['contestId'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
 

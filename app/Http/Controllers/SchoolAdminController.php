@@ -444,5 +444,47 @@ class SchoolAdminController extends Controller
             ]
         ]);
     }
+    public function updateProblemSelect(Request $request){
 
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $rules = [
+            'id'=>'required|integer',
+            'problemId'=>'required|integer'
+        ];
+
+        $info = ValidationHelper::checkAndGet($request,$rules);
+
+        $this->schoolAdminService->updateTeamProblem($request->user->school_id,$info['id'],$info['problemId']);
+
+        return response()->json(
+            [
+                'code'=>0
+            ]
+        );
+    }
+
+    public function checkTeamProblem(Request $request){
+
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $rules = [
+            'contestId'=>'required|integer',
+            'status'=>'required|string'
+        ];
+
+        $info = ValidationHelper::checkAndGet($request,$rules);
+
+        $this->schoolAdminService->checkTeamProblem($info['contestId'],$request->user->school_id,$info['status']);
+
+        return response()->json(
+            [
+                'code'=>0
+            ]
+        );
+    }
 }

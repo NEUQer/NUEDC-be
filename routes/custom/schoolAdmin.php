@@ -57,7 +57,9 @@ Route::group(['middleware' => ['token']], function () {
     Route::post('/school/admin/team/import/{contestId}','SchoolAdminController@importTeams');
 
 
+    Route::put('/school/admin/team/problem/select','SchoolAdminController@updateProblemSelect');
 
+    Route::put('/school/admin/team/problem/check','SchoolAdminController@checkTeamProblem');
 });
 
 /**

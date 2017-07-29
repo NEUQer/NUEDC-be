@@ -11,11 +11,17 @@ namespace App\Services;
 use App\Common\Encrypt;
 use App\Common\Utils;
 use App\Exceptions\Auth\UserExistedException;
+use App\Exceptions\Contest\ContestCloseException;
+use App\Exceptions\Contest\ContestNotExistException;
 use App\Exceptions\Contest\ContestNotResultException;
+use App\Exceptions\Contest\ContestNotStartException;
+use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
 use App\Repository\Eloquent\ContestRecordRepository;
 use App\Repository\Eloquent\ContestRepository;
+use App\Repository\Eloquent\ProblemCheckRepository;
+use App\Repository\Eloquent\ProblemRepository;
 use App\Repository\Eloquent\SchoolRepository;
 use App\Repository\Eloquent\UserRepository;
 use App\Services\Contracts\SchoolAdminServiceInterface;
@@ -32,8 +38,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     private $userRepo;
     private $schoolRepo;
     private $roleService;
+    private $problemRepo;
+    private $problemCheckRepo;
 
-    public function __construct(ContestRecordRepository $contestRecordsRepository,
+    public function __construct(ProblemCheckRepository $problemCheckRepository,ProblemRepository $problemRepository,ContestRecordRepository $contestRecordsRepository,
                                 ContestRepository $contestRepository,
                                 ExcelService $excelService,
                                 UserService $userService, UserRepository $userRepository, SchoolRepository $schoolRepository, RoleService $roleService)
@@ -45,6 +53,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $this->userRepo = $userRepository;
         $this->schoolRepo = $schoolRepository;
         $this->roleService = $roleService;
+        $this->problemRepo = $problemRepository;
+        $this->problemCheckRepo = $problemCheckRepository;
+
     }
 
     function getStartedContest()
@@ -264,6 +275,55 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     function getSchoolDetail($schoolId)
     {
         return $this->schoolRepo->get($schoolId);
+    }
+
+    function updateTeamProblem(int $schoolId,int $id, int $problemId)
+    {
+        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>'已审核'])->first();
+
+        if ($status != null)
+            throw new ContestCloseException();
+
+        if ($this->problemRepo->get($problemId) == null) {
+            throw new ContestNotExistException();
+        }
+
+        $info = $this->contestRecordsRepo->getByMult(['id' => $id,'status' => '已通过'], ['school_id','contest_id','problem_selected', 'problem_selected_at'])->first();
+
+        if ($info == null)
+            throw new ContestRegisterHaveNotPassException();
+
+        if ($info['school_id'] != $schoolId)
+            throw new SchoolTeamsNotExistedException();
+
+        $time = $this->contestRepo->get($info['contest_id'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
+
+        if ($time['can_select_problem'] == -1) {
+            $now = strtotime(Carbon::now());
+
+            if ($now < strtotime($time['problem_start_time']))
+                throw new ContestNotStartException();
+
+
+            if ($now > strtotime($time['problem_end_time']))
+                throw new ContestCloseException();
+
+        } else if ($time['can_select_problem'] == 0) {
+            throw new ContestCloseException();
+        }
+
+
+        return $this->contestRecordsRepo->update(['problem_selected' => $problemId, 'problem_selected_at' => Carbon::now()],$id);
+    }
+
+    function checkTeamProblem(int $contestId, int $schoolId,string $status)
+    {
+        $info = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId])->first();
+
+        if ($info == null)
+            return $this->problemCheckRepo->insert(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>$status]);
+
+        return $this->problemCheckRepo->updateWhere(['contest_id'=>$contestId,'school_id'=>$schoolId],['status'=>$status]);
     }
 }
 
