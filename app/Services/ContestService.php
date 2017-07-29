@@ -91,7 +91,7 @@ class ContestService implements ContestServiceInterface
         } //不为空说明已经报过名
         else {
 
-            if ($Info['status'] == "已审核") {
+            if ($Info['status'] == "已通过") {
                 throw new ContestRegisterHavePassed();
             }
 
@@ -135,7 +135,7 @@ class ContestService implements ContestServiceInterface
 
     function getContestProblemList(int $contestId, int $operatorId): array
     {
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $contestId, 'register_id' => $operatorId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $contestId, 'register_id' => $operatorId, 'status' => '已通过'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
@@ -162,14 +162,14 @@ class ContestService implements ContestServiceInterface
 
     function getAllPassContestList(int $userId): array
     {
-        $contestIds = $this->contestRecordRepo->getByMult(['register_id' => $userId, 'status' => "已审核"], ['contest_id'])->toArray();
+        $contestIds = $this->contestRecordRepo->getByMult(['register_id' => $userId, 'status' => "已通过"], ['contest_id'])->toArray();
 
         return $this->contestRepo->getIn('id', $contestIds)->toArray();
     }
 
     function getProblemDetail(int $userId, array $key)
     {
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
@@ -195,7 +195,7 @@ class ContestService implements ContestServiceInterface
             throw new ContestProblemNotExist();
         }
 
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
@@ -219,13 +219,13 @@ class ContestService implements ContestServiceInterface
 
 
         //无论选择与否都是更新对应行数据
-        return $this->contestRecordRepo->updateWhere(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已审核'], ['problem_selected' => $key['problemId'], 'problem_selected_at' => Carbon::now()]);
+        return $this->contestRecordRepo->updateWhere(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['problem_selected' => $key['problemId'], 'problem_selected_at' => Carbon::now()]);
 
     }
 
     function getContestResult(int $userId, int $contestId)
     {
-        $row = $this->contestRecordRepo->getWhereCount(['contest_id' => $contestId, 'register_id' => $userId, 'status' => '已审核']);
+        $row = $this->contestRecordRepo->getWhereCount(['contest_id' => $contestId, 'register_id' => $userId, 'status' => '已通过']);
         if ($row == 0)
             throw new ContestRegisterHaveNotPassException();
 

@@ -456,4 +456,14 @@ class UserController extends Controller
             ]
         );
     }
+
+    public function getSchoolAdmins(Request $request)
+    {
+        return response()->json([
+            'code' => 0,
+            'data' => [
+                'school_admins' => $this->userService->getSchoolAdmins($request->user->school_id)
+            ]
+        ]);
+    }
 }

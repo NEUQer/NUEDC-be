@@ -40,7 +40,7 @@ Route::group(['middleware' => 'user'], function() {
         Route::get('/{contestId}/abandonContest','UserController@abandonContest');
         Route::get('/getAllPassContest','UserController@getAllPassContest');
         Route::get('/getSignedUpContest','UserController@getSignedUpContest');
-
+        Route::get('/getSchoolAdmins','UserController@getSchoolAdmins');
 
     });
 

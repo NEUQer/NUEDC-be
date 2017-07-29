@@ -235,4 +235,12 @@ class UserService implements UserServiceInterface
 
         return $this->userRepository->update(['mobile'=>$mobile],$userId);
     }
+
+    function getSchoolAdmins(int $schoolId)
+    {
+        return $this->userRepository->getByMult([
+            'school_id' => $schoolId,
+            'role' => 'school_admin',
+        ]);
+    }
 }
