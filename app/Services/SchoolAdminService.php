@@ -279,6 +279,8 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function updateTeamProblem(int $schoolId,int $id, int $problemId)
     {
+        $contestId = $this->contestRecordsRepo->get($id,['contest_id'])->contest_id;
+
         $status = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>'已审核'])->first();
 
         if ($status != null)
