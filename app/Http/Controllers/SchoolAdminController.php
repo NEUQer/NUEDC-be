@@ -349,7 +349,7 @@ class SchoolAdminController extends Controller
             unset($item[10]);
             unset($item[11]);
             unset($item[13]);
-            dd($item);
+//            dd($item);
             $rows[] = $item;
         }
 
