@@ -23,7 +23,7 @@ interface SchoolAdminServiceInterface
 
     function deleteSchoolTeam(int $schoolTeamId): bool;
 
-    function checkSchoolTeam(int $schoolTeamId): bool;
+    function checkSchoolTeam(int $schoolTeamId, string $status): bool;
 
     function getSchoolResults(array $conditions, int $page, int $size);
 

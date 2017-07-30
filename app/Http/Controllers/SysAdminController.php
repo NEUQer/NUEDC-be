@@ -644,7 +644,7 @@ class SysAdminController extends Controller
         $success = [];
         foreach ($userIds as $userId) {
             $mobile = $this->userService->getUserInfo(['id' => $userId])->toArray()['mobile'];
-            //TODO: 根据sendSms的返回码做状态判断，用fail和success数组保存
+
             if (Sms::sendSms($mobile, $message)[1] != '0') {
                 $fail[] = $mobile;
             } else {

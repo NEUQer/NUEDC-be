@@ -225,7 +225,13 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        if (!$this->schoolAdminService->checkSchoolTeam($id)) {
+        $rules = [
+            'record_check' => 'required|string'
+        ];
+
+        $check = ValidationHelper::checkAndGet($request, $rules);
+
+        if (!$this->schoolAdminService->checkSchoolTeam($id, $check['record_check'])) {
             throw new UnknownException("check fail");
         }
 
@@ -247,26 +253,33 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $schoolTeamIds = ValidationHelper::checkAndGet($request, [
-            'school_team_ids' => 'required|array'
-        ])['school_team_ids'];
+        $schoolChecks = ValidationHelper::checkAndGet($request, [
+            'checks' => 'required|array'
+        ])['checks'];
 
-        $flag = -1;
+        $rules = [
+            'record_id' => 'required|integer|min:1',
+            'record_check' => 'required|string',
+        ];
 
-        foreach ($schoolTeamIds as $teamId) {
+        $fail = [];
+        $success = [];
 
-            if (!$this->schoolAdminService->checkSchoolTeam($teamId)) {
-                $flag = $teamId;
-                break;
+        foreach ($schoolChecks as $check) {
+            ValidationHelper::validateCheck($check, $rules);
+            if (!$this->schoolAdminService->checkSchoolTeam($check['record_id'], $check['record_check'])) {
+                $fail[] = $check['record_id'];
+            } else {
+                $success[] = $check['record_id'];
             }
         }
 
-        if (!$flag) {
-            throw new UnknownException("fail to check school teams after $flag");
-        }
-
         return response()->json([
-            'code' => 0
+            'code' => 0,
+            'data' => [
+                'success' => $success,
+                'fail' => $fail
+            ]
         ]);
     }
 

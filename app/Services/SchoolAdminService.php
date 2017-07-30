@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Common\Encrypt;
 use App\Common\Utils;
 use App\Exceptions\Auth\UserExistedException;
+use App\Exceptions\BaseException;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Contest\ContestCloseException;
 use App\Exceptions\Contest\ContestNotExistException;
@@ -234,25 +235,22 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return $this->contestRecordsRepo->deleteWhere(['id' => $schoolTeamId]) == 1;
     }
 
-    function checkSchoolTeam(int $schoolTeamId): bool
+    function checkSchoolTeam(int $schoolTeamId, string $status): bool
     {
-        $record = $this->contestRecordsRepo->get($schoolTeamId,['contest_id']);
+        $record = $this->contestRecordsRepo->get($schoolTeamId);
 
         if ($record === null) {
-            throw new SchoolTeamsNotExistedException();
+            return false;
         }
 
-        if (!$this->canUpdateTeam($record->contest_id)) {
-            throw new UnknownException('比赛当前不可再修改参赛信息');
+        try {
+            $this->canUpdateTeam($record->contest_id);
+        } catch (BaseException $exception) {
+            return false;
         }
 
-        $row = $this->contestRecordsRepo->getWhereCount(['id' => $schoolTeamId]);
 
-        if ($row < 1) {
-            throw new SchoolTeamsNotExistedException();
-        }
-
-        return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已通过']) == 1;
+        return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => $status]) == 1;
     }
 
     function getSchoolResults(array $conditions, int $page, int $size)
