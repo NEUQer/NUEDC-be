@@ -11,11 +11,13 @@ namespace App\Services;
 use App\Common\Encrypt;
 use App\Common\Utils;
 use App\Exceptions\Auth\UserExistedException;
+use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Contest\ContestCloseException;
 use App\Exceptions\Contest\ContestNotExistException;
 use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
+use App\Exceptions\Contest\ContestRegisterTimeError;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
 use App\Repository\Eloquent\ContestRecordRepository;
@@ -78,6 +80,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function addSchoolTeam(array $schoolTeamInfo): bool
     {
+        if(!$this->canUpdateTeam($schoolTeamInfo['contest_id'])) {
+            throw new UnknownException('比赛当前不可再增加报名队伍');
+        }
+
         $tempUserId = $this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first();
 
         $flag = false;
@@ -194,6 +200,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function updateSchoolTeam(int $schoolTeamId, array $schoolTeamInfo): bool
     {
+        if (!$this->canUpdateTeam($schoolTeamInfo['contest_id'])) {
+            throw new UnknownException('比赛当前已不可更新参赛信息');
+        }
+
         $row = $this->contestRecordsRepo->getWhereCount(['id' => $schoolTeamId]);
 
         if ($row < 1) {
@@ -205,6 +215,16 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function deleteSchoolTeam(int $schoolTeamId): bool
     {
+        $record = $this->contestRecordsRepo->get($schoolTeamId,['contest_id']);
+
+        if ($record === null) {
+            throw new SchoolTeamsNotExistedException();
+        }
+
+        if (!$this->canUpdateTeam($record->contest_id)) {
+            throw new UnknownException('比赛当前不可再修改参赛信息');
+        }
+
         $row = $this->contestRecordsRepo->getWhereCount(['id' => $schoolTeamId]);
 
         if ($row < 1) {
@@ -216,13 +236,23 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function checkSchoolTeam(int $schoolTeamId): bool
     {
+        $record = $this->contestRecordsRepo->get($schoolTeamId,['contest_id']);
+
+        if ($record === null) {
+            throw new SchoolTeamsNotExistedException();
+        }
+
+        if (!$this->canUpdateTeam($record->contest_id)) {
+            throw new UnknownException('比赛当前不可再修改参赛信息');
+        }
+
         $row = $this->contestRecordsRepo->getWhereCount(['id' => $schoolTeamId]);
 
         if ($row < 1) {
             throw new SchoolTeamsNotExistedException();
         }
 
-        return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已审核']) == 1;
+        return $this->contestRecordsRepo->updateWhere(['id' => $schoolTeamId], ['status' => '已通过']) == 1;
     }
 
     function getSchoolResults(array $conditions, int $page, int $size)
@@ -279,6 +309,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function updateTeamProblem(int $schoolId,int $id, int $problemId)
     {
+
         $contestId = $this->contestRecordsRepo->get($id,['contest_id'])->contest_id;
 
         $status = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>'已审核'])->first();
@@ -314,18 +345,62 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             throw new ContestCloseException();
         }
 
-
         return $this->contestRecordsRepo->update(['problem_selected' => $problemId, 'problem_selected_at' => Carbon::now()],$id);
     }
 
     function checkTeamProblem(int $contestId, int $schoolId,string $status)
     {
+        if (!$this->canUpdateProblemSelect($contestId)) {
+            throw new UnknownException('当前比赛选题不可再修改');
+        }
+
         $info = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId])->first();
 
         if ($info == null)
             return $this->problemCheckRepo->insert(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>$status]);
 
         return $this->problemCheckRepo->updateWhere(['contest_id'=>$contestId,'school_id'=>$schoolId],['status'=>$status]);
+    }
+
+    public function canUpdateTeam(int $contestId):bool
+    {
+        $time = $this->contestRepo->get($contestId, ['can_register', 'register_start_time', 'register_end_time']);
+
+        if ($time == null)
+            throw new ContestNotExistException();
+
+        if ($time['can_register'] == -1) {
+            $now = strtotime(Carbon::now());
+
+            if (strtotime($time['register_start_time']) > $now || $now > strtotime($time['register_end_time'])) {
+                throw new ContestRegisterTimeError();
+            }
+        } else if ($time['can_register'] == 0) {
+            throw new ContestRegisterTimeError();
+        }
+
+        return true;
+    }
+
+    public function canUpdateProblemSelect(int $contestId):bool
+    {
+        $time = $this->contestRepo->get($contestId, ['can_select_problem', 'problem_start_time', 'problem_end_time']);
+
+        if ($time['can_select_problem'] == -1) {
+            $now = strtotime(Carbon::now());
+
+            if ($now < strtotime($time['problem_start_time']))
+                throw new ContestNotStartException();
+
+
+            if ($now > strtotime($time['problem_end_time']))
+                throw new ContestCloseException();
+
+        } else if ($time['can_select_problem'] == 0) {
+            throw new ContestCloseException();
+        }
+
+        return true;
     }
 }
 
