@@ -6,8 +6,8 @@ use App\Common\ValidationHelper;
 use App\Exceptions\Common\UnknownException;
 use App\Exceptions\Permission\PermissionDeniedException;
 use App\Exceptions\SchoolAdmin\SchoolNotExistedException;
+use App\Facades\Permission;
 use App\Services\ExcelService;
-use Permission;
 use App\Services\SchoolAdminService;
 use Illuminate\Http\Request;
 
@@ -179,6 +179,33 @@ class SchoolAdminController extends Controller
             'code' => 0,
             'data' => $data
         ]);
+    }
+
+    /*
+     * 获取学生选题
+     */
+
+    public function getTeamProblems(Request $request)
+    {
+        $conditions = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'required|integer'
+        ]);
+
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $conditions['school_id'] = $request->user->school_id;
+        $page = $request->input('page', 1);
+        $size = $request->input('size', -1);
+
+        $data = $this->schoolAdminService->getTeamProblemSelected($conditions, $page, $size);
+
+        return response()->json([
+            'code' => 0,
+            'data' => $data
+        ]);
+
     }
 
     /**

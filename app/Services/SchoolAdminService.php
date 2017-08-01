@@ -163,6 +163,42 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return $bool;
     }
 
+    function getTeamProblemSelected(array $conditions,int $page,int $size)
+    {
+        $columns = [
+            'contest_id',
+            'id',
+            'team_name',
+//            'school_id',
+//            'school_name',
+//            'school_level',
+            'member1',
+            'member2',
+            'member3',
+            'teacher',
+            'contact_mobile',
+            'email',
+//            'status'
+            'problem_selected',
+        ];
+
+        $conditions['status'] = '已通过';
+
+        if ($size == -1) {
+            $teams = $this->contestRecordsRepo->getResultWithProblemTitle($conditions, $columns);
+            $count = count($teams);
+        } else {
+            $count = $this->contestRecordsRepo->getWhereCount($conditions);
+            $teams = $this->contestRecordsRepo->paginateWithProblemTitle($page, $size, $conditions, $columns);
+        }
+
+        return [
+            'teams' => $teams,
+            'count' => $count
+        ];
+
+    }
+
     function getSchoolTeams(array $conditions, int $page, int $size)
     {
         if ($conditions['contest_id'] === -1) {

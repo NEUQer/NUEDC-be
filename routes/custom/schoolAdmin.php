@@ -10,6 +10,7 @@ Route::group(['middleware' => ['token']], function () {
      * 获取学校队伍
      */
     Route::get("/school/team/info", 'SchoolAdminController@getSchoolTeams');
+    Route::get("/school/team/problems", 'SchoolAdminController@getTeamProblems');
     /**
      * 添加学校队伍
      */
