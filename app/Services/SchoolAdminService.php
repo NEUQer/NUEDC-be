@@ -19,6 +19,7 @@ use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterTimeError;
+use App\Exceptions\Contest\ProblemSelectTimeException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
 use App\Repository\Eloquent\ContestRecordRepository;
@@ -444,6 +445,18 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         return true;
     }
+
+    public function getProblemList(int $contestId, int $schoolId)
+    {
+        $time = $this->contestRepo->get($contestId,['problem_start_time', 'problem_end_time']);
+
+        if (!$this->canUpdateProblemSelect($contestId)) {
+            throw new ProblemSelectTimeException();
+        }
+
+        return $this->problemRepo->getBy('contest_id', $contestId);
+    }
+
 }
 
 

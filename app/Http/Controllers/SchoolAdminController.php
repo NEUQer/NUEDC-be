@@ -187,7 +187,7 @@ class SchoolAdminController extends Controller
 
     public function getTeamProblems(Request $request)
     {
-        $conditions = ValidationHelper::checkAndGet($request,[
+        $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer'
         ]);
 
@@ -484,53 +484,56 @@ class SchoolAdminController extends Controller
             ]
         ]);
     }
-    public function updateProblemSelect(Request $request){
+
+    public function updateProblemSelect(Request $request)
+    {
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
         $rules = [
-            'id'=>'required|integer',
-            'problemId'=>'required|integer'
+            'id' => 'required|integer',
+            'problemId' => 'required|integer'
         ];
 
-        $info = ValidationHelper::checkAndGet($request,$rules);
+        $info = ValidationHelper::checkAndGet($request, $rules);
 
-        $this->schoolAdminService->updateTeamProblem($request->user->school_id,$info['id'],$info['problemId']);
+        $this->schoolAdminService->updateTeamProblem($request->user->school_id, $info['id'], $info['problemId']);
 
         return response()->json(
             [
-                'code'=>0
+                'code' => 0
             ]
         );
     }
 
-    public function checkTeamProblem(Request $request){
+    public function checkTeamProblem(Request $request)
+    {
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
             throw new PermissionDeniedException();
         }
 
         $rules = [
-            'contestId'=>'required|integer',
-            'status'=>'required|string'
+            'contestId' => 'required|integer',
+            'status' => 'required|string'
         ];
 
-        $info = ValidationHelper::checkAndGet($request,$rules);
+        $info = ValidationHelper::checkAndGet($request, $rules);
 
-        $this->schoolAdminService->checkTeamProblem($info['contestId'],$request->user->school_id,$info['status']);
+        $this->schoolAdminService->checkTeamProblem($info['contestId'], $request->user->school_id, $info['status']);
 
         return response()->json(
             [
-                'code'=>0
+                'code' => 0
             ]
         );
     }
 
     public function getProblemCheckStatus(Request $request)
     {
-        $input = ValidationHelper::checkAndGet($request,[
+        $input = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer'
         ]);
 
@@ -538,7 +541,7 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $status = $this->schoolAdminService->getProblemCheckStatus($input['contest_id'],$request->user->school_id);
+        $status = $this->schoolAdminService->getProblemCheckStatus($input['contest_id'], $request->user->school_id);
 
         if ($status !== null && $status == '已审核') {
             return response()->json([
@@ -547,7 +550,7 @@ class SchoolAdminController extends Controller
                     'status' => $status
                 ]
             ]);
-        }else {
+        } else {
             return response()->json([
                 'code' => 0,
                 'data' => [
@@ -555,5 +558,19 @@ class SchoolAdminController extends Controller
                 ]
             ]);
         }
+    }
+
+    public function getProblemList(Request $request, int $contestId)
+    {
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $problemList = $this->schoolAdminService->getProblemList($contestId, $request->user->school_id);
+
+        return response()->json([
+            'code' => 0,
+            'problem_list' => $problemList
+        ]);
     }
 }

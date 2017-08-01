@@ -30,6 +30,8 @@ interface SchoolAdminServiceInterface
     function updateTeamProblem(int $schoolId,int $id,int $problemId);
 
     function checkTeamProblem(int $contestId,int $schoolId,string $status);
+
+    function getProblemList(int $contestId, int $schoolId);
 }
 
 ?>
