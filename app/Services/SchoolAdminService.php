@@ -163,6 +163,14 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         return $bool;
     }
 
+    function getProblemCheckStatus(int $contestId,int $schoolId)
+    {
+        return $this->problemCheckRepo->getByMult([
+            'contest_id' => $contestId,
+            'school_id' => $schoolId
+        ],['status'])->first();
+    }
+
     function getTeamProblemSelected(array $conditions,int $page,int $size)
     {
         $columns = [

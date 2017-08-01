@@ -527,4 +527,33 @@ class SchoolAdminController extends Controller
             ]
         );
     }
+
+    public function getProblemCheckStatus(Request $request)
+    {
+        $input = ValidationHelper::checkAndGet($request,[
+            'contest_id' => 'required|integer'
+        ]);
+
+        if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $status = $this->schoolAdminService->getProblemCheckStatus($input['contest_id'],$request->user->school_id);
+
+        if ($status !== null && $status == '已审核') {
+            return response()->json([
+                'code' => 0,
+                'data' => [
+                    'status' => $status
+                ]
+            ]);
+        }else {
+            return response()->json([
+                'code' => 0,
+                'data' => [
+                    'status' => '未审核'
+                ]
+            ]);
+        }
+    }
 }

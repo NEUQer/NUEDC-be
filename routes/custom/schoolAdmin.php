@@ -61,6 +61,8 @@ Route::group(['middleware' => ['token']], function () {
     Route::put('/school/admin/team/problem/select','SchoolAdminController@updateProblemSelect');
 
     Route::put('/school/admin/team/problem/check','SchoolAdminController@checkTeamProblem');
+
+    Route::get('/school/admin/team/problem/check','SchoolAdminController@getProblemCheckStatus');
 });
 
 /**
