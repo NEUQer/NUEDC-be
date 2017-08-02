@@ -63,8 +63,8 @@ class VerifyCodeService implements VerifyCodeServiceInterface
             if ($user != 1) {
                 throw new UserExistedException("mobile not Exist");
             } else {
-//                if (Sms::updateUserMobile($mobile, $verifyCode)[1] != "0")
-//                    throw new VerifyCodeSendException();
+                if (Sms::updateUserMobile($mobile, $verifyCode)[1] != "0")
+                    throw new VerifyCodeSendException();
             }
         }
 
