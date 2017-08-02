@@ -103,7 +103,7 @@ class SysAdminController extends Controller
     {
         $contest = ValidationHelper::checkAndGet($request, [
             'title' => 'string|max:45',
-            'description' => 'string|max:255',
+            'description' => 'string',
             'register_start_time' => 'date',
             'register_end_time' => 'date',
             'problem_start_time' => 'date',

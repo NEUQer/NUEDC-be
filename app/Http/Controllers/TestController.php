@@ -16,6 +16,8 @@ use App\Facades\Permission;
 use App\Services\AuthService;
 use App\Services\ContestService;
 use App\Services\ExcelService;
+use App\Services\PrivilegeService;
+use App\Services\RoleService;
 use App\Services\SchoolAdminService;
 use App\Services\SysAdminService;
 use App\Services\UserService;
@@ -149,6 +151,16 @@ class TestController extends Controller
             //TODO: 增加验证逻辑
            // $this->Sms::sendSms($mobile, $message);
         }
+
+        return response()->json([
+            'code' => 0
+        ]);
+    }
+
+    public function generate(Request $request,RoleService $service)
+    {
+
+        $service->giveRoleTo(1,'system_admin');
 
         return response()->json([
             'code' => 0

@@ -32,7 +32,7 @@ Route::group(['middleware' => 'token'],function (){
     });
 });
 
-Route::get('/test','TestController@test');
+Route::get('/test','TestController@generate');
 Route::get('/test/excel/export','TestController@export');
 Route::post('/test/excel/import','TestController@import');
 Route::get('/getSchoolListTemplateFile','TestController@getSchoolListTemplateFile');
