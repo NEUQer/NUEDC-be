@@ -14,6 +14,7 @@ use App\Exceptions\Auth\UserExistedException;
 use App\Exceptions\Auth\UserNotExistException;
 use App\Exceptions\Common\VerifyCodeSendException;
 use App\Exceptions\VerifyCode\VerifyCodeErrorException;
+use App\Exceptions\VerifyCode\VerifyCodeTimeErrorException;
 use App\Exceptions\VerifyCode\VerifyCodeTimeOutException;
 use Sms;
 use App\Repository\Eloquent\UserRepository;
@@ -62,8 +63,8 @@ class VerifyCodeService implements VerifyCodeServiceInterface
             if ($user != 1) {
                 throw new UserExistedException("mobile not Exist");
             } else {
-                if (Sms::updateUserMobile($mobile, $verifyCode)[1] != "0")
-                    throw new VerifyCodeSendException();
+//                if (Sms::updateUserMobile($mobile, $verifyCode)[1] != "0")
+//                    throw new VerifyCodeSendException();
             }
         }
 
@@ -75,6 +76,9 @@ class VerifyCodeService implements VerifyCodeServiceInterface
     {
 
         $verify = $this->verifyCodeRepository->getByMult(['mobile' => $mobile, 'type' => $type])->first();
+
+        if ($verify['updated_at'] + 50000 > Utils::createTimeStamp())
+            throw new VerifyCodeTimeErrorException();
 
         if ($verify == null) {
             $newVerify = [
