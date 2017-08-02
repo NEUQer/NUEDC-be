@@ -170,10 +170,12 @@ class SysAdminService implements SysAdminServiceInterface
                 'name' => $user['name'],
                 'school_id' => $school->id,
                 'school_name' => $school->name,
+                'email' => $user['email'],
                 'password' => Encrypt::encrypt($user['password']),
                 'mobile' => $user['mobile'],
                 'status' => 1,
-                'role' => 'school_admin'
+                'role' => 'school_admin',
+                'sex' => $user['sex']
             ]);
 
             $this->authService->giveRoleTo($userId, 'school_admin');

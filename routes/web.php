@@ -32,8 +32,8 @@ Route::group(['middleware' => 'token'],function (){
     });
 });
 
-Route::get('/test','TestController@generate');
-Route::get('/test/excel/export','TestController@export');
-Route::post('/test/excel/import','TestController@import');
-Route::get('/getSchoolListTemplateFile','TestController@getSchoolListTemplateFile');
-Route::post('/test/send','TestController@sendMessages');
+//Route::get('/test','TestController@generate');
+//Route::get('/test/excel/export','TestController@export');
+//Route::post('/test/excel/import','TestController@import');
+//Route::get('/getSchoolListTemplateFile','TestController@getSchoolListTemplateFile');
+//Route::post('/test/send','TestController@sendMessages');
