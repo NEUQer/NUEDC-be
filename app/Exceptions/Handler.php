@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Prophecy\Exception\Doubler\MethodNotFoundException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,7 +51,6 @@ class Handler extends ExceptionHandler
                 'data' => $exception->getData()
             ],201);
         }
-
         return parent::render($request, $exception);
     }
 

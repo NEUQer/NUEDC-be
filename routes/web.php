@@ -11,25 +11,27 @@
 |
 */
 
-include 'custom/user.php';
-include 'custom/sysAdmin.php';
-include 'custom/schoolAdmin.php';
-include 'custom/auth.php';
-include 'custom/problem.php';
-include 'custom/file.php';
-include 'custom/message.php';
+Route::group(['prefix' => 'api'],function (){
+    include 'custom/user.php';
+    include 'custom/sysAdmin.php';
+    include 'custom/schoolAdmin.php';
+    include 'custom/auth.php';
+    include 'custom/problem.php';
+    include 'custom/file.php';
+    include 'custom/message.php';
+
+    Route::group(['middleware' => 'token'],function (){
+        Route::get('/verify-token',function (\Illuminate\Http\Request $request) {
+            return [
+                'code' => 0,
+                'user' => $request->user
+            ];
+        });
+    });
+});
 
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::group(['middleware' => 'token'],function (){
-    Route::get('/verify-token',function (\Illuminate\Http\Request $request) {
-        return [
-            'code' => 0,
-            'user' => $request->user
-        ];
-    });
 });
 
 //Route::get('/test','TestController@generate');
