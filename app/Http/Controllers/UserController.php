@@ -272,7 +272,6 @@ class UserController extends Controller
         );
     }
 
-
     public function abandonContest(Request $request, int $contestId)
     {
 

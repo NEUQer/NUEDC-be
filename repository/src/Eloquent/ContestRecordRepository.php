@@ -109,4 +109,12 @@ class ContestRecordRepository extends AbstractRepository {
         }
     }
 
+    function getMaxTeamCode(int $contestId,string $schoolLevel)
+    {
+        return $this->model
+            ->where('contest_id',$contestId)
+            ->where('school_level',$schoolLevel)
+            ->max('team_code');
+    }
+
 }

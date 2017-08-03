@@ -217,6 +217,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $columns = [
             'contest_id',
             'id',
+            'team_code',
             'team_name',
             'school_id',
             'school_name',
@@ -364,7 +365,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             throw new ContestNotExistException();
         }
 
-        $info = $this->contestRecordsRepo->getByMult(['id' => $id,'status' => '已通过'], ['school_id','contest_id','problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordsRepo->getByMult(['id' => $id,'status' => '已通过'], ['school_id','school_level','team_code','contest_id','problem_selected', 'problem_selected_at'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
@@ -388,7 +389,24 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             throw new ContestCloseException();
         }
 
-        return $this->contestRecordsRepo->update(['problem_selected' => $problemId, 'problem_selected_at' => Carbon::now()],$id);
+        // 此处根据库内数据动态生成TEAM_CODE，TEAM_CODE的两个分类依据：contest_id,school_level
+        // 判定是否已经生成过team_code
+
+        $teamCode = $info->team_code;
+
+        if ($teamCode === null) {
+            $lastCode = $this->contestRecordsRepo->getMaxTeamCode($info['contest_id'],$info['school_level']);
+//            $schoolType = $info['school_level'] == '本科'?'B':'G';
+            if ($lastCode === null)  {
+                $teamCode = '001';
+            }else {
+                $lastCode = intval(substr($lastCode,1));
+                $lastCode = sprintf("%04d",++$lastCode);
+                $teamCode = $lastCode;
+            }
+        }
+
+        return $this->contestRecordsRepo->update(['problem_selected' => $problemId, 'problem_selected_at' => Carbon::now(),'team_code' => $teamCode],$id);
     }
 
     function checkTeamProblem(int $contestId, int $schoolId,string $status)

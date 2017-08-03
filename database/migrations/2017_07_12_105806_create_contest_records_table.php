@@ -16,6 +16,7 @@ class CreateContestRecordsTable extends Migration
         Schema::create('contest_records', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('register_id');
+            $table->string('team_code',45);
             $table->string('team_name');
             $table->integer('school_id');
             $table->string('school_name', 100);

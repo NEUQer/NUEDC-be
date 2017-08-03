@@ -341,7 +341,7 @@ class SchoolAdminController extends Controller
         }
 
         $rows = [];
-        $rows[] = ['队伍编号', '队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '队伍审核状态'];
+        $rows[] = ['队伍id','队伍编号','队伍名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师', '联系电话', '邮件', '队伍审核状态'];
 
         foreach ($data as $item) {
             $rows[] = array_values($item);

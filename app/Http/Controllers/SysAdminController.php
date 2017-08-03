@@ -523,13 +523,13 @@ class SysAdminController extends Controller
         Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 $sheet->appendRow([
-                    '队伍编号', '队伍名称', '学校名称', '成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
+                    'id','队伍编号','队伍名称', '学校名称','成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
                     '联系电话', '邮件', '所选题目编号','所选题目名称','所得奖项', '现场赛相关信息']);
                 foreach ($records as &$record) {
                     $record = array_values($record->toArray());
 //                    dd($record);
-                    array_splice($record,10,0,$record[12]===null?'':$record[12]);
-                    unset($record[13]);
+                    array_splice($record,11,0,$record[13]===null?'':$record[13]);
+                    unset($record[14]);
 //                    dd($record);
                     $sheet->appendRow($record);
                 }
@@ -575,7 +575,7 @@ class SysAdminController extends Controller
         foreach ($contestRecords as $contestRecord) {
             $condition = [
                 'record_id' => $contestRecord[0],
-                'result' => $contestRecord[11],
+                'result' => $contestRecord[12],
 //                'result_info' => $contestRecord[11],
             ];
 

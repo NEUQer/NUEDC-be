@@ -199,7 +199,7 @@ class ContestService implements ContestServiceInterface
             throw new ContestProblemNotExist();
         }
 
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['school_id','problem_selected', 'problem_selected_at'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['school_id','school_level','problem_selected', 'problem_selected_at','team_code'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
@@ -225,9 +225,33 @@ class ContestService implements ContestServiceInterface
             throw new ContestCloseException();
         }
 
+        // 此处根据库内数据动态生成TEAM_CODE，TEAM_CODE的两个分类依据：contest_id,school_level
+        // 判定是否已经生成过team_code
+
+        $teamCode = $info->team_code;
+
+        if ($teamCode === null) {
+            $lastCode = $this->contestRecordRepo->getMaxTeamCode($key['contestId'],$info['school_level']);
+//            $schoolType = $info['school_level'] == '本科'?'B':'G';
+            if ($lastCode === null)  {
+                $teamCode = '001';
+            }else {
+                $lastCode = intval(substr($lastCode,1));
+                $lastCode = sprintf("%04d",++$lastCode);
+                $teamCode = $lastCode;
+            }
+        }
+
 
         //无论选择与否都是更新对应行数据
-        return $this->contestRecordRepo->updateWhere(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['problem_selected' => $key['problemId'], 'problem_selected_at' => Carbon::now()]);
+        return $this->contestRecordRepo->updateWhere([
+            'contest_id' => $key['contestId'],
+            'register_id' => $userId, 'status' => '已通过'
+        ], [
+            'problem_selected' => $key['problemId'],
+            'problem_selected_at' => Carbon::now(),
+            'team_code' => $teamCode
+            ]);
 
     }
 
