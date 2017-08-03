@@ -111,7 +111,7 @@ class MessageController extends Controller
 
     public function deleteMessage(Request $request,int $messageId){
 
-        $messageInfo = $this->messageService->getMessageDetail($messageId);
+        $messageInfo = $this->messageService->getMessage($messageId);
 
         $permission =  ($messageInfo['type'] >0) ? 'manage_notice' : 'manage_news';
 

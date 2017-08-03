@@ -73,4 +73,9 @@ class MessageService implements MessageServiceInterface
     {
         return $this->messageRepo->update($messageInfo,$messageId);
     }
+
+    function getMessage(int $messageId)
+    {
+        return $this->messageRepo->get($messageId);
+    }
 }

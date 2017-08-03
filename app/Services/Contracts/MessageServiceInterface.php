@@ -20,4 +20,6 @@ Interface MessageServiceInterface
     function getMessageDetail(int $messageId,int $type);
 
     function deleteMessage(int $messageId);
+
+    function getMessage(int $messageId);
 }
