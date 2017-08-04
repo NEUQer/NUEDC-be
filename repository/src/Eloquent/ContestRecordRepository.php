@@ -117,4 +117,13 @@ class ContestRecordRepository extends AbstractRepository {
             ->max('team_code');
     }
 
+    function getPassedContests(int $userId)
+    {
+        return $this->model
+            ->where('register_id',$userId)
+            ->where('contest_records.status','已通过')
+            ->leftJoin('contests','contests.id','=','contest_records.contest_id')
+            ->select('contests.*','contest_records.team_code')
+            ->get();
+    }
 }

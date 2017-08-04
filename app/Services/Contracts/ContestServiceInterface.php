@@ -21,7 +21,7 @@ interface ContestServiceInterface
 
     function getContestProblemList(int $contestId,int $operatorId):array ;
 
-    function getAllPassContestList(int $userId):array ;
+    function getAllPassContestList(int $userId);
 
     function getProblemDetail(int $userId,array $key);
 
