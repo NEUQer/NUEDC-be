@@ -82,8 +82,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
     function addSchoolTeam(array $schoolTeamInfo): bool
     {
-        if(!$this->canUpdateTeam($schoolTeamInfo['contest_id'])) {
-            throw new UnknownException('比赛当前不可再增加报名队伍');
+        try {
+            $this->canUpdateTeam($schoolTeamInfo['contest_id']);
+        } catch (BaseException $exception) {
+            return false;
         }
 
         $tempUserId = $this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first();
@@ -92,10 +94,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         //当该用户已经存在时
         if ($tempUserId != null) {
-            $flag = true;
-            $user = [
-                'id' => $tempUserId
-            ];
+            return false;
         } else {
             $user = [
                 'name' => $schoolTeamInfo['member1'],
@@ -112,52 +111,21 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $bool = false;
 
         DB::transaction(function () use ($user, $schoolTeamInfo, $flag, &$bool) {
-            if ($flag > 0) {
-                // 用户存在
-                $recordId = $this->contestRecordsRepo->getByMult([
-                    'contact_mobile' => $schoolTeamInfo['contact_mobile'],
-                    'contest_id' => $schoolTeamInfo['contest_id']
-                ], ['id'])->first();
+            // 用户不存在
+            $userId = $this->userRepo->insertWithId($user);
+            $this->roleService->giveRoleTo($userId, 'student');
+            $currentTime = new Carbon();
+            $schoolTeamInfo['created_at'] = $currentTime;
+            $schoolTeamInfo['updated_at'] = $currentTime;
+            //-1作为未选题的标识
+            $schoolTeamInfo['problem_selected'] = -1;
+            //中文字符标记状态
+            $schoolTeamInfo['status'] = '未审核';
 
-                if ($recordId != null) {
-                    // 用户已经创建过队伍，更新其队伍信息
-                    $currentTime = new Carbon();
-                    $schoolTeamInfo['updated_at'] = $currentTime;
-                    if ($this->contestRecordsRepo->update($schoolTeamInfo, $recordId->toArray()['id']) == 1) {
-                        $bool = true;
-                    }
-                } else {
-                    // 用户未创建队伍，新建队伍
-                    $currentTime = new Carbon();
-                    $schoolTeamInfo['created_at'] = $currentTime;
-                    $schoolTeamInfo['updated_at'] = $currentTime;
-                    //-1作为未选题的标识
-                    $schoolTeamInfo['problem_selected'] = -1;
-                    //中文字符标记状态
-                    $schoolTeamInfo['status'] = '未审核';
+            $schoolTeamInfo['register_id'] = $userId;
 
-                    $schoolTeamInfo['register_id'] = $flag;
-
-                    if ($this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
-                        $bool = true;
-                }
-            } else {
-                // 用户不存在
-                $userId = $this->userRepo->insertWithId($user);
-                $this->roleService->giveRoleTo($userId, 'student');
-                $currentTime = new Carbon();
-                $schoolTeamInfo['created_at'] = $currentTime;
-                $schoolTeamInfo['updated_at'] = $currentTime;
-                //-1作为未选题的标识
-                $schoolTeamInfo['problem_selected'] = -1;
-                //中文字符标记状态
-                $schoolTeamInfo['status'] = '未审核';
-
-                $schoolTeamInfo['register_id'] = $userId;
-
-                if ($this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
-                    $bool = true;
-            }
+            if ($this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
+                $bool = true;
 
         });
 
