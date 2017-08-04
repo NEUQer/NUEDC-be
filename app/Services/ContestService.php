@@ -16,6 +16,7 @@ use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestProblemNotExist;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterHavePassed;
+use App\Exceptions\Contest\ProblemSubmittedException;
 use App\Repository\Eloquent\ProblemCheckRepository;
 use App\Repository\Eloquent\ProblemRepository;
 use App\Services\Contracts\ContestServiceInterface;
@@ -199,15 +200,19 @@ class ContestService implements ContestServiceInterface
             throw new ContestProblemNotExist();
         }
 
-        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['school_id','school_level','problem_selected', 'problem_selected_at','team_code'])->first();
+        $info = $this->contestRecordRepo->getByMult(['contest_id' => $key['contestId'], 'register_id' => $userId, 'status' => '已通过'], ['school_id','school_level','problem_selected', 'problem_selected_at','team_code','problem_submit'])->first();
 
         if ($info == null)
             throw new ContestRegisterHaveNotPassException();
 
-        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$key['contestId'],'school_id'=>$info['school_id'],'status'=>'已审核'])->first();
+//        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$key['contestId'],'school_id'=>$info['school_id'],'status'=>'已审核'])->first();
+//
+//        if ($status != null)
+//            throw new ContestCloseException();
 
-        if ($status != null)
-            throw new ContestCloseException();
+        if ($info->problem_submit === '已提交') {
+            throw new ProblemSubmittedException();
+        }
 
         $time = $this->contestRepo->get($key['contestId'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
 

@@ -29,9 +29,9 @@ class CreateContestRecordsTable extends Migration
             $table->string('contact_mobile', 45);
             $table->string('email', 100);
             $table->integer('problem_selected')->default(-1);
+            $table->string('problem_submit')->default('未提交'); // 作品提交情况
             $table->string('status')->default('未审核');
             $table->string('result')->nullable(); // 获奖情况
-            $table->string('result_info')->nullable()->default('未审核'); // 结果评审进度
             $table->string('onsite_info')->nullable();//现场比赛相关信息
             $table->timestamp('problem_selected_at')->nullable();
             $table->timestamp('result_at')->nullable();//比赛结果确定时间

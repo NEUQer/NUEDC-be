@@ -19,6 +19,7 @@ use App\Exceptions\Contest\ContestNotResultException;
 use App\Exceptions\Contest\ContestNotStartException;
 use App\Exceptions\Contest\ContestRegisterHaveNotPassException;
 use App\Exceptions\Contest\ContestRegisterTimeError;
+use App\Exceptions\Contest\ContestSubmitEndedException;
 use App\Exceptions\Contest\ProblemSelectTimeException;
 use App\Exceptions\SchoolAdmin\SchoolTeamsNotExistedException;
 use App\Facades\Permission;
@@ -157,6 +158,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
             'email',
 //            'status'
             'problem_selected',
+            'problem_submit'
         ];
 
         $conditions['status'] = '已通过';
@@ -271,6 +273,9 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     {
         // 增加逻辑判断：比赛没出结果时会抛出异常
 
+        $conditions['status'] = '已通过';
+//        $conditions['problem_submit'] = '已提交';
+
         $contest = $this->contestRepo->get($conditions['contest_id'], ['id', 'result_check']);
 
         if ($contest == null || $contest->result_check !== '已公布') {
@@ -324,10 +329,10 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         $contestId = $this->contestRecordsRepo->get($id,['contest_id'])->contest_id;
 
-        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>'已审核'])->first();
-
-        if ($status != null)
-            throw new ContestCloseException();
+//        $status = $this->problemCheckRepo->getByMult(['contest_id'=>$contestId,'school_id'=>$schoolId,'status'=>'已通过'])->first();
+//
+//        if ($status != null)
+//            throw new ContestCloseException();
 
         if ($this->problemRepo->get($problemId) == null) {
             throw new ContestNotExistException();
@@ -369,7 +374,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                 $teamCode = '001';
             }else {
                 $lastCode = intval(substr($lastCode,1));
-                $lastCode = sprintf("%04d",++$lastCode);
+                $lastCode = sprintf("%03d",++$lastCode);
                 $teamCode = $lastCode;
             }
         }
@@ -441,6 +446,39 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         }
 
         return $this->problemRepo->getBy('contest_id', $contestId);
+    }
+
+    public function updateProblemSubmit(int $contestId,int $schoolId,array $data)
+    {
+        $contest = $this->contestRepo->get($contestId,['problem_end_time','submit_end_time']);
+
+        if ($contest == null) {
+            throw new ContestNotExistException();
+        }
+
+//        $problemEndTime = strtotime($contest->problem_end_time);
+        $submitEndTime = strtotime($contest->submit_end_time);
+
+        $current = strtotime(Carbon::now());
+
+        if ($current > $submitEndTime) {
+            throw new ContestSubmitEndedException();
+        }
+
+        $failed = [];
+
+        DB::transaction(function ()use($data,$schoolId,&$failed){
+            foreach ($data as $datum) {
+                $record = $this->contestRecordsRepo->get($datum['record_id'],['school_id','status','problem_selected']);
+                if ($record === null || $record->school_id != $schoolId || $record->status != '已通过' || $record->problem_selected == -1) {
+                    $failed[] = $datum['record_id'];
+                    continue;
+                }
+                $this->contestRecordsRepo->update(['problem_submit' => $datum['problem_submit']],$datum['record_id']);
+            }
+        });
+
+        return $failed;
     }
 
 }

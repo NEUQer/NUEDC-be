@@ -277,6 +277,8 @@ class SysAdminService implements SysAdminServiceInterface
 
     public function getResults(array $condition)
     {
+        $condition['status'] = '已通过';
+        $condition['problem_submit'] = '已提交';
 
         return $this->recordRepo->getResultWithProblemTitle($condition,[
             'id','team_code','team_name','school_name','member1','member2','member3',

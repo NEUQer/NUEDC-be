@@ -78,6 +78,7 @@ class SysAdminController extends Controller
             'register_end_time' => 'required|date',
             'problem_start_time' => 'required|date',
             'problem_end_time' => 'required|date',
+            'submit_end_time' => 'required|date',
             'add_on' => 'string'
         ]);
 
@@ -108,6 +109,7 @@ class SysAdminController extends Controller
             'register_end_time' => 'date',
             'problem_start_time' => 'date',
             'problem_end_time' => 'date',
+            'submit_end_time' => 'date',
             'can_register' => 'integer|min:-1|max:1',
             'can_select_problem' => 'integer|min:-1|max:1',
             'add_on' => 'string'
@@ -250,6 +252,8 @@ class SysAdminController extends Controller
         // 因为学校的id和名称是绑定的，所以这里不允许修改name
 
         $data = ValidationHelper::checkAndGet($request, [
+            'name' => 'string|max:100',
+            'level' => 'string|max:45',
             'address' => 'string|max:255',
             'post_code' => 'string|max:45',
             'principal' => 'string|max:100',
@@ -411,7 +415,8 @@ class SysAdminController extends Controller
             'contest_id' => 'integer',
             'status' => 'string|max:255',
             'result' => 'string|max:255',
-            'school_id' => 'integer'
+            'school_id' => 'integer',
+            'problem_submit' => 'string'
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['manage_all_teams'])) {
@@ -426,6 +431,10 @@ class SysAdminController extends Controller
 
         if ($request->input('status', null) != null) {
             $conditions['status'] = $request->input('status');
+        }
+
+        if ($request->input('problem_submit', null) != null) {
+            $conditions['problem_submit'] = $request->input('problem_submit');
         }
 
         if ($request->input('result', null) != null) {
@@ -466,7 +475,7 @@ class SysAdminController extends Controller
             'problem_selected' => 'integer',
             'status' => 'string|max:255',
             'result' => 'string|max:255',
-            'result_info' => 'string|max:255',
+            'problem_submit' => 'string|max:255',
             'onsite_info' => 'string|max:255',
             'problem_selected_at' => 'date',
             'result_at' => 'date'

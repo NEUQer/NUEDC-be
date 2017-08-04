@@ -27,7 +27,7 @@ interface SchoolAdminServiceInterface
 
     function getSchoolResults(array $conditions, int $page, int $size);
 
-    function updateTeamProblem(int $schoolId,int $id,int $problemId);
+    function updateTeamProblem(int $schoolId,int $id, int $problemId);
 
     function checkTeamProblem(int $contestId,int $schoolId,string $status);
 

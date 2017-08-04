@@ -160,7 +160,8 @@ class SchoolAdminController extends Controller
     {
         $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer',
-            'status' => 'string|max:255'
+            'status' => 'string|max:255',
+            'problem_submit' => 'string|max:255',
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
@@ -218,7 +219,7 @@ class SchoolAdminController extends Controller
     {
         $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
-            'result_info' => 'string|max:255'
+            'result' => 'string|max:255'
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['view_school_results'])) {
@@ -361,7 +362,7 @@ class SchoolAdminController extends Controller
     {
         $conditions = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'required|integer',
-            'result_info' => 'string|max:255'
+            'result' => 'string|max:255'
         ]);
 
         if (!Permission::checkPermission($request->user->id, ['manage_school_teams'])) {
@@ -529,6 +530,35 @@ class SchoolAdminController extends Controller
                 'code' => 0
             ]
         );
+    }
+
+    public function updateTeamProblemSubmit(Request $request,int $contestId)
+    {
+        $inputs = ValidationHelper::checkAndGet($request,[
+            'data' => 'required|array'
+        ]);
+
+        $data = $inputs['data'];
+
+        foreach ($data as $datum) {
+            ValidationHelper::validateCheck($datum,[
+                'record_id' => 'required|integer',
+                'problem_submit' => 'required|string'
+            ]);
+        }
+
+        if (!Permission::checkPermission($request->user->id,['manage_school_teams'])) {
+            throw new PermissionDeniedException();
+        }
+
+        $failed = $this->schoolAdminService->updateProblemSubmit($contestId,$request->school_id,$data);
+
+        return response([
+            'code' => 0,
+            'data' => [
+                'failed' => $failed
+            ]
+        ]);
     }
 
     public function getProblemCheckStatus(Request $request)

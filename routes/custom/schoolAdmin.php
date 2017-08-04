@@ -60,9 +60,11 @@ Route::group(['middleware' => ['token']], function () {
 
     Route::put('/school/admin/team/problem/select','SchoolAdminController@updateProblemSelect');
 
-    Route::put('/school/admin/team/problem/check','SchoolAdminController@checkTeamProblem');
+    Route::post('/school/admin/contest/{id}/submit/check','SchoolAdminController@updateTeamProblemSubmit');
 
-    Route::get('/school/admin/team/problem/check','SchoolAdminController@getProblemCheckStatus');
+//    Route::put('/school/admin/team/problem/check','SchoolAdminController@checkTeamProblem');
+
+//    Route::get('/school/admin/team/problem/check','SchoolAdminController@getProblemCheckStatus');
 
     Route::get('/school/admin/problem-list/{contestId}','SchoolAdminController@getProblemList');
 });

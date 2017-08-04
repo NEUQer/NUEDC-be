@@ -31,6 +31,7 @@ class CreateContestsTable extends Migration
             $table->timestamp('problem_start_time')->default($current);
             $table->timestamp('problem_end_time')->default($current);
             // 附加
+            $table->timestamp('submit_end_time')->default($current);
             $table->text('add_on')->nullable();
             $table->timestamps();
         });
