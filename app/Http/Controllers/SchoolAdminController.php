@@ -551,7 +551,7 @@ class SchoolAdminController extends Controller
             throw new PermissionDeniedException();
         }
 
-        $failed = $this->schoolAdminService->updateProblemSubmit($contestId,$request->school_id,$data);
+        $failed = $this->schoolAdminService->updateProblemSubmit($contestId,$request->user->school_id,$data);
 
         return response([
             'code' => 0,
