@@ -122,7 +122,7 @@ class UserController extends Controller
 
         return response()->json(
             [
-                'code' => 0,
+                'code' => 0
             ]
         );
 
