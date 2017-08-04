@@ -65,7 +65,7 @@ class ProblemService implements ProblemServiceInterface
             throw new ProblemNotExistException();
         }
 
-        $count = $this->contestRecordRepo->getWhereCount(['contest_id' => $problem->contest_id, 'register_id' => $userId, 'status' => '已审核']);
+        $count = $this->contestRecordRepo->getWhereCount(['contest_id' => $problem->contest_id, 'register_id' => $userId, 'status' => '已通过']);
 
         if ($count === 0) {
             throw new PermissionDeniedException();
