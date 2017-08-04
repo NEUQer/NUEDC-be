@@ -389,14 +389,11 @@ class UserController extends Controller
         $data = ValidationHelper::getInputData($request, $rules);
 
 
-        $verifyCode = $this->verifyCodeService->sendVerifyCode($data['mobile'], $data['type']);
+       $this->verifyCodeService->sendVerifyCode($data['mobile'], $data['type']);
 
         return response()->json(
             [
-                'code' => 0,
-                'data' => [
-                    'verifyCode' => $verifyCode
-                ]
+                'code' => 0
             ]
         );
     }
