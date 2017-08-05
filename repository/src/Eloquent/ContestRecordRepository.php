@@ -90,8 +90,7 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model
             ->where('register_id',$userId)
             ->leftjoin('contests','contest_records.contest_id','=','contests.id')
-            ->select('contests.*','contest_records.status as signUpStatus','contest_records.team_code')
-            ->get();
+            ->select('contests.*','contest_records.status as signUpStatus','contest_records.team_code','contest_records.team_name','contest_records.school_name','contest_records.member1','contest_records.member2','contest_records.member3','contest_records.teacher','contest_records.contact_mobile','contest_records.email')->get();
     }
 
     function getRecentContestId($userId)
@@ -116,16 +115,6 @@ class ContestRecordRepository extends AbstractRepository {
             ->where('contest_id',$contestId)
             ->where('school_level',$schoolLevel)
             ->max('team_code');
-    }
-
-    function getPassedContests(int $userId)
-    {
-        return $this->model
-            ->where('register_id',$userId)
-            ->where('contest_records.status','已通过')
-            ->leftJoin('contests','contests.id','=','contest_records.contest_id')
-            ->select('contests.*','contest_records.team_code')
-            ->get();
     }
 
 }
