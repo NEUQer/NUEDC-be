@@ -15,7 +15,7 @@ interface SchoolAdminServiceInterface
 
     function getStartedContest();
 
-    function addSchoolTeam(array $schoolTeamInfo): bool;
+    function addSchoolTeam(array $schoolTeamInfo): int;
 
     function getSchoolTeams(array $conditions,int $page, int $size);
 

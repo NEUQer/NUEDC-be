@@ -443,9 +443,11 @@ class SchoolAdminController extends Controller
 
         //去掉表头
         array_pull($contestTeams, 0);
-        //用于保存成功与失败记录
+        //用于保存成功、失败、更新记录
         $success = [];
+        $update = [];
         $fail = [];
+
 
         $schoolInfo = $this->schoolAdminService->getSchoolDetail($request->user->school_id);
 
@@ -470,10 +472,13 @@ class SchoolAdminController extends Controller
                 'school_level' => $schoolInfo['level']
             ];
 
-            if ($this->schoolAdminService->addSchoolTeam($condition)) {
+            //1成功，2失败，3更新
+            if ($this->schoolAdminService->addSchoolTeam($condition) == 1) {
                 $success[] = $contestTeam;
-            } else {
+            } else if ($this->schoolAdminService->addSchoolTeam($condition) == 2) {
                 $fail[] = $contestTeam;
+            } else {
+                $update[] = $contestTeam;
             }
         }
 
@@ -481,6 +486,7 @@ class SchoolAdminController extends Controller
             'code' => 0,
             'data' => [
                 'success' => $success,
+                'update' => $update,
                 'fail' => $fail
             ]
         ]);
