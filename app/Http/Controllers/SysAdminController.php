@@ -74,6 +74,7 @@ class SysAdminController extends Controller
             'title' => 'required|string|max:45',
             'description' => 'required',
             'status' => 'string|max:255',
+            'prefix' => 'required|string|max:1',
             'register_start_time' => 'required|date',
             'register_end_time' => 'required|date',
             'problem_start_time' => 'required|date',
@@ -110,6 +111,7 @@ class SysAdminController extends Controller
             'problem_start_time' => 'date',
             'problem_end_time' => 'date',
             'submit_end_time' => 'date',
+//            'prefix' => 'string|max:1',
             'can_register' => 'integer|min:-1|max:1',
             'can_select_problem' => 'integer|min:-1|max:1',
             'add_on' => 'string'

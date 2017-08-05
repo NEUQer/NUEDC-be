@@ -346,7 +346,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         if ($info['school_id'] != $schoolId)
             throw new SchoolTeamsNotExistedException();
 
-        $time = $this->contestRepo->get($info['contest_id'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
+        $time = $this->contestRepo->get($info['contest_id'], ['prefix','can_select_problem', 'problem_start_time', 'problem_end_time']);
 
         if ($time['can_select_problem'] == -1) {
             $now = strtotime(Carbon::now());
@@ -369,13 +369,13 @@ class SchoolAdminService implements SchoolAdminServiceInterface
 
         if ($teamCode === null) {
             $lastCode = $this->contestRecordsRepo->getMaxTeamCode($info['contest_id'],$info['school_level']);
-//            $schoolType = $info['school_level'] == '本科'?'B':'G';
+            $schoolType = $time['prefix'];
             if ($lastCode === null)  {
-                $teamCode = '001';
+                $teamCode = $schoolType.'001';
             }else {
                 $lastCode = intval(substr($lastCode,1));
                 $lastCode = sprintf("%03d",++$lastCode);
-                $teamCode = $lastCode;
+                $teamCode = $schoolType.$lastCode;
             }
         }
 

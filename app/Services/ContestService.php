@@ -217,7 +217,7 @@ class ContestService implements ContestServiceInterface
             throw new ProblemSubmittedException();
         }
 
-        $time = $this->contestRepo->get($key['contestId'], ['can_select_problem', 'problem_start_time', 'problem_end_time']);
+        $time = $this->contestRepo->get($key['contestId'], ['prefix','can_select_problem', 'problem_start_time', 'problem_end_time']);
 
         if ($time['can_select_problem'] == -1) {
             $now = strtotime(Carbon::now());
@@ -240,13 +240,13 @@ class ContestService implements ContestServiceInterface
 
         if ($teamCode === null) {
             $lastCode = $this->contestRecordRepo->getMaxTeamCode($key['contestId'],$info['school_level']);
-//            $schoolType = $info['school_level'] == '本科'?'B':'G';
+            $prefix = $time->prefix;
             if ($lastCode === null)  {
-                $teamCode = '001';
+                $teamCode = $prefix.'001';
             }else {
                 $lastCode = intval(substr($lastCode,1));
-                $lastCode = sprintf("%04d",++$lastCode);
-                $teamCode = $lastCode;
+                $lastCode = sprintf("%03d",++$lastCode);
+                $teamCode = $prefix.$lastCode;
             }
         }
 

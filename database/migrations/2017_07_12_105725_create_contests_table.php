@@ -19,6 +19,8 @@ class CreateContestsTable extends Migration
             $table->increments('id');
             $table->string('title',45);
             $table->text('description')->nullable();
+//            $table->string('level',45);
+            $table->string('prefix',4);
             $table->string('status');
             $table->string('result_check',45)->default('未公布');
             $table->tinyInteger('can_register')->default(-1);
