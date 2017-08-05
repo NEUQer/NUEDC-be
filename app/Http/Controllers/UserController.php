@@ -419,7 +419,8 @@ class UserController extends Controller
     public function updateUserInfo(Request $request){
         $rules = [
             'email' => 'email|max:100',
-            'name' => 'max:100'
+            'name' => 'max:100',
+            'sex' => 'max:4'
         ];
 
         $info = ValidationHelper::checkAndGet($request,$rules);
