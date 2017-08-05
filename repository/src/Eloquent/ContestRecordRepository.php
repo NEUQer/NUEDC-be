@@ -90,7 +90,8 @@ class ContestRecordRepository extends AbstractRepository {
         return $this->model
             ->where('register_id',$userId)
             ->leftjoin('contests','contest_records.contest_id','=','contests.id')
-            ->select('contests.*','contest_records.status as signUpStatus')->get();
+            ->select('contests.*','contest_records.status as signUpStatus','contest_records.team_code')
+            ->get();
     }
 
     function getRecentContestId($userId)
@@ -126,4 +127,5 @@ class ContestRecordRepository extends AbstractRepository {
             ->select('contests.*','contest_records.team_code')
             ->get();
     }
+
 }
