@@ -527,6 +527,8 @@ class SysAdminController extends Controller
 
         $condition = ValidationHelper::checkAndGet($request, [
             'contest_id' => 'integer|required',
+            'status' => 'string',
+            'school_id' => 'integer'
         ]);
 
         $records = $this->sysAdminService->getAllRecords($condition);
