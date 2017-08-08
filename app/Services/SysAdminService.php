@@ -249,6 +249,15 @@ class SysAdminService implements SysAdminServiceInterface
 
     // 参赛管理
 
+    public function getAllRecords(array $condition)
+    {
+        return $this->recordRepo->getResultWithProblemTitle($condition,[
+            'id','team_code','team_name','school_name','member1','member2','member3',
+            'teacher','contact_mobile','email','problem_selected','result',
+            'onsite_info'
+        ]);
+    }
+
     public function getRecords(int $page, int $size, array $condition)
     {
         // 如果没有填写contest_id，就默认取出数据库中最新的那个

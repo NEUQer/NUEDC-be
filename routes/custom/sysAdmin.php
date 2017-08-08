@@ -31,6 +31,7 @@ Route::group(['prefix' => 'sysadmin'],function (){
     Route::post('/contest-record/update','SysAdminController@updateRecord');
     Route::get('/contest-record/delete','SysAdminController@deleteRecord');
     Route::get('/contest-record/export','SysAdminController@exportRecord');
+    Route::get('/contest-record/export/all','SysAdminController@exportAllRecords');
 
     Route::get('/getSchoolListTemplateFile','SysAdminController@getSchoolListTemplateFile');
 

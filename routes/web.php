@@ -34,7 +34,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//Route::get('/test','TestController@generate');
+Route::get('/test','TestController@exportAllRecords');
 //Route::get('/test/excel/export','TestController@export');
 //Route::post('/test/excel/import','TestController@import');
 //Route::get('/getSchoolListTemplateFile','TestController@getSchoolListTemplateFile');

@@ -56,6 +56,8 @@ interface SysAdminServiceInterface
 
     // todo 参赛情况管理
 
+    function getAllRecords(array $condition);
+
     function getRecords(int $page,int $size,array $condition);
 
     function updateRecord(array $update):bool;
