@@ -93,10 +93,12 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         $tempUserId = $this->userRepo->getBy('mobile', $schoolTeamInfo['contact_mobile'], ['id'])->first();
 
         $flag = false;
+        $registerId = -1;
 
         //当该用户已经存在时
         if ($tempUserId != null) {
             $flag = true;
+            $registerId = $tempUserId->toArray()['id'];
             $user = [
                 'id' => $tempUserId
             ];
@@ -114,8 +116,8 @@ class SchoolAdminService implements SchoolAdminServiceInterface
         }
 
         $bool = 0;
-
-        DB::transaction(function () use ($user, $schoolTeamInfo, $flag, &$bool) {
+//        dd($registerId);
+        DB::transaction(function () use ($user, $schoolTeamInfo, $flag, $registerId, &$bool) {
             if ($flag) {
                 // 用户存在
                 $recordId = $this->contestRecordsRepo->getByMult([
@@ -139,8 +141,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
                     $schoolTeamInfo['problem_selected'] = -1;
                     //中文字符标记状态
                     $schoolTeamInfo['status'] = '未审核';
-
-                    $schoolTeamInfo['register_id'] = $flag;
+                    $schoolTeamInfo['register_id'] = $registerId;
 
                     if ($this->contestRecordsRepo->insert($schoolTeamInfo) == 1)
                         $bool = 1;
