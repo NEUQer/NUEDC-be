@@ -180,6 +180,7 @@ class SchoolAdminService implements SchoolAdminServiceInterface
     function getTeamProblemSelected(array $conditions,int $page,int $size)
     {
         $columns = [
+            'team_code',
             'contest_id',
             'id',
             'team_name',
