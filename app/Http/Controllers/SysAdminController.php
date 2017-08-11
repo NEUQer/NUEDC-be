@@ -537,16 +537,16 @@ class SysAdminController extends Controller
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 $sheet->appendRow([
                     'id','参赛编号','队名', '所属学校名称','成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
-                    '联系电话', '邮件','所选题目名称','所得奖项', '现场赛相关信息']);
+                    '联系电话', '邮件','所选题目名称','所得奖项', '现场赛相关信息','提交审核状态']);
                 foreach ($records as &$record) {
 //                    dd($record);
                     $record = array_values($record->toArray());
 //                    dd($record);
-                    array_splice($record,11,0,$record[13]===null?'':$record[13]);
+                    array_splice($record,11,0,$record[14]===null?'':$record[14]);
                     //去除problem_selected
                     unset($record[10]);
                     //去除偏移后的title
-                    unset($record[14]);
+                    unset($record[15]);
 //                    dd($record);
                     $sheet->appendRow($record);
                 }

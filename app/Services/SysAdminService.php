@@ -254,7 +254,7 @@ class SysAdminService implements SysAdminServiceInterface
         return $this->recordRepo->getResultWithProblemTitle($condition,[
             'id','team_code','team_name','school_name','member1','member2','member3',
             'teacher','contact_mobile','email','problem_selected','result',
-            'onsite_info'
+            'onsite_info','problem_submit'
         ]);
     }
 
