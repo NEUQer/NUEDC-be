@@ -113,7 +113,7 @@ class ContestRecordRepository extends AbstractRepository {
     {
         return $this->model
             ->where('contest_id',$contestId)
-            ->where('school_level',$schoolLevel)
+//            ->where('school_level',$schoolLevel)
             ->max('team_code');
     }
     function getPassedContests(int $userId)
