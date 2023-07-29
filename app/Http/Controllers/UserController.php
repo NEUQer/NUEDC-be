@@ -110,7 +110,7 @@ class UserController extends Controller
     public function perRegister(Request $request)
     {
         $rules = [
-            'mobile' => 'required|mobile|max:100'
+            'mobile' => 'required|max:45'
         ];
 
         ValidationHelper::validateCheck($request->all(), $rules);
@@ -133,7 +133,7 @@ class UserController extends Controller
         $rules = [
             'name' => 'required|max:100',
             'email' => 'required|email|max:100',
-            'mobile' => 'required|mobile|max:45',
+            'mobile' => 'required|max:45',
             'password' => 'required|min:6|max:20',
             'sex' => 'required|max:4',
             'schoolId' => 'required',
@@ -243,8 +243,14 @@ class UserController extends Controller
             'contestId' => 'required|integer',
             'schoolLevel' => 'required',
             'member1' => 'required',
+            'member1Major' => 'required',
+            'member1Year' => 'required',
             'member2' => 'required',
+            'member2Major' => 'required',
+            'member2Year' => 'required',
             'member3' => 'required',
+            'member3Major' => 'required',
+            'member3Year' => 'required',
             'teacher' => 'required',
             'mobile' => 'required|max:45',
             'email' => 'required|max:100',
@@ -380,7 +386,7 @@ class UserController extends Controller
     public function getVerifyCode(Request $request)
     {
         $rules = [
-            'mobile' => 'required|mobile|max:100',
+            'mobile' => 'required|max:45',
             'type' => 'required|min:1|max:2'
         ];
 
@@ -401,7 +407,7 @@ class UserController extends Controller
     public function forgetPassword(Request $request)
     {
         $rules = [
-            'mobile' => 'required|mobile|max:100',
+            'mobile' => 'required|max:45',
             'code' => 'required',
             'newPassword' => 'required|min:6|max:20'
         ];
@@ -436,7 +442,7 @@ class UserController extends Controller
 
     public function updateUserMobile(Request $request){
         $rules = [
-            'newMobile'=>'required|mobile|max:100',
+            'newMobile'=>'required|max:45',
             'code'=>'required'
         ];
         $info = ValidationHelper::checkAndGet($request,$rules);

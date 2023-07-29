@@ -252,7 +252,9 @@ class SysAdminService implements SysAdminServiceInterface
     public function getAllRecords(array $condition)
     {
         return $this->recordRepo->getResultWithProblemTitle($condition,[
-            'id','team_code','team_name','school_name','member1','member2','member3',
+            'id','team_code','team_name','school_name','member1','member1_major', 'member1_year',
+            'member2','member2_major', 'member2_year',
+            'member3','member3_major', 'member3_year',
             'teacher','contact_mobile','email','problem_selected','result',
             'onsite_info','problem_submit'
         ]);

@@ -469,8 +469,14 @@ class SysAdminController extends Controller
             'contest_id' => 'integer',
             'school_level' => 'string|max:45',
             'member1' => 'string|max:255',
+            'member1_major' => 'string|max:100',
+            'member1_year' => 'string|max:10',
             'member2' => 'string|max:255',
+            'member2_major' => 'string|max:100',
+            'member2_year' => 'string|max:10',
             'member3' => 'string|max:255',
+            'member3_major' => 'string|max:100',
+            'member3_year' => 'string|max:10',
             'teacher' => 'string|max:255',
             'contact_mobile' => 'string|max:45',
             'email' => 'string|max:100',
@@ -536,17 +542,21 @@ class SysAdminController extends Controller
         Excel::create('contest-record', function ($excel) use ($records) {
             $excel->sheet('sheet1', function ($sheet) use ($records) {
                 $sheet->appendRow([
-                    'id','参赛编号','队名', '所属学校名称','成员1姓名', '成员2姓名', '成员3姓名', '指导教师',
+                    'id','参赛编号','队名', '所属学校名称',
+                    '成员1姓名', '成员1专业', '成员1入学年份',
+                    '成员2姓名', '成员2专业', '成员2入学年份',
+                    '成员3姓名', '成员3专业', '成员3入学年份',
+                    '指导教师',
                     '联系电话', '邮件','所选题目名称','所得奖项', '现场赛相关信息','提交审核状态']);
                 foreach ($records as &$record) {
 //                    dd($record);
                     $record = array_values($record->toArray());
 //                    dd($record);
-                    array_splice($record,11,0,$record[14]===null?'':$record[14]);
+                    array_splice($record,17,0,$record[20]===null?'':$record[20]);
                     //去除problem_selected
-                    unset($record[10]);
+                    unset($record[16]);
                     //去除偏移后的title
-                    unset($record[15]);
+                    unset($record[21]);
 //                    dd($record);
                     $sheet->appendRow($record);
                 }
